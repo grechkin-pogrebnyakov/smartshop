@@ -1,0 +1,23 @@
+upstream uwsgi {
+    server unix:///tmp/smartshop.sock; # взаимодействие с uwsgi через Unix-сокет
+}
+
+server {
+    listen      80;
+    charset     utf-8;
+
+    location /api/registration {
+        uwsgi_pass  uwsgi;
+        include     uwsgi_params;
+    }
+
+    location /api/auth {
+        uwsgi_pass  uwsgi;
+        include     uwsgi_params;
+    }
+    
+    location /api/foreign_auth {
+        uwsgi_pass  uwsgi;
+        include     uwsgi_params;
+    }
+}

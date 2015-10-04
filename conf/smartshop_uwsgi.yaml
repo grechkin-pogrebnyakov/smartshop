@@ -1,0 +1,24 @@
+# Сервер запускаем так: uwsgi -y smartshop_uwsgi.yaml
+uwsgi:
+    # указываем socket, при помощи которого будет происходить
+    # взаимодействие между nginx и uwsgi
+    socket: /tmp/smartshop.sock
+    # здесь указываем путь к django-проекту
+    pythonpath: /home/gexogen/projects/smartshop/smartshop
+    # это имя модуля, который будет запускаться на выполнение
+    # в такой постановке, будет запускаться wsgi.py из директории
+    # указанной выше в 'pythonpath'
+    # Возможно, вместо smartshop.wsgi, нужно просто написать smartshop !!!
+    module: smartshop.wsgi
+    # путь к лог файлу
+    daemonize: /home/gexogen/projects/smartshop/log/uwsgi.log
+    # прочие настройки, значения который можно посмотреть на сайте uWSGI
+    master: True
+    # количество воркеров лучше сделать равным кол-ву воркеров nginx
+    processes: 4
+    # если выполнить команду "touch <имя ниже указанного файла>",
+    # то произойдет перезапуск uwsgi демона.
+    touch-reload: /tmp/smartshop_touch_reload
+    # остановка сервера: uwsgi --stop /var/run/smartshop_uwsgi.pid
+    pidfile: /tmp/smartshop_uwsgi.pid
+    vacuum: True
