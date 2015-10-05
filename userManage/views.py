@@ -7,24 +7,34 @@ import json
 # Create your views here.
 
 #пока говнокод, потом пофиксю
-def login(request):
+def login_api(request):
     if request.method == 'POST':
         try:
-            data=request.body
+            data = request.body
             data = json.loads(data)
             user = authenticate(username=data['email'],password=data['password'])
             if user is None:
                 return HttpResponse('{"status":"400","body":"login fail"}')
             else:
                 login(request,user)
-                answer = json.dumps(user)
-                return('{"status":"200","body":"login success"}')
+    #                answer = json.dumps(user)
+                return HttpResponse('{"status":"200","body":"login success"}')
         except Exception:
             return HttpResponse('{"status":"500","body":"internal server error"}')
     else:
         return HttpResponse('{"status":"400","body":"wrong parameters"}')
 
-def register(request):
+def logout_api(request):
+    if request.method == 'POST':
+        try:
+            logout(request)
+            return HttpResponse('{"status":"200","body":"logout success"}')
+        except Exception:
+            return HttpResponse('{"status":"500","body":"internal server error"}')
+    else:
+        return HttpResponse('{"status":"400","body":"wrong parameters"}')
+
+def register_api(request):
     if request.method == 'POST':
         try:
             data=request.body
