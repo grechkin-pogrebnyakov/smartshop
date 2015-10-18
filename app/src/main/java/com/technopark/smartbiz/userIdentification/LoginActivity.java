@@ -496,7 +496,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 e.printStackTrace();
                 showToast("Ошибка сервера !");
             }
-            return true;
+            return false;
         }
 
         private boolean registration()  {
