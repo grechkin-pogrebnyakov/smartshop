@@ -10,10 +10,31 @@
     tools:showIn="@layout/activity_main2" tools:context="com.technopark.smartbiz.Main2Activity">
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Logout"
-        android:id="@+id/buttonLogout"
+        android:id="@+id/button_logout"
         android:layout_gravity="center_horizontal" />
+
+    <Button android:id="@+id/scan_button" style="?android:textAppearanceSmall"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" android:text="@string/scan_barcode_button"
+        android:layout_below="@id/button_logout"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/scan_format"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/scan_button" />
+    <TextView
+        android:id="@+id/scan_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/scan_format" />
 
 </RelativeLayout>
