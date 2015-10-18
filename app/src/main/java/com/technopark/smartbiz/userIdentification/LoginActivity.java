@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Инициализируем компоненты формы логина
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
-        if(sharedPreferences.contains(SESSION_ID)) {
+        if ( sharedPreferences.contains(SESSION_ID) ) {
             String session = sharedPreferences.getString(SESSION_ID, "");
             Log.e("session", session);
             if ( !session.isEmpty() ) {
@@ -454,6 +454,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 jsonRequest.accumulate("email", mEmail);
                 jsonRequest.accumulate("password", mPassword);
                 JSONObject jsonResponse = requestPostMethod(urlAuthorization, jsonRequest);
+
                 switch (jsonResponse.getInt("status")) {
 
                     case 200:
@@ -474,6 +475,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             case "email": // TODO: невалидный логин
                                 break;
                             default: // TODO: неизвестная ошибка
+                                return false;
                         }
                         break;
 
@@ -492,6 +494,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+                showToast("Ошибка сервера !");
             }
             return true;
         }
