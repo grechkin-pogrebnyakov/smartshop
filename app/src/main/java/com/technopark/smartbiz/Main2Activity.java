@@ -10,7 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.userIdentification.LoginActivity;
 
 
@@ -37,7 +41,7 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        Button logOut = (Button) findViewById(R.id.buttonLogout);
+        Button logOut = (Button) findViewById(R.id.button_logout);
 
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,6 +50,29 @@ public class Main2Activity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
         });
+
+        Button scanBarcode = (Button) findViewById(R.id.scan_button);
+
+        scanBarcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IntentIntegrator integrator = new IntentIntegrator(Main2Activity.this);
+                integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (result != null) {
+            String contents = result.getContents();
+            if (contents != null) {
+                Toast.makeText(getApplicationContext(), "Sucssed scan" + result.toString(), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "failed scan", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 }
