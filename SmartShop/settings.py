@@ -33,7 +33,13 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
-    'social_auth',
+    'django.contrib.sites',
+    'rest_framework.authtoken',
+    'django_extensions',
+    'rest_framework',
+    'rest_auth',
+    'storeManage',
+    'allauth.socialaccount',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -135,3 +141,11 @@ LOGGING = {
                                                                                         }
                                             }
                             }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}

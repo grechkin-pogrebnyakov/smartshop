@@ -1,11 +1,8 @@
-from django.conf.urls import include, url
+from django.conf.urls import include, url,patterns
 from django.contrib import admin
 
-urlpatterns = [
-    # Examples:
-    # url(r'^$', 'SmartShop.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
+urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/',include('userManage.urls'))
-]
+    url(r'^api/auth/',include('rest_auth.urls')),
+    url(r'^api/store',include('storeManage.urls'))
+    )
