@@ -6,4 +6,18 @@ from storeManage.models import Shop,Item
 class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
-        fields=('name')
+        fields = ('name', 'id')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
