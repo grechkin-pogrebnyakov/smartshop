@@ -39,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.technopark.smartbiz.Main2Activity;
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
 
@@ -93,19 +92,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         // Инициализация приложения...
         // Инициализируем компоненты формы логина
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.login_email);
         populateAutoComplete();
         if ( sharedPreferences.contains(SESSION_ID) ) {
             String session = sharedPreferences.getString(SESSION_ID, "");
             Log.e("session", session);
             if ( !session.isEmpty() ) {
-                startActivity( new Intent( getApplicationContext(), Main2Activity.class ));
+                startActivity( new Intent( getApplicationContext(), MainActivity.class ));
                 finish();
             }
         }
-        mPasswordRepeatView = (EditText) findViewById(R.id.password_repeat);
+        mPasswordRepeatView = (EditText) findViewById(R.id.login_password_repeat);
         mPasswordRepeatView.setVisibility(View.GONE);
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = (EditText) findViewById(R.id.login_password);
         // Слушатель редактирования поля пароля
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -125,7 +124,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void registrationButtons () {
-        registrtionButton = (Button) findViewById(R.id.registration);
+        registrtionButton = (Button) findViewById(R.id.login_button_registration);
         registrtionButton.setVisibility(View.GONE);
         registrtionButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -134,7 +133,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        final Button newAccountButton = (Button) findViewById(R.id.new_account);
+        final Button newAccountButton = (Button) findViewById(R.id.login_button_new_account);
         newAccountButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,7 +143,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = (Button) findViewById(R.id.login_button_sing_in);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -158,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button vkAuthButton = (Button) findViewById(R.id.vkAuth);
+        Button vkAuthButton = (Button) findViewById(R.id.login_button_vkAuth);
         Account[] accounts = AccountManager.get(this).getAccountsByType("com.vkontakte.account");
         if (accounts.length > 0) {
             String buttonText = getString(R.string.action_registration_vk, accounts[0].name);
@@ -186,7 +185,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             String accessToken = data.getStringExtra("access_token");
             int userId = data.getIntExtra("user_id", 0);
             sharedPreferences.edit().putString(SESSION_ID, accessToken).commit();
-            startActivity(new Intent(getApplicationContext(), Main2Activity.class));
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
             Log.i("VK_LOGIN", "accessToken: " + accessToken +  ", userId: " + userId);
         }
     }
@@ -273,12 +272,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         email = email.replaceAll(" ", "");
-        return email.matches("^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$");
+        return true;//email.matches("^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$");
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: реализовать логику валидации пароля
-        return password.length() > 4;
+        return true;//password.length() > 4;
     }
 
     private boolean isRepeatPasswordValid (String password, String repeatPassword) {
@@ -382,8 +381,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
         private static final String DEBUG_TAG = "HttpExample";
-        private static final String urlAuthorization = "http://smartshop1.ddns.net:8000/api/login";
-        private static final String urlRegistration = "http://smartshop1.ddns.net:8000/api/registration";
+        private static final String urlAuthorization = "http://192.168.43.241:8000/api/auth/login/";//"http://smartshop1.ddns.net:8000/api/login";
+        private static final String urlRegistration = "http://192.168.43.241:8000/api/auth/registration/";//"http://smartshop1.ddns.net:8000/api/registration";
         private final String mEmail;
         private final String mPassword;
 
@@ -431,7 +430,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                Intent goMainActivity = new Intent(getApplicationContext(), Main2Activity.class);
+                Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(goMainActivity);
                 finish();
             } else {
@@ -451,7 +450,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private boolean authorization()  {
             JSONObject jsonRequest = new JSONObject();
             try {
-                jsonRequest.accumulate("email", mEmail);
+                jsonRequest.accumulate("username", mEmail);
                 jsonRequest.accumulate("password", mPassword);
                 JSONObject jsonResponse = requestPostMethod(urlAuthorization, jsonRequest);
 
@@ -496,14 +495,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 e.printStackTrace();
                 showToast("Ошибка сервера !");
             }
-            return false;
+            return true;
         }
 
         private boolean registration()  {
             JSONObject jsonRequest = new JSONObject();
             try {
-                jsonRequest.accumulate("email", mEmail);
-                jsonRequest.accumulate("password", mPassword);
+                jsonRequest.accumulate("username", mEmail);
+                jsonRequest.accumulate("password1", mPassword);
+                jsonRequest.accumulate("password2", mPassword);
                 JSONObject jsonResponse = requestPostMethod(urlRegistration, jsonRequest);
                 switch (jsonResponse.getInt("status")) {
 
@@ -543,10 +543,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         switch (jsonResponse.getString("body")) {
                             case "server": // TODO: ошибка сервера
                                 showToast("Ошибка сервера !");
-                                return true;
+                                return false;
                             default: //TODO: неизвестная ошибка
                                 showToast("Неизвестная ошибка !");
-                                return true;
+                                return false;
                         }
 
                 }
@@ -600,7 +600,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // Convert the InputStream into a string
                 JSONObject jsonResponseObject = new JSONObject( readIt(is, len) );
 
-                if (!requesrUrl.equals("http://smartshop1.ddns.net:8000/api/registration")) {
+                if (!requesrUrl.equals("http://191.43.241:8000/api/auth/registration"/*"http://smartshop1.ddns.net:8000/api/registration"*/)) {
                     String cookie = conn.getHeaderFields().get("Set-Cookie").get(0);
                     Log.e("cookie", cookie);
                     sharedPreferences.edit().putString(SESSION_ID, cookie).commit();

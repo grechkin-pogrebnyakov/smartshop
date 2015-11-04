@@ -93,6 +93,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="picasso-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="core-3.2.0" level="project" />
     <orderEntry type="library" exported="" name="androidsdk-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="zxing-android-embedded-3.0.1" level="project" />

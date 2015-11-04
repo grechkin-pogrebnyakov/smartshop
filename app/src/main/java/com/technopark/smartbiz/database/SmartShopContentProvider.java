@@ -16,10 +16,10 @@ import android.util.Log;
  */
 public class SmartShopContentProvider extends ContentProvider {
 
-    final String LOG_TAG = "SmartShopLog";
+    public final String LOG_TAG = "DatabaseLog";
 
     // Таблица
-    static final String ITEMS_TABLE = "Items";
+    static final String ITEMS_TABLE = DatabaseHelper.PRODUCT_TABLE_NAME;
 
     // Поля
     static final String ITEMS_ID = "_id";
@@ -29,7 +29,7 @@ public class SmartShopContentProvider extends ContentProvider {
     static final String AUTHORITY = "ru.tech_mail.smart_biz.data";
 
     // path
-    static final String ITEMS_PATH = "Items";
+    static final String ITEMS_PATH = DatabaseHelper.PRODUCT_TABLE_NAME;
 
     // Общий Uri
     public static final Uri ITEMS_CONTENT_URI = Uri.parse("content://"
@@ -129,7 +129,7 @@ public class SmartShopContentProvider extends ContentProvider {
             throw new IllegalArgumentException("Wrong URI: " + uri);
 
         db = dbHelper.getWritableDatabase();
-        long rowID = db.insert(ITEMS_TABLE, null, values);
+        long rowID = db.insert(DatabaseHelper.PRODUCT_TABLE_NAME, null, values);
         Uri resultUri = ContentUris.withAppendedId(ITEMS_CONTENT_URI, rowID);
         // уведомляем ContentResolver, что данные по адресу resultUri изменились
         getContext().getContentResolver().notifyChange(resultUri, null);

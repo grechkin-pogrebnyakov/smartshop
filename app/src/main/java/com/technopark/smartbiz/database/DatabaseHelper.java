@@ -19,6 +19,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " barcode INTEGER UNIQUE," +
                     " photo_path TEXT, " +
                     " name TEXT, " +
+                    " price_selling_product INTEGER, " +
+                    " price_purchase_product INTEGER, " +
                     " description TEXT, " +
                     " count INTEGER, );";
 
