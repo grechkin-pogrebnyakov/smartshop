@@ -22,7 +22,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " price_selling_product INTEGER, " +
                     " price_purchase_product INTEGER, " +
                     " description TEXT, " +
-                    " count INTEGER, );";
+                    " count INTEGER );";
 
     DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

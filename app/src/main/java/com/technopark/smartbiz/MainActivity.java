@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         goToAddProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
+                Intent goAddProduct = new Intent(getApplicationContext(), ListAddedProducts.class);
                 startActivity(goAddProduct);
             }
         });

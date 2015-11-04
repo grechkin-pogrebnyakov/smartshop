@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
@@ -66,13 +67,15 @@ public class AddProductActivity extends AppCompatActivity {
         addProductButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (addRecord() != null) {
+                    Toast.makeText(getApplicationContext(), "add record", Toast.LENGTH_LONG).show();
+                } else Toast.makeText(getApplicationContext(), "error add", Toast.LENGTH_LONG).show();
             }
         });
 
     }
 
-    private Uri addRecord () {
+    private Uri addRecord() {
         // Defines a new Uri object that receives the result of the insertion
         Uri mNewUri;
 
@@ -85,11 +88,11 @@ public class AddProductActivity extends AppCompatActivity {
  */
         mNewValues.put("barcode", "7657545323");
         mNewValues.put("photo_path", "example.user");
-        mNewValues.put("name", "example.user");
-        mNewValues.put("price_selling_product", "example.user");
-        mNewValues.put("price_purchase_product", "example.user");
+        mNewValues.put("name", "myproduct");
+        mNewValues.put("price_selling_product", "300");
+        mNewValues.put("price_purchase_product", "150");
         mNewValues.put("description", "example.user");
-        mNewValues.put("count", "example.user");
+        mNewValues.put("count", "20");
 
         mNewUri = getContentResolver().insert(
                 SmartShopContentProvider.ITEMS_CONTENT_URI,   // the user dictionary content URI

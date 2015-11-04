@@ -25,7 +25,6 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
 
     private ListView listViewAddedProducts;
     final String LOG_TAG = "myLogs";
-    static final String from[] = { "description", "download_time" };
     // Уникальный идентификатор загрузчика
     private static final int LOADER_ID = 1;
     private SimpleCursorAdapter simpleCursorAdapter;
@@ -90,7 +89,7 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
         switch ( loader.getId() ) {
             case LOADER_ID:
                 // Данные загружены и готовы к использованию
-                simpleCursorAdapter.swapCursor( cursor );
+                //simpleCursorAdapter.swapCursor( cursor );
                 if ( cursor.moveToFirst() ) {
                     do {
                         String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
@@ -105,11 +104,6 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
                         adapter.addItem( product );
                     } while ( cursor.moveToNext() );
                 }
-//                new Item("MAKS ",
-//                        "https://pp.vk.me/c9591/v9591001/74/bGqB3eciXRc.jpg",
-//                        data.getString(data.getColumnIndex("photo_medium")),
-//                        data.getString(data.getColumnIndex("photo_large")),
-//                        data.getString(data.getColumnIndex("description")) );
                 break;
         }
         // список теперь содержит данные на экране
@@ -119,6 +113,6 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
     public void onLoaderReset( Loader<Cursor> loader ) {
         // Если по какой-то причине данные не доступны, то удаляем ссылки на старые данные,
         // заменяя их пустым курсором
-        simpleCursorAdapter.swapCursor(null);
+        //simpleCursorAdapter.swapCursor(null);
     }
 }
