@@ -620,7 +620,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     is.close();
                 }
             }
-            return null;
+            return new JSONObject();
         }
 
         private String readIt(InputStream stream, int len) throws IOException {

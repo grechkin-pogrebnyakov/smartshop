@@ -96,7 +96,7 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
                         String descriptionProduct = cursor.getString(cursor.getColumnIndex("description"));
                         String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
                         int priceSellingProduct = cursor.getInt(cursor.getColumnIndex("price_selling_product"));
-                        int pricePurchaseProduct = cursor.getInt(cursor.getColumnIndex("price_purchase_product"));
+                        int pricePurchaseProduct = cursor.getInt(cursor.getColumnIndex("price_cost_product"));
                         int productBarcode = cursor.getInt(cursor.getColumnIndex("barcode"));
                         int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
                         Product product = new Product(nameProduct, descriptionProduct, photoPath, priceSellingProduct,

@@ -20,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " photo_path TEXT, " +
                     " name TEXT, " +
                     " price_selling_product INTEGER, " +
-                    " price_purchase_product INTEGER, " +
+                    " price_cost_product INTEGER, " +
                     " description TEXT, " +
                     " count INTEGER );";
 
