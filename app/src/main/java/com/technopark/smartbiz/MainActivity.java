@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        LineChart mainChart = (LineChart) findViewById(R.id.activity_main_chart);
+        LineChart mainChart = (LineChart) findViewById(R.id.content_main_chart);
 
 
         Button logOut = (Button) findViewById(R.id.button_logout);
@@ -62,6 +62,15 @@ public class MainActivity extends AppCompatActivity {
                 integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
             }
         });
+
+        Button purchaseButton = (Button) findViewById(R.id.content_main_button_purchase);
+	    purchaseButton.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+			    Intent intent = new Intent(MainActivity.this, PurchaseActivity.class);
+			    startActivity(intent);
+		    }
+	    });
     }
 
     @Override

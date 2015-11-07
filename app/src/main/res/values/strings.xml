@@ -28,4 +28,6 @@
     <string name="scan_barcode_button">Сканировать штрих-код</string>
     <string name="title_activity_add_product">Добавление товаров</string>
     <string name="title_activity_list_added_products">Добавленные товары</string>
+    <string name="content_main_button_new_check">Продать</string>
+    <string name="title_activity_purchase">Продажа</string>
 </resources>
