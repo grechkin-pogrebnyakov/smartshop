@@ -51,11 +51,22 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 
 /**
@@ -74,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     public static final String APP_PREFERENCES = "mysettings";
-    public static final String SESSION_ID = "sesion_id";
+    public static final String TOKEN_AUTORIZATION = "token";
     private UserLoginTask mAuthTask = null;
     SharedPreferences sharedPreferences;
     // Ссылки на графические компоненты
@@ -94,8 +105,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Инициализируем компоненты формы логина
         mEmailView = (AutoCompleteTextView) findViewById(R.id.login_email);
         populateAutoComplete();
-        if ( sharedPreferences.contains(SESSION_ID) ) {
-            String session = sharedPreferences.getString(SESSION_ID, "");
+        if ( sharedPreferences.contains(TOKEN_AUTORIZATION) ) {
+            String session = sharedPreferences.getString(TOKEN_AUTORIZATION, "");
             Log.e("session", session);
             if ( !session.isEmpty() ) {
                 startActivity( new Intent( getApplicationContext(), MainActivity.class ));
@@ -184,7 +195,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (requestCode == 1 && data != null && data.hasExtra("access_token")) {
             String accessToken = data.getStringExtra("access_token");
             int userId = data.getIntExtra("user_id", 0);
-            sharedPreferences.edit().putString(SESSION_ID, accessToken).commit();
+            sharedPreferences.edit().putString(TOKEN_AUTORIZATION, accessToken).commit();
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             Log.i("VK_LOGIN", "accessToken: " + accessToken +  ", userId: " + userId);
         }
@@ -381,8 +392,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
         private static final String DEBUG_TAG = "HttpExample";
-        private static final String urlAuthorization = "http://192.168.43.241:8000/api/auth/login/";//"http://smartshop1.ddns.net:8000/api/login";
-        private static final String urlRegistration = "http://192.168.43.241:8000/api/auth/registration/";//"http://smartshop1.ddns.net:8000/api/registration";
+        private static final String urlAuthorization = "https://smartshop1.ddns.net/api/auth/login/";//"https://smartshop1.ddns.net:8000/api/login";
+        private static final String urlRegistration = "https://smartshop1.ddns.net/api/auth/registration/";//"https://smartshop1.ddns.net:8000/api/registration";
         private final String mEmail;
         private final String mPassword;
 
@@ -454,7 +465,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 jsonRequest.accumulate("password", mPassword);
                 JSONObject jsonResponse = requestPostMethod(urlAuthorization, jsonRequest);
 
-                switch (jsonResponse.getInt("status")) {
+                switch (jsonResponse.getInt("responceCode")) {
 
                     case 200:
                         switch (jsonResponse.getString("body")) {
@@ -575,10 +586,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             OutputStream os = null;
             int len = 500;
             try {
+                disableSSLCertificateChecking();
                 CookieManager cookieManager = new CookieManager();
                 CookieHandler.setDefault(cookieManager);
                 URL url = new URL(requesrUrl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 conn.setReadTimeout(10000 /* milliseconds */);
                 conn.setConnectTimeout(15000 /* milliseconds */);
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -587,25 +599,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 conn.setDoOutput(true);
                 conn.setDoInput(true);
 
+
+
                 os = conn.getOutputStream();
                 os.write(jsonRequest.toString().getBytes("UTF-8"));
 
                 // Starts the query
                 conn.connect();
 
-                int response = conn.getResponseCode();
-                Log.d(DEBUG_TAG, "The response is: " + response);
+                int responce = conn.getResponseCode();
+                Log.d(DEBUG_TAG, "The responce is: " + responce);
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
                 JSONObject jsonResponseObject = new JSONObject( readIt(is, len) );
+                jsonResponseObject.put("responceCode", responce);
 
-                if (!requesrUrl.equals("http://191.43.241:8000/api/auth/registration"/*"http://smartshop1.ddns.net:8000/api/registration"*/)) {
-                    String cookie = conn.getHeaderFields().get("Set-Cookie").get(0);
-                    Log.e("cookie", cookie);
-                    sharedPreferences.edit().putString(SESSION_ID, cookie).commit();
-                    Log.e("session", sharedPreferences.getString(SESSION_ID, "default"));
-                }
+//                if (!requesrUrl.equals("https://smartshop1.ddns.net/api/auth/registration/")) {
+//                    String token = jsonResponseObject.getString("key");//conn.getHeaderFields().get("Key").get(0);
+//                    Log.e("cookie", token);
+//                    sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
+//                    Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+//                }
 
 
                 return jsonResponseObject;
@@ -614,13 +629,47 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // finished using it.
             } catch (JSONException e) {
                 e.printStackTrace();
-            } finally {
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            finally {
                 if (is != null) {
                     os.close();
                     is.close();
                 }
             }
             return new JSONObject();
+        }
+
+        private void disableSSLCertificateChecking() {
+            HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                    // Not implemented
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                    // Not implemented
+                }
+            } };
+
+            try {
+                SSLContext sc = SSLContext.getInstance("TLS");
+
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
         }
 
         private String readIt(InputStream stream, int len) throws IOException {
@@ -635,5 +684,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
+    private class NullHostNameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String s, SSLSession sslSession) {
+            return true;
+        }
+    }
 }
 

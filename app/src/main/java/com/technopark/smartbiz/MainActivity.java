@@ -19,72 +19,71 @@ import com.technopark.smartbiz.userIdentification.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-	SharedPreferences sharedPreferences;
-	public static final String APP_PREFERENCES = "mysettings";
-	public static final String SESSION_ID = "sesion_id";
+    SharedPreferences sharedPreferences;
+    public static final String APP_PREFERENCES = "mysettings";
+    public static final String TOKEN_AUTORIZATION = "token";
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-		LineChart mainChart = (LineChart) findViewById(R.id.content_main_chart);
+        LineChart mainChart = (LineChart) findViewById(R.id.content_main_chart);
 
 
-		Button logOut = (Button) findViewById(R.id.button_logout);
+        Button logOut = (Button) findViewById(R.id.button_logout);
 
-		logOut.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				sharedPreferences.edit().remove(SESSION_ID).commit();
-				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-			}
-		});
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sharedPreferences.edit().remove(TOKEN_AUTORIZATION).commit();
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            }
+        });
 
-		Button goToAddProduct = (Button) findViewById(R.id.go_to_add_product);
-		goToAddProduct.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
-				startActivity(goAddProduct);
-			}
-		});
+        Button goToAddProduct = (Button) findViewById(R.id.go_to_add_product);
+        goToAddProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
+                startActivity(goAddProduct);
+            }
+        });
 
-		Button scanBarcode = (Button) findViewById(R.id.scan_button);
+        Button scanBarcode = (Button) findViewById(R.id.scan_button);
 
-		scanBarcode.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
-				integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
-			}
-		});
+        scanBarcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
+                integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
+            }
+        });
 
-		Button purchaseButton = (Button) findViewById(R.id.content_main_button_purchase);
-		purchaseButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, PurchaseActivity.class);
-				startActivity(intent);
-			}
-		});
-	}
+        Button purchaseButton = (Button) findViewById(R.id.content_main_button_purchase);
+	    purchaseButton.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+			    Intent intent = new Intent(MainActivity.this, PurchaseActivity.class);
+			    startActivity(intent);
+		    }
+	    });
+    }
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-		if (result != null) {
-			String contents = result.getContents();
-			if (contents != null) {
-				Toast.makeText(getApplicationContext(), "Sucssed scan" + result.toString(), Toast.LENGTH_LONG).show();
-			}
-			else {
-				Toast.makeText(getApplicationContext(), "failed scan", Toast.LENGTH_LONG).show();
-			}
-		}
-	}
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (result != null) {
+            String contents = result.getContents();
+            if (contents != null) {
+                Toast.makeText(getApplicationContext(), "Sucssed scan" + result.toString(), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "failed scan", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
 }
