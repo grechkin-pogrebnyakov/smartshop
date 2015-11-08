@@ -32,4 +32,7 @@
     <string name="title_activity_purchase">Продажа</string>
     <string name="activity_purchase_total">Сумма, руб.</string>
     <string name="activity_purchase_button_submit">Оформить</string>
+    <string name="layout_purchase_add_product_edittext_count">Количество</string>
+    <string name="layout_purchase_add_product_textview_total">Сумма</string>
+    <string name="layout_purchase_add_product_button_add">Добавить</string>
 </resources>

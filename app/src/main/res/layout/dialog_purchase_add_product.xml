@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/dialog_purchase_add_product_textview_product_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Product name place here"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
+
+    <EditText
+        android:id="@+id/dialog_purchase_add_product_edittext_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_purchase_add_product_textview_product_name"
+        android:ems="10"
+        android:hint="@string/layout_purchase_add_product_edittext_count"
+        android:inputType="number"
+        />
+
+    <EditText
+        android:id="@+id/dialog_purchase_add_product_edittext_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_purchase_add_product_edittext_count"
+        android:ems="10"
+        android:inputType="number"
+        />
+
+    <TextView
+        android:id="@+id/dialog_purchase_add_product_textview_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_purchase_add_product_edittext_price"
+        android:text="@string/layout_purchase_add_product_textview_total"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
+
+    <TextView
+        android:id="@+id/dialog_purchase_add_product_textview_total_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_purchase_add_product_textview_total"
+        android:text="Place total price here"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
+
+    <Button
+        android:id="@+id/dialog_purchase_add_product_button_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dialog_purchase_add_product_textview_total_price"
+        android:text="@string/layout_purchase_add_product_button_add"
+        />
+</RelativeLayout>
