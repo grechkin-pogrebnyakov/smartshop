@@ -9,7 +9,8 @@ from django.contrib.auth.models import User
 
 class Shop(models.Model):
     name = models.CharField(max_length=255)
-    #author = models.ForeignKey(User,related_name='shop_author')
+    owner = models.ForeignKey(UserProfile,related_name='owner')
+    workers = models.ForeignKey(UserProfile,related_name='workers', null=True)
 
 class Item(models.Model):
     id = models.IntegerField(primary_key=True)

@@ -4,6 +4,7 @@ from rest_auth.views import (
     LoginView, LogoutView, UserDetailsView, PasswordChangeView,
     PasswordResetView, PasswordResetConfirmView
 )
+from rest_framework.authtoken import views
 
 urlpatterns = patterns(
     '',
@@ -19,4 +20,5 @@ urlpatterns = patterns(
     url(r'^user/$', UserDetailsView.as_view(), name='rest_user_details'),
     url(r'^password/change/$', PasswordChangeView.as_view(),
         name='rest_password_change'),
+    url(r'^api-token-auth/', views.obtain_auth_token)
 )

@@ -39,6 +39,9 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_auth',
     'storeManage',
+    'userManage',
+    'allauth',
+    'allauth.account',
     'allauth.socialaccount',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -145,7 +148,7 @@ LOGGING = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-        #'rest_framework.authentication.BasicAuthentication',
-         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     )
 }

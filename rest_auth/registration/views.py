@@ -13,7 +13,7 @@ from rest_auth.app_settings import TokenSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.views import LoginView
 
-
+from userManage.models import UserProfile
 class RegisterView(APIView, SignupView):
     """
     Accepts the credentials and creates a new user
@@ -38,6 +38,7 @@ class RegisterView(APIView, SignupView):
 
     def form_valid(self, form):
         self.user = form.save(self.request)
+
         self.token, created = self.token_model.objects.get_or_create(
             user=self.user
         )
@@ -56,6 +57,9 @@ class RegisterView(APIView, SignupView):
         self.form = self.get_form(form_class)
         if self.form.is_valid():
             self.form_valid(self.form)
+            userProfile = UserProfile()
+            userProfile.user=self.user;
+            userProfile.save()
             return self.get_response()
         else:
             return self.get_response_with_errors()
