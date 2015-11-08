@@ -30,4 +30,6 @@
     <string name="title_activity_list_added_products">Добавленные товары</string>
     <string name="content_main_button_new_check">Продать</string>
     <string name="title_activity_purchase">Продажа</string>
+    <string name="activity_purchase_total">Сумма, руб.</string>
+    <string name="activity_purchase_button_submit">Оформить</string>
 </resources>
