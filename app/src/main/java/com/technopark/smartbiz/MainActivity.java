@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.github.mikephil.charting.charts.LineChart;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.technopark.smartbiz.screnListView.ListAddedProducts;
+import com.technopark.smartbiz.buisnessLogic.addProduct.AddProductActivity;
 import com.technopark.smartbiz.userIdentification.LoginActivity;
 
 
@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     SharedPreferences sharedPreferences;
     public static final String APP_PREFERENCES = "mysettings";
-    public static final String SESSION_ID = "sesion_id";
+    public static final String TOKEN_AUTORIZATION = "token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sharedPreferences.edit().remove(SESSION_ID).commit();
+                sharedPreferences.edit().remove(TOKEN_AUTORIZATION).commit();
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
         });
