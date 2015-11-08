@@ -74,6 +74,11 @@
             android:label="@string/title_activity_check"
             >
         </activity>
+        <activity
+            android:name=".PaymentActivity"
+            android:label="@string/title_activity_payment"
+            >
+        </activity>
     </application>
 
 </manifest>

@@ -38,4 +38,11 @@
     <string name="activity_check_total">Сумма, руб.</string>
     <string name="activity_check_button_submit">Оплата</string>
     <string name="title_activity_check">Чек</string>
+    <string name="title_activity_payment">Оплата</string>
+    <string name="textView2">Сумма, руб.</string>
+    <string name="activity_payment_textview_total">Place total price here</string>
+    <string name="textView4">Оплачено, руб.</string>
+    <string name="textView5">Сдача, руб.</string>
+    <string name="activity_payment_textview_odd_money">Place odd money here</string>
+    <string name="activity_payment_button_pay">Оплатить</string>
 </resources>
