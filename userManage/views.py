@@ -19,4 +19,4 @@ class UserProfileView(ListCreateAPIView):
         serializer = self.get_serializer(profiles,many=True)
         return Response(serializer.data)
     def post(self, request, *args, **kwargs):
-        return None
+        return
