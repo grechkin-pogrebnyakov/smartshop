@@ -7,14 +7,21 @@ import android.widget.Button;
 
 public class PurchaseActivity extends AppCompatActivity {
 
-	PurchaseDialogFragment purchaseDialogFragment = null;
+	private PurchaseDialogFragment purchaseDialogFragment = new PurchaseDialogFragment();
+	private View.OnClickListener dialogListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			int i = purchaseDialogFragment.getProductCount();
+			float f = purchaseDialogFragment.getTotalPrice();
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_purchase);
 
-		purchaseDialogFragment = new PurchaseDialogFragment();
+		purchaseDialogFragment.setAddButtonCallback(dialogListener);
 
 		Button button = (Button) findViewById(R.id.activity_purchase_button_submit);
 		button.setOnClickListener(new View.OnClickListener() {
