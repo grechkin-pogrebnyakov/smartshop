@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.technopark.smartbiz.CheckActivity"
+    >
+
+    <ListView
+        android:id="@+id/activity_check_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/activity_check_layout_total"
+        android:layout_alignParentTop="true"
+        />
+
+    <RelativeLayout
+        android:id="@+id/activity_check_layout_total"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        >
+
+        <TextView
+            android:id="@+id/activity_check_layout_total_string"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/activity_check_total"
+            android:layout_alignParentTop="true"
+            android:layout_alignTop="@+id/activity_check_total"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
+            android:text="@string/activity_check_total"
+            android:textSize="20sp"
+            />
+
+        <TextView
+            android:id="@+id/activity_check_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/activity_check_button_submit"
+            android:layout_alignTop="@+id/activity_check_button_submit"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@+id/activity_check_layout_total_string"
+            android:layout_toLeftOf="@+id/activity_check_button_submit"
+            android:layout_toRightOf="@+id/activity_check_layout_total_string"
+            android:layout_toStartOf="@+id/activity_check_button_submit"
+            android:gravity="center_vertical"
+            android:textSize="30sp"
+            />
+
+        <Button
+            android:id="@+id/activity_check_button_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/activity_check_button_submit"
+            />
+
+    </RelativeLayout>
+</RelativeLayout>

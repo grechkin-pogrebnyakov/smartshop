@@ -35,4 +35,7 @@
     <string name="layout_purchase_add_product_edittext_count">Количество</string>
     <string name="layout_purchase_add_product_textview_total">Сумма</string>
     <string name="layout_purchase_add_product_button_add">Добавить</string>
+    <string name="activity_check_total">Сумма, руб.</string>
+    <string name="activity_check_button_submit">Оплата</string>
+    <string name="title_activity_check">Чек</string>
 </resources>

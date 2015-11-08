@@ -26,6 +26,12 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 	private EditText countEditText;
 	private EditText productPriceEditText;
 
+	private View.OnClickListener addButtonCallback = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+		}
+	};
+
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,9 +75,8 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		this.productCount = productCount;
 	}
 
-	@Override
-	public void onClick(View v) {
-
+	public void setAddButtonCallback(View.OnClickListener addButtonCallback) {
+		this.addButtonCallback = addButtonCallback;
 	}
 
 	@Override
@@ -101,4 +106,17 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		totalTextView.setText(String.format(Locale.US, "%.2f", totalPrice));
 	}
 
+	public float getTotalPrice() {
+		return totalPrice;
+	}
+
+	public int getProductCount() {
+		return productCount;
+	}
+
+	@Override
+	public void onClick(View v) {
+		addButtonCallback.onClick(v);
+		dismiss();
+	}
 }
