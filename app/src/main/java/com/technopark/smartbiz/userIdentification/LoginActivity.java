@@ -465,7 +465,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 jsonRequest.accumulate("password", mPassword);
                 JSONObject jsonResponse = requestPostMethod(urlAuthorization, jsonRequest);
 
-                switch (jsonResponse.getInt("status")) {
+                switch (jsonResponse.getInt("responceCode")) {
 
                     case 200:
                         switch (jsonResponse.getString("body")) {
@@ -607,19 +607,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // Starts the query
                 conn.connect();
 
-                int response = conn.getResponseCode();
-                Log.d(DEBUG_TAG, "The response is: " + response);
+                int responce = conn.getResponseCode();
+                Log.d(DEBUG_TAG, "The responce is: " + responce);
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
                 JSONObject jsonResponseObject = new JSONObject( readIt(is, len) );
+                jsonResponseObject.put("responceCode", responce);
 
-                if (!requesrUrl.equals("https://smartshop1.ddns.net/api/auth/registration/")) {
-                    String token = jsonResponseObject.getString("Key");//conn.getHeaderFields().get("Key").get(0);
-                    Log.e("cookie", token);
-                    sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
-                    Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
-                }
+//                if (!requesrUrl.equals("https://smartshop1.ddns.net/api/auth/registration/")) {
+//                    String token = jsonResponseObject.getString("key");//conn.getHeaderFields().get("Key").get(0);
+//                    Log.e("cookie", token);
+//                    sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
+//                    Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+//                }
 
 
                 return jsonResponseObject;
