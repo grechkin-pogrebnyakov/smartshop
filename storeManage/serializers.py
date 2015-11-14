@@ -12,8 +12,11 @@ class ShopSerializer(serializers.ModelSerializer):
         read_only_fields = ('accountType',)
 
 
-
-
+class ShopItemSerializer(serializers.ModelSerializer):
+    #owner = serializers.PrimaryKeyRelatedField(many=False,read_only=True)
+    class Meta:
+        model = Item
+        fields = ('id','name','code')
 
 
 

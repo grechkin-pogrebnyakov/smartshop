@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.vk',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -152,3 +153,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     )
 }
+
+VKAPP_APP_ID = "5093720"
+VKAPP_API_SECRET = "bFCtfRc6NhGBhuFy7CYw"

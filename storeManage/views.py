@@ -18,7 +18,7 @@ from storeManage.models import Shop
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
-from storeManage.serializers import ShopSerializer
+from storeManage.serializers import ShopSerializer,ShopItemSerializer
 
 
 class JSONResponse(HttpResponse):
@@ -47,3 +47,11 @@ class Store(ListCreateAPIView):
         return Response(serializer.data)
 
 
+class Item(ListCreateAPIView):
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated)
+    serializer_class = ShopItemSerializer
+    def get(self, request, *args, **kwargs):
+        items = Item.objects.all()
+        serializer = self.get_serializer(items,many=True)
+        return Response(serializer.data)

@@ -7,14 +7,17 @@ from pygments import highlight
 from django.contrib.auth.models import User
 
 
-class Shop(models.Model):
-    name = models.CharField(max_length=255)
-    owner = models.ForeignKey(UserProfile,related_name='owner')
-    workers = models.ForeignKey(UserProfile,related_name='workers', null=True)
-
 class Item(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
-    shop = models.ForeignKey(Shop, related_name='shop')
+
+class Shop(models.Model):
+    name = models.CharField(max_length=255)
+    owner = models.ForeignKey(UserProfile,related_name='owner')
+    workers = models.ForeignKey(UserProfile,related_name='workers', null=True)
+    items = models.ForeignKey(Item, related_name='shop')
+
+
+
 
