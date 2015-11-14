@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 import com.technopark.smartbiz.database.items.Product;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class ProductAdapter extends BaseAdapter {
         if (tempView == null) {
             tempView = layoutInflater.inflate(R.layout.product_layout, viewGroup, false);
         }
-        Product product = getProduct(i);
+        ItemForProductAdapter product = getProduct(i);
         TextView nameProductTextView = (TextView) tempView.findViewById(R.id.clap_name_product_textView);
         TextView priceOfTheProductTextView = (TextView) tempView.findViewById(R.id.clap_price_of_the_product);
         TextView countProductTextView = (TextView) tempView.findViewById(R.id.clap_count_product);
@@ -69,13 +70,13 @@ public class ProductAdapter extends BaseAdapter {
         nameProductTextView.setText(product.getProductName());
         countProductTextView.setText(stringBuilder.append("Кол-во : ").append(String.valueOf(product.getCount())));
         stringBuilder.setLength(0);
-        priceOfTheProductTextView.setText(stringBuilder.append("Цена : ").append( String.valueOf( product.getPriceSellingProduct() ) ).append(" р.") );
+        priceOfTheProductTextView.setText(stringBuilder.append("Цена : ").append(String.valueOf(product.getPriceSellingProduct())).append(" р."));
         setPic(imageProductView, product.getPhotoPath());
         return tempView;
     }
 
-    private Product getProduct (int position) {
-        return (Product) getItem(position);
+    private ItemForProductAdapter getProduct (int position) {
+        return (ItemForProductAdapter) getItem(position);
     }
 
     private void setPic(ImageView imageProductView, String photoPath) {

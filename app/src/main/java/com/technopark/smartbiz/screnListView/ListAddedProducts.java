@@ -24,10 +24,9 @@ import java.util.List;
 public class ListAddedProducts extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ListView listViewAddedProducts;
-    final String LOG_TAG = "myLogs";
+    private final String LOG_TAG = "ListAddedProducts";
     // Уникальный идентификатор загрузчика
     private static final int LOADER_ID = 1;
-    private SimpleCursorAdapter simpleCursorAdapter;
     private ProductAdapter adapter;
     // The callbacks through which we will interact with the LoaderManager.
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
@@ -59,13 +58,6 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
         });
     }
 
-    private List<Product> initData () {
-        List<Product> listProduct = new ArrayList<>();
-        listProduct.add( new Product("Молоко", "Цельное молоко", "", 53, 23, 12324, 12) );
-        listProduct.add( new Product("Чай Lipton", "Чай в пакетиках", "", 150, 12, 1254363, 2) );
-
-        return listProduct;
-    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {

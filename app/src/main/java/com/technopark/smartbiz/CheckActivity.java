@@ -7,19 +7,48 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
+
+import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.screnListView.EndlessScrollListener;
 
 public class CheckActivity extends AppCompatActivity {
 
+	private static int SELECT_PRODUCT = 1;
+
+	private ListView checkList;
+	private final String LOG_TAG = "CheckActivity";
+	// Уникальный идентификатор загрузчика
+	private ProductAdapter adapter;
+
 	private float totalPrice = 123.45f;
 	public static String TOTAL_PRICE = "TotalPrice";
+
+	private Button checkButtonSubmit;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_check);
 
-		Button button = (Button) findViewById(R.id.activity_check_button_submit);
-		button.setOnClickListener(new View.OnClickListener() {
+		initializationButtons();
+
+		checkList = (ListView) findViewById( R.id.activity_check_listview );
+		adapter = new ProductAdapter( this );
+		checkList.setAdapter(adapter);
+		checkList.setOnScrollListener(new EndlessScrollListener() {
+			@Override
+			public void loadData(int offset) {
+
+			}
+		});
+
+
+	}
+
+	private void initializationButtons () {
+		checkButtonSubmit = (Button) findViewById(R.id.activity_check_button_submit);
+		checkButtonSubmit.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent submit = new Intent(getApplicationContext(), PaymentActivity.class);
@@ -39,13 +68,14 @@ public class CheckActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent addProduct = new Intent(getApplicationContext(), PurchaseActivity.class);
 		addProduct.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-		startActivityForResult(addProduct, 1);
+		startActivityForResult(addProduct, SELECT_PRODUCT);
 		return false;
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Implement activity result
-		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == SELECT_PRODUCT) {
+
+		}
 	}
 }

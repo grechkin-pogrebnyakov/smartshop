@@ -141,27 +141,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 		final Button newAccountButton = (Button) findViewById(R.id.login_button_new_account);
 		newAccountButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				mPasswordRepeatView.setVisibility(View.VISIBLE);
-				newAccountButton.setVisibility(View.GONE);
-				registrtionButton.setVisibility(View.VISIBLE);
-			}
-		});
+            @Override
+            public void onClick(View view) {
+                mPasswordRepeatView.setVisibility(View.VISIBLE);
+                newAccountButton.setVisibility(View.GONE);
+                registrtionButton.setVisibility(View.VISIBLE);
+            }
+        });
 
 		Button mEmailSignInButton = (Button) findViewById(R.id.login_button_sing_in);
 		mEmailSignInButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
-					mPasswordRepeatView.setVisibility(View.GONE);
-					registrtionButton.setVisibility(View.GONE);
-					newAccountButton.setVisibility(View.VISIBLE);
-				}
-				attemptLoginOrRegistration();
+            @Override
+            public void onClick(View view) {
+                if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
+                    mPasswordRepeatView.setVisibility(View.GONE);
+                    registrtionButton.setVisibility(View.GONE);
+                    newAccountButton.setVisibility(View.VISIBLE);
+                }
+                attemptLoginOrRegistration();
 
-			}
-		});
+            }
+        });
 
 		Button vkAuthButton = (Button) findViewById(R.id.login_button_vkAuth);
 		Account[] accounts = AccountManager.get(this).getAccountsByType("com.vkontakte.account");
@@ -203,6 +203,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		getLoaderManager().initLoader(0, null, this);
 	}
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
 	/**
 	 * Попытка авторизоваться по логину и паролю указанному в форме входа.
@@ -424,22 +428,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					return false;
 			}
 
-
-			//            try {
-			//                // Эмуляция сетевого доступа.
-			//                Thread.sleep(2000);
-			//            } catch (InterruptedException e) {
-			//                return false;
-			//            }
-
-			//            for (String credential : DUMMY_CREDENTIALS) {
-			//                String[] pieces = credential.split(":");
-			//                if (pieces[0].equals(mEmail)) {
-			//                    // Акаунт существует, вернуть true если пароль совподает.
-			//                    return pieces[1].equals(mPassword);
-			//                }
-			//            }
-
 			// TODO: регистрировать новый акаунт для пользователя.
 			//return true;
 		}
@@ -497,41 +485,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					return false;
 				}
 
-				//                switch () {
-				//
-				//                    case 200:
-				//                        switch (jsonResponse.getString("body")) {
-				//                            case "ok": // TODO: успешная авторизация. нужно получить токен !
-				//                                showToast("Успешный вход");
-				//                                return true;
-				//                        }
-				//                        break;
-				//
-				//                    case 400:
-				//                        switch (jsonResponse.getString("body")) {
-				//                            case "exists": // TODO: пользователь существует
-				//                                break;
-				//                            case "login fail": // TODO: невалидный пароль
-				//                                showToast("Некорректный логин или пароль !");
-				//                                return false;
-				//                            case "email": // TODO: невалидный логин
-				//                                break;
-				//                            default: // TODO: неизвестная ошибка
-				//                                return false;
-				//                        }
-				//                        break;
-				//
-				//                    case 500:
-				//                        switch (jsonResponse.getString("body")) {
-				//                            case "internal server error": // TODO: ошибка сервера
-				//                                showToast("Ошибка сервера !");
-				//                                return false;
-				//                            default: //TODO: неизвестная ошибка
-				//                                showToast("Неизвестная ошибка !");
-				//                                return false;
-				//                        }
-				//
-				//                }
 			}
 			catch (JSONException e) {
 				e.printStackTrace();
@@ -541,7 +494,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				showToast("Ошибка сервера !");
 			}
 			showToast("Неизвестная ошибка !");
-			return true;
+			return false;
 		}
 
 		private boolean registration() {
@@ -575,51 +528,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					return false;
 				}
 
-				//                switch (jsonResponse.getInt("status")) {
-				//
-				//                    case 200:
-				//                        switch (jsonResponse.getString("body")) {
-				//                            case "registration success": // TODO: успешная авторизация. нужно получить токен !
-				//                                showToast("Регистрация прошла успешно !");
-				//                                runOnUiThread(new Runnable() {
-				//                                    public void run() {
-				//                                        mPasswordRepeatView.setVisibility(View.GONE);
-				//                                        registrtionButton.setVisibility(View.GONE);
-				//                                    }
-				//                                });
-				//                                return false;
-				//                            default:
-				//                                showToast("Неизвестный ответ сервера !");
-				//                                return false;
-				//                        }
-				//
-				//                    case 400:
-				//                        switch (jsonResponse.getString("body")) {
-				//                            case "exists": // TODO: пользователь существует
-				//                                showToast("Пользователь уже существует !");
-				//                                return false;
-				//                            case "registration failed": // TODO: невалидный пароль
-				//                                showToast("Пользователь уже существует !");
-				//                                return false;
-				//                            case "email": // TODO: невалидный логин
-				//                                break;
-				//                            default: // TODO: неизвестная ошибка
-				//                                showToast("Неизвестная ошибка !");
-				//                                return false;
-				//                        }
-				//                        break;
-				//
-				//                    case 500:
-				//                        switch (jsonResponse.getString("body")) {
-				//                            case "server": // TODO: ошибка сервера
-				//                                showToast("Ошибка сервера !");
-				//                                return false;
-				//                            default: //TODO: неизвестная ошибка
-				//                                showToast("Неизвестная ошибка !");
-				//                                return false;
-				//                        }
-				//
-				//                }
 			}
 			catch (JSONException e) {
 				e.printStackTrace();

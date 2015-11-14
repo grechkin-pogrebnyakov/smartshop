@@ -3,7 +3,7 @@ package com.technopark.smartbiz.database.items;
 /**
  * Created by Abovyan on 18.10.15.
  */
-public class Product {
+public class Product implements ItemForProductAdapter {
 
     private String productName;
     private String descriptionProduct;
