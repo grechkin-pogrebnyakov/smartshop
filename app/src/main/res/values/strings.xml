@@ -2,7 +2,7 @@
     <string name="app_name">SmartBiz</string>
     
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
+    <string name="login">Логин</string>
     <string name="prompt_password">Пароль</string>
     <string name="repeat_password">Повторите пароль</string>
     <string name="action_sign_in">Войти</string>

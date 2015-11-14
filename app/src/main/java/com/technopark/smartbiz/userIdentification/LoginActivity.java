@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	public static final String APP_PREFERENCES = "mysettings";
 	public static final String TOKEN_AUTORIZATION = "token";
 	private UserLoginTask mAuthTask = null;
-	SharedPreferences sharedPreferences;
+	private SharedPreferences sharedPreferences;
 	// Ссылки на графические компоненты
 	private AutoCompleteTextView mEmailView;
 	private EditText mPasswordView;
@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		// Инициализация приложения...
 		// Инициализируем компоненты формы логина
-		mEmailView = (AutoCompleteTextView) findViewById(R.id.login_email);
+		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
 		if (sharedPreferences.contains(TOKEN_AUTORIZATION)) {
 			String session = sharedPreferences.getString(TOKEN_AUTORIZATION, "");
@@ -127,11 +127,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 		mLoginFormView = findViewById(R.id.login_form);
 		mProgressView = findViewById(R.id.login_progress);
-	}
-
-	@Override
-	public void onBackPressed() {
-		moveTaskToBack(true);
 	}
 
 	private void registrationButtons() {
@@ -187,7 +182,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				}
 			});
 		}
-		else vkAuthButton.setVisibility(View.GONE);
+		else {
+			vkAuthButton.setVisibility(View.GONE);
+		}
 	}
 
 
@@ -270,7 +267,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				if (repeatPassword == null) {
 					mAuthTask.execute("authorization");
 				}
-				else mAuthTask.execute("registration");
+				else {
+					mAuthTask.execute("registration");
+				}
 			}
 			else {
 				showProgress(false);
@@ -293,14 +292,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private boolean isPasswordValid(String password) {
 		//TODO: реализовать логику валидации пароля
-		return true;//password.length() > 4;
+		return password.length() > 5;
 	}
 
 	private boolean isRepeatPasswordValid(String password, String repeatPassword) {
 		if (password.equals(repeatPassword)) {
 			return true;
 		}
-		else return false;
+		else {
+			return false;
+		}
 	}
 
 	/**
@@ -424,20 +425,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			}
 
 
-//            try {
-//                // Эмуляция сетевого доступа.
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                return false;
-//            }
+			//            try {
+			//                // Эмуляция сетевого доступа.
+			//                Thread.sleep(2000);
+			//            } catch (InterruptedException e) {
+			//                return false;
+			//            }
 
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Акаунт существует, вернуть true если пароль совподает.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
+			//            for (String credential : DUMMY_CREDENTIALS) {
+			//                String[] pieces = credential.split(":");
+			//                if (pieces[0].equals(mEmail)) {
+			//                    // Акаунт существует, вернуть true если пароль совподает.
+			//                    return pieces[1].equals(mPassword);
+			//                }
+			//            }
 
 			// TODO: регистрировать новый акаунт для пользователя.
 			//return true;
@@ -455,8 +456,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			}
 			else {
 				showProgress(false);
-//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                mPasswordView.requestFocus();
+				//                mPasswordView.setError(getString(R.string.error_incorrect_password));
+				//                mPasswordView.requestFocus();
 			}
 		}
 
@@ -472,43 +473,65 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			try {
 				jsonRequest.accumulate("username", mEmail);
 				jsonRequest.accumulate("password", mPassword);
-				JSONObject jsonResponse = requestPostMethod(urlAuthorization, jsonRequest);
+				JSONObject jsonResponce = requestPostMethod(urlAuthorization, jsonRequest);
+				int responceCode = jsonResponce.getInt("responceCode");
 
-				switch (jsonResponse.getInt("responceCode")) {
-
-					case 200:
-						switch (jsonResponse.getString("body")) {
-							case "ok": // TODO: успешная авторизация. нужно получить токен !
-								showToast("Успешный вход");
-								return true;
-						}
-						break;
-
-					case 400:
-						switch (jsonResponse.getString("body")) {
-							case "exists": // TODO: пользователь существует
-								break;
-							case "login fail": // TODO: невалидный пароль
-								showToast("Некорректный логин или пароль !");
-								return false;
-							case "email": // TODO: невалидный логин
-								break;
-							default: // TODO: неизвестная ошибка
-								return false;
-						}
-						break;
-
-					case 500:
-						switch (jsonResponse.getString("body")) {
-							case "internal server error": // TODO: ошибка сервера
-								showToast("Ошибка сервера !");
-								return false;
-							default: //TODO: неизвестная ошибка
-								showToast("Неизвестная ошибка !");
-								return false;
-						}
-
+				if (200 <= responceCode && responceCode < 300) {
+					String token = jsonResponce.getString("key");//conn.getHeaderFields().get("Key").get(0);
+					Log.e("cookie", token);
+					sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
+					Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+					showToast("Успешный вход");
+					return true;
 				}
+				else if (300 <= responceCode && responceCode < 400) {
+					showToast("Ошибка авторизации !");
+					return false;
+				}
+				else if (400 <= responceCode && responceCode < 500) {
+					showToast("Неправильный логин или пароль !");
+					return false;
+				}
+				else if (responceCode >= 500) {
+					showToast("Ошибка сервера !");
+					return false;
+				}
+
+				//                switch () {
+				//
+				//                    case 200:
+				//                        switch (jsonResponse.getString("body")) {
+				//                            case "ok": // TODO: успешная авторизация. нужно получить токен !
+				//                                showToast("Успешный вход");
+				//                                return true;
+				//                        }
+				//                        break;
+				//
+				//                    case 400:
+				//                        switch (jsonResponse.getString("body")) {
+				//                            case "exists": // TODO: пользователь существует
+				//                                break;
+				//                            case "login fail": // TODO: невалидный пароль
+				//                                showToast("Некорректный логин или пароль !");
+				//                                return false;
+				//                            case "email": // TODO: невалидный логин
+				//                                break;
+				//                            default: // TODO: неизвестная ошибка
+				//                                return false;
+				//                        }
+				//                        break;
+				//
+				//                    case 500:
+				//                        switch (jsonResponse.getString("body")) {
+				//                            case "internal server error": // TODO: ошибка сервера
+				//                                showToast("Ошибка сервера !");
+				//                                return false;
+				//                            default: //TODO: неизвестная ошибка
+				//                                showToast("Неизвестная ошибка !");
+				//                                return false;
+				//                        }
+				//
+				//                }
 			}
 			catch (JSONException e) {
 				e.printStackTrace();
@@ -517,6 +540,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				e.printStackTrace();
 				showToast("Ошибка сервера !");
 			}
+			showToast("Неизвестная ошибка !");
 			return true;
 		}
 
@@ -526,52 +550,76 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				jsonRequest.accumulate("username", mEmail);
 				jsonRequest.accumulate("password1", mPassword);
 				jsonRequest.accumulate("password2", mPassword);
-				JSONObject jsonResponse = requestPostMethod(urlRegistration, jsonRequest);
-				switch (jsonResponse.getInt("status")) {
+				JSONObject jsonResponce = requestPostMethod(urlRegistration, jsonRequest);
 
-					case 200:
-						switch (jsonResponse.getString("body")) {
-							case "registration success": // TODO: успешная авторизация. нужно получить токен !
-								showToast("Регистрация прошла успешно !");
-								runOnUiThread(new Runnable() {
-									public void run() {
-										mPasswordRepeatView.setVisibility(View.GONE);
-										registrtionButton.setVisibility(View.GONE);
-									}
-								});
-								return false;
-							default:
-								showToast("Неизвестный ответ сервера !");
-								return false;
-						}
+				int responceCode = jsonResponce.getInt("responceCode");
 
-					case 400:
-						switch (jsonResponse.getString("body")) {
-							case "exists": // TODO: пользователь существует
-								showToast("Пользователь уже существует !");
-								return false;
-							case "registration failed": // TODO: невалидный пароль
-								showToast("Пользователь уже существует !");
-								return false;
-							case "email": // TODO: невалидный логин
-								break;
-							default: // TODO: неизвестная ошибка
-								showToast("Неизвестная ошибка !");
-								return false;
-						}
-						break;
-
-					case 500:
-						switch (jsonResponse.getString("body")) {
-							case "server": // TODO: ошибка сервера
-								showToast("Ошибка сервера !");
-								return false;
-							default: //TODO: неизвестная ошибка
-								showToast("Неизвестная ошибка !");
-								return false;
-						}
-
+				if (200 <= responceCode && responceCode < 300) {
+					String token = jsonResponce.getString("key");//conn.getHeaderFields().get("Key").get(0);
+					Log.e("cookie", token);
+					sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
+					Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+					showToast("Регистрация прошла успешно !");
+					return true;
 				}
+				else if (300 <= responceCode && responceCode < 400) {
+					showToast("Ошибка регистрации !");
+					return false;
+				}
+				else if (400 <= responceCode && responceCode < 500) {
+					showToast("Пользователь уже существует !");
+					return false;
+				}
+				else if (responceCode >= 500) {
+					showToast("Ошибка сервера !");
+					return false;
+				}
+
+				//                switch (jsonResponse.getInt("status")) {
+				//
+				//                    case 200:
+				//                        switch (jsonResponse.getString("body")) {
+				//                            case "registration success": // TODO: успешная авторизация. нужно получить токен !
+				//                                showToast("Регистрация прошла успешно !");
+				//                                runOnUiThread(new Runnable() {
+				//                                    public void run() {
+				//                                        mPasswordRepeatView.setVisibility(View.GONE);
+				//                                        registrtionButton.setVisibility(View.GONE);
+				//                                    }
+				//                                });
+				//                                return false;
+				//                            default:
+				//                                showToast("Неизвестный ответ сервера !");
+				//                                return false;
+				//                        }
+				//
+				//                    case 400:
+				//                        switch (jsonResponse.getString("body")) {
+				//                            case "exists": // TODO: пользователь существует
+				//                                showToast("Пользователь уже существует !");
+				//                                return false;
+				//                            case "registration failed": // TODO: невалидный пароль
+				//                                showToast("Пользователь уже существует !");
+				//                                return false;
+				//                            case "email": // TODO: невалидный логин
+				//                                break;
+				//                            default: // TODO: неизвестная ошибка
+				//                                showToast("Неизвестная ошибка !");
+				//                                return false;
+				//                        }
+				//                        break;
+				//
+				//                    case 500:
+				//                        switch (jsonResponse.getString("body")) {
+				//                            case "server": // TODO: ошибка сервера
+				//                                showToast("Ошибка сервера !");
+				//                                return false;
+				//                            default: //TODO: неизвестная ошибка
+				//                                showToast("Неизвестная ошибка !");
+				//                                return false;
+				//                        }
+				//
+				//                }
 			}
 			catch (JSONException e) {
 				e.printStackTrace();
@@ -579,7 +627,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-			return true;
+			showToast("Неизвестная ошибка !");
+			return false;
 		}
 
 		private boolean refreshAutorization(String sessionId) {
@@ -597,6 +646,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		private JSONObject requestPostMethod(String requesrUrl, JSONObject jsonRequest) throws IOException {
 			InputStream is = null;
 			OutputStream os = null;
+			int responce = 0;
 			int len = 500;
 			try {
 				disableSSLCertificateChecking();
@@ -619,7 +669,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				// Starts the query
 				conn.connect();
 
-				int responce = conn.getResponseCode();
+				responce = conn.getResponseCode();
 				Log.d(DEBUG_TAG, "The responce is: " + responce);
 				is = conn.getInputStream();
 
@@ -627,12 +677,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				JSONObject jsonResponseObject = new JSONObject(readIt(is, len));
 				jsonResponseObject.put("responceCode", responce);
 
-//                if (!requesrUrl.equals("https://smartshop1.ddns.net/api/auth/registration/")) {
-//                    String token = jsonResponseObject.getString("key");//conn.getHeaderFields().get("Key").get(0);
-//                    Log.e("cookie", token);
-//                    sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
-//                    Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
-//                }
+				//                if (!requesrUrl.equals("https://smartshop1.ddns.net/api/auth/registration/")) {
+				//                    String token = jsonResponseObject.getString("key");//conn.getHeaderFields().get("Key").get(0);
+				//                    Log.e("cookie", token);
+				//                    sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
+				//                    Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+				//                }
 
 
 				return jsonResponseObject;
@@ -652,7 +702,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					is.close();
 				}
 			}
-			return new JSONObject();
+			try {
+				return new JSONObject().put("responceCode", responce);
+			}
+			catch (JSONException e) {
+				e.printStackTrace();
+				return new JSONObject();
+			}
 		}
 
 		private void disableSSLCertificateChecking() {

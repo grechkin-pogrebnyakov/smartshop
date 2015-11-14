@@ -20,8 +20,8 @@
         android:gravity="center" />
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:id="@+id/clap_photo_product"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
