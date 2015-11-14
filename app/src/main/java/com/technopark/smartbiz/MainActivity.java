@@ -14,12 +14,14 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.buisnessLogic.addProduct.AddProductActivity;
+import com.technopark.smartbiz.screnListView.ListAddedProducts;
 import com.technopark.smartbiz.userIdentification.LoginActivity;
 
 
 public class MainActivity extends AppCompatActivity {
 
-	SharedPreferences sharedPreferences;
+	private SharedPreferences sharedPreferences;
+
 	public static final String APP_PREFERENCES = "mysettings";
 	public static final String TOKEN_AUTORIZATION = "token";
 
@@ -27,21 +29,20 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
 		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
 		LineChart mainChart = (LineChart) findViewById(R.id.content_main_chart);
 
-
 		Button logOut = (Button) findViewById(R.id.button_logout);
-
 		logOut.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				sharedPreferences.edit().remove(TOKEN_AUTORIZATION).commit();
 				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-				finish();
 			}
 		});
 
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 		Button scanBarcode = (Button) findViewById(R.id.scan_button);
-
 		scanBarcode.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -68,10 +68,24 @@ public class MainActivity extends AppCompatActivity {
 		purchaseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, PurchaseActivity.class);
+				Intent intent = new Intent(MainActivity.this, CheckActivity.class);
 				startActivity(intent);
 			}
 		});
+
+		Button showProductsButton = (Button) findViewById(R.id.content_main_button_show_products);
+		showProductsButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent show = new Intent(getApplicationContext(), ListAddedProducts.class);
+				startActivity(show);
+			}
+		});
+	}
+
+	@Override
+	public void onBackPressed() {
+		moveTaskToBack(true);
 	}
 
 	@Override
@@ -80,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
 		if (result != null) {
 			String contents = result.getContents();
 			if (contents != null) {
-				Toast.makeText(getApplicationContext(), "Sucssed scan" + result.toString(), Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), "Sucssed scan" + result.toString(),
+						Toast.LENGTH_LONG).show();
 			}
 			else {
 				Toast.makeText(getApplicationContext(), "failed scan", Toast.LENGTH_LONG).show();

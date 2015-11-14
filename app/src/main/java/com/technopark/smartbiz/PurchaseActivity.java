@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 
 public class PurchaseActivity extends AppCompatActivity {
 
@@ -17,6 +16,10 @@ public class PurchaseActivity extends AppCompatActivity {
 		public void onClick(View v) {
 			int i = purchaseDialogFragment.getProductCount();
 			float f = purchaseDialogFragment.getTotalPrice();
+			Intent result = new Intent();
+			// TODO Add data to result
+			setResult(RESULT_OK, result);
+			finish();
 		}
 	};
 
@@ -26,15 +29,6 @@ public class PurchaseActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_purchase);
 
 		purchaseDialogFragment.setAddButtonCallback(dialogListener);
-
-		Button button = (Button) findViewById(R.id.activity_purchase_button_submit);
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent submit = new Intent(getApplicationContext(), CheckActivity.class);
-				startActivity(submit);
-			}
-		});
 	}
 
 	private void showDialog() {

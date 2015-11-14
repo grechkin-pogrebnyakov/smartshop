@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/dialog_purchase_add_product_edittext_count"
         android:ems="10"
-        android:inputType="number"
+        android:inputType="number|numberDecimal"
         />
 
     <TextView
