@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'rest_framework',
     'rest_auth',
+    'rest_auth.registration',
     'storeManage',
     'userManage',
     'allauth',

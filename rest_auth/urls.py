@@ -22,7 +22,8 @@ urlpatterns = patterns(
     url(r'^password/change/$', PasswordChangeView.as_view(),
         name='rest_password_change'),
     url(r'^api-token-auth/', views.obtain_auth_token),
+
     url(r'^accounts/', include('allauth.urls')),
     (r'^rest-auth/registration/', include('rest_auth.registration.urls')),
-    url(r'^vk/$', VkLogin.as_view(), name='fb_login')
+    url(r'^vk/$', VkLogin.as_view(), name='vk_login')
 )
