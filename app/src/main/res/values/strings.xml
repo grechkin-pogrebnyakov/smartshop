@@ -46,4 +46,5 @@
     <string name="activity_payment_textview_odd_money">Place odd money here</string>
     <string name="activity_payment_button_pay">Оплатить</string>
     <string name="content_main_button_show_products">Список продуктов</string>
+    <string name="add_product">Добавить</string>
 </resources>
