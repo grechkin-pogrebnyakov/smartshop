@@ -163,7 +163,7 @@ public class AddProductActivity extends AppCompatActivity {
         mNewValues.put("count", count);
 
         mNewUri = getContentResolver().insert(
-                SmartShopContentProvider.ITEMS_CONTENT_URI,   // the user dictionary content URI
+                SmartShopContentProvider.PRODUCTS_CONTENT_URI,   // the user dictionary content URI
                 mNewValues                          // the values to insert
         );
         return mNewUri;

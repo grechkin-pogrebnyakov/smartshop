@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 sharedPreferences.edit().remove(TOKEN_AUTORIZATION).commit();
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                finish();
             }
         });
 
