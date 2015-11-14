@@ -107,6 +107,13 @@
             android:text="Отсканировать"
             />
 
+        <ImageButton
+            android:id="@+id/content_add_product_photo"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/camera"
+            />
+
         <android.support.design.widget.TextInputLayout
             android:id="@+id/autoCompleteTextView5"
             android:layout_width="match_parent"
@@ -146,13 +153,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Добавить продукт"
-            />
-
-        <ImageButton
-            android:id="@+id/content_add_product_photo"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:background="@drawable/camera"
             />
 
     </LinearLayout>

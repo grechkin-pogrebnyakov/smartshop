@@ -8,8 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -50,15 +48,7 @@ public class AddProductActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-			}
-		});
-		photoPath = new String();
+		photoPath = "";
 
 		initializationEditTextFields();
 		initializationButtons();
@@ -122,7 +112,8 @@ public class AddProductActivity extends AppCompatActivity {
 			finish();
 		}
 		else {
-			Toast.makeText(getApplicationContext(), "Ошибка добавления продукта", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "Ошибка добавления продукта",
+					Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -137,17 +128,21 @@ public class AddProductActivity extends AppCompatActivity {
 		if (result != null) {
 			String contents = result.getContents();
 			if (contents != null) {
-				Toast.makeText(getApplicationContext(), "Успешно отсканированно !" + result.toString(), Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(),
+						"Успешно отсканированно !" + result.toString(),
+						Toast.LENGTH_LONG)
+						.show();
 				barcodeEditText.setText(result.getContents());
 			}
 			else {
-				Toast.makeText(getApplicationContext(), "Не отсканировано !", Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), "Не отсканировано !",
+						Toast.LENGTH_LONG).show();
 			}
 		}
 	}
 
 	private Uri addRecord(String name, String priceCostProduct, String priceSellingProduct,
-	                      String count, String barcode, String description, String photoPath) {
+			String count, String barcode, String description, String photoPath) {
 		// Defines a new Uri object that receives the result of the insertion
 		Uri mNewUri;
 

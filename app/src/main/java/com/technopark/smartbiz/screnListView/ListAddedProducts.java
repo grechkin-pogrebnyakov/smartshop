@@ -41,15 +41,6 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         mCallbacks = this;
         // Инициализируем загрузчик с идентификатором '1' и 'mCallbacks'.
         // Если загрузчик не существует, то он будет создан,
