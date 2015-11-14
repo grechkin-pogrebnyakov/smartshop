@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url, include
 from rest_auth.registration.views import RegisterView
-
+from rest_auth.vkontakte import VkLogin
 from rest_auth.views import (
     LoginView, LogoutView, UserDetailsView, PasswordChangeView,
     PasswordResetView, PasswordResetConfirmView
@@ -23,5 +23,6 @@ urlpatterns = patterns(
         name='rest_password_change'),
     url(r'^api-token-auth/', views.obtain_auth_token),
     url(r'^accounts/', include('allauth.urls')),
-    (r'^rest-auth/registration/', include('rest_auth.registration.urls'))
+    (r'^rest-auth/registration/', include('rest_auth.registration.urls')),
+    url(r'^vk/$', VkLogin.as_view(), name='fb_login')
 )
