@@ -3,7 +3,6 @@ package com.technopark.smartbiz;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 public class PurchaseActivity extends AppCompatActivity {
 
@@ -11,9 +10,9 @@ public class PurchaseActivity extends AppCompatActivity {
 
 	private PurchaseDialogFragment purchaseDialogFragment = new PurchaseDialogFragment();
 
-	private View.OnClickListener dialogListener = new View.OnClickListener() {
+	private DialogFragmentCallback dialogListener = new DialogFragmentCallback() {
 		@Override
-		public void onClick(View v) {
+		public void callback() {
 			int i = purchaseDialogFragment.getProductCount();
 			float f = purchaseDialogFragment.getTotalPrice();
 			Intent result = new Intent();
