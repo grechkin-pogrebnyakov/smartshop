@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.screnListView.EndlessScrollListener;
 
 public class CheckActivity extends AppCompatActivity {
@@ -35,6 +36,7 @@ public class CheckActivity extends AppCompatActivity {
 
 		checkList = (ListView) findViewById( R.id.activity_check_listview );
 		adapter = new ProductAdapter( this );
+
 		checkList.setAdapter(adapter);
 		checkList.setOnScrollListener(new EndlessScrollListener() {
 			@Override
@@ -42,7 +44,8 @@ public class CheckActivity extends AppCompatActivity {
 
 			}
 		});
-
+		Check check = new Check("hdbc", "", 34, 34, 34, 54);
+		adapter.addItem(check);
 
 	}
 
@@ -74,8 +77,10 @@ public class CheckActivity extends AppCompatActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == SELECT_PRODUCT) {
-
+		if (requestCode == SELECT_PRODUCT && resultCode == RESULT_OK) {
+			Check check = data.getParcelableExtra(PurchaseActivity.KEY_RESPONCE_OBJECT);
+			adapter.addItem(check);
+			adapter.notifyDataSetChanged();
 		}
 	}
 }

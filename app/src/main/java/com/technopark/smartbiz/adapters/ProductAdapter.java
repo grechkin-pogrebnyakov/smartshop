@@ -22,31 +22,31 @@ import java.util.List;
  */
 public class ProductAdapter extends BaseAdapter {
 
-    private List<Product> listProduct;
+    private List<ItemForProductAdapter> listItems;
     private LayoutInflater layoutInflater;
 
-    public ProductAdapter (Context context, List<Product> listProduct) {
-        this.listProduct = listProduct;
+    public ProductAdapter (Context context, List<ItemForProductAdapter> listItems) {
+        this.listItems = listItems;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     public ProductAdapter (Context context) {
-        this.listProduct = new ArrayList<>();
+        this.listItems = new ArrayList<>();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void addItem(Product product) {
-        listProduct.add(product);
+    public void addItem(ItemForProductAdapter product) {
+        listItems.add(product);
     }
 
     @Override
     public int getCount() {
-        return listProduct.size();
+        return listItems.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return listProduct.get(i);
+        return listItems.get(i);
     }
 
     @Override
@@ -102,5 +102,9 @@ public class ProductAdapter extends BaseAdapter {
 
         Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
         imageProductView.setImageBitmap(bitmap);
+    }
+
+    public List<ItemForProductAdapter> getListItems() {
+        return listItems;
     }
 }

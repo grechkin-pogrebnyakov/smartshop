@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.technopark.smartbiz.database.items.Check;
+import com.technopark.smartbiz.database.items.ItemForProductAdapter;
+
 import java.util.Locale;
 
 /**
@@ -24,6 +27,7 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 	private float productPrice = 0.0f;
 	private int productCount = 1;
 	private float totalPrice = productCount * productPrice;
+	private Check check;
 
 	private View view = null;
 	private TextView productNameTextView;
@@ -102,12 +106,20 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		this.addButtonCallback = addButtonCallback;
 	}
 
+	public void setCheck (Check check) {
+		this.check = check;
+	}
+
 	private void updateTotalPrice() {
 		totalPrice = productCount * productPrice;
 
 		TextView totalTextView = (TextView) view
 				.findViewById(R.id.dialog_purchase_add_product_textview_total_price);
 		totalTextView.setText(String.format(Locale.US, "%.2f", totalPrice));
+	}
+
+	public Check getCheck () {
+		return check;
 	}
 
 	public float getTotalPrice() {

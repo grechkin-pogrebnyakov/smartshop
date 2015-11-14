@@ -6,18 +6,18 @@ import android.os.Parcelable;
 /**
  * Created by Abovyan on 14.11.15.
  */
-public class Check implements Parcelable {
+public class Check implements Parcelable, ItemForProductAdapter {
 
-	private String checkName;
+	private String productName;
 	private String photoPath;
 	private int priceSellingProduct;
 	private int pricePurchaseProduct;
-	private int idFromProductsTable;
+	private long idFromProductsTable;
 	private int count;
 
 
-	public Check(String checkName, String photoPath, int priceSellingProduct, int pricePurchaseProduct, int idFromProductsTable, int count) {
-		this.checkName = checkName;
+	public Check(String productName, String photoPath, int priceSellingProduct, int pricePurchaseProduct, long idFromProductsTable, int count) {
+		this.productName = productName;
 		this.photoPath = photoPath;
 		this.idFromProductsTable = idFromProductsTable;
 		this.count = count;
@@ -26,20 +26,20 @@ public class Check implements Parcelable {
 	}
 
 	public Check(Parcel source) {
-		source.readString();
-		source.readString();
-		source.readInt();
-		source.readInt();
-		source.readInt();
-		source.readInt();
+		productName = source.readString();
+		photoPath = source.readString();
+		priceSellingProduct = source.readInt();
+		pricePurchaseProduct = source.readInt();
+		idFromProductsTable = source.readLong();
+		count = source.readInt();
 	}
 
-	public String getCheckName() {
-		return checkName;
+	public String getProductName() {
+		return productName;
 	}
 
-	public void setCheckName(String checkName) {
-		this.checkName = checkName;
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 
 	public String getPhotoPath() {
@@ -66,11 +66,11 @@ public class Check implements Parcelable {
 		this.pricePurchaseProduct = pricePurchaseProduct;
 	}
 
-	public int getIdFromProductsTable() {
+	public long getIdFromProductsTable() {
 		return idFromProductsTable;
 	}
 
-	public void setIdFromProductsTable(int idFromProductsTable) {
+	public void setIdFromProductsTable(long idFromProductsTable) {
 		this.idFromProductsTable = idFromProductsTable;
 	}
 
@@ -89,11 +89,11 @@ public class Check implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(checkName);
+		dest.writeString(productName);
 		dest.writeString(photoPath);
 		dest.writeInt(priceSellingProduct);
 		dest.writeInt(pricePurchaseProduct);
-		dest.writeInt(idFromProductsTable);
+		dest.writeLong(idFromProductsTable);
 		dest.writeInt(count);
 	}
 

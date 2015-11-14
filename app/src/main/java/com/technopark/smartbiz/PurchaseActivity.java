@@ -8,15 +8,23 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.database.items.Check;
+import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.screnListView.EndlessScrollListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PurchaseActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
 
 	private String DIALOG = "purchaseDialogFragment";
+	public static String KEY_RESPONCE_OBJECT = "check";
 
 	private ListView listViewAddedProducts;
 	private final String LOG_TAG = "ListAddedProducts";
@@ -33,9 +41,8 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 	private DialogFragmentCallback dialogListener = new DialogFragmentCallback() {
 		@Override
 		public void callback() {
-			int i = purchaseDialogFragment.getProductCount();
-			float f = purchaseDialogFragment.getTotalPrice();
 			Intent result = new Intent();
+			result.putExtra(KEY_RESPONCE_OBJECT, purchaseDialogFragment.getCheck());
 			// TODO Add data to result
 			setResult(RESULT_OK, result);
 			finish();
@@ -61,6 +68,13 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 			@Override
 			public void loadData(int offset) {
 
+			}
+		});
+		listViewAddedProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				Product product = (Product) adapter.getListItems().get(i);
+				showDialog(product.getCheck());
 			}
 		});
 
@@ -90,8 +104,9 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 						int pricePurchaseProduct = cursor.getInt(cursor.getColumnIndex("price_cost_product"));
 						int productBarcode = cursor.getInt(cursor.getColumnIndex("barcode"));
 						int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
+						long id = cursor.getLong(cursor.getColumnIndex("_id"));
 						Product product = new Product(nameProduct, descriptionProduct, photoPath, priceSellingProduct,
-								pricePurchaseProduct, productBarcode, countProduct);
+								pricePurchaseProduct, productBarcode, countProduct, id);
 						adapter.addItem( product );
 					} while ( cursor.moveToNext() );
 				}
@@ -107,9 +122,10 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 		//simpleCursorAdapter.swapCursor(null);
 	}
 
-	private void showDialog() {
-		purchaseDialogFragment.setProductName("qwerty");
-		purchaseDialogFragment.setProductPrice(12.3f);
+	private void showDialog(Check check) {
+		purchaseDialogFragment.setCheck(check);
+		purchaseDialogFragment.setProductName(check.getProductName());
+		purchaseDialogFragment.setProductPrice(check.getPriceSellingProduct());
 		purchaseDialogFragment.setProductCount(1);
 		purchaseDialogFragment.show(getFragmentManager(), DIALOG);
 	}

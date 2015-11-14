@@ -12,6 +12,7 @@ public class Product implements ItemForProductAdapter {
     private int pricePurchaseProduct;
     private int productBarcode;
     private int count;
+    private long id;
 
 
     public Product(String productName, String descriptionProduct, String photoPath, int priceSellingProduct, int pricePurchaseProduct, int productBarcode, int count) {
@@ -22,6 +23,17 @@ public class Product implements ItemForProductAdapter {
         this.count = count;
         this.priceSellingProduct = priceSellingProduct;
         this.pricePurchaseProduct = pricePurchaseProduct;
+    }
+
+    public Product(String productName, String descriptionProduct, String photoPath, int priceSellingProduct, int pricePurchaseProduct, int productBarcode, int count, long id) {
+        this.productName = productName;
+        this.descriptionProduct = descriptionProduct;
+        this.photoPath = photoPath;
+        this.productBarcode = productBarcode;
+        this.count = count;
+        this.priceSellingProduct = priceSellingProduct;
+        this.pricePurchaseProduct = pricePurchaseProduct;
+        this.id = id;
     }
 
     public int getProductBarcode() {
@@ -46,6 +58,10 @@ public class Product implements ItemForProductAdapter {
 
     public int getPriceSellingProduct() {
         return priceSellingProduct;
+    }
+
+    public Check getCheck () {
+        return new Check(productName, photoPath, priceSellingProduct, pricePurchaseProduct, id, count);
     }
 
     public int getPricePurchaseProduct() {
