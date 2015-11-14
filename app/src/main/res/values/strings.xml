@@ -29,7 +29,7 @@
     <string name="title_activity_add_product">Добавление товаров</string>
     <string name="title_activity_list_added_products">Добавленные товары</string>
     <string name="content_main_button_new_check">Продать</string>
-    <string name="title_activity_purchase">Продажа</string>
+    <string name="title_activity_purchase">Список продуктов</string>
     <string name="activity_purchase_total">Сумма, руб.</string>
     <string name="activity_purchase_button_submit">Оформить</string>
     <string name="layout_purchase_add_product_edittext_count">Количество</string>
