@@ -52,7 +52,7 @@
             android:layout_toRightOf="@+id/activity_check_layout_total_string"
             android:layout_toStartOf="@+id/activity_check_button_submit"
             android:gravity="center_vertical"
-            android:textSize="30sp"
+            android:textSize="20sp"
             />
 
         <Button
