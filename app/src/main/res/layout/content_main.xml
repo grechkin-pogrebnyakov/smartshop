@@ -72,6 +72,17 @@
                 android:textStyle="bold"
                 />
 
+            <Button
+                android:id="@+id/content_main_button_edit_shop_profile"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/content_main_button_show_products"
+                android:layout_marginTop="16dp"
+                android:text="@string/content_main_button_edit_shop_profile"
+                android:textStyle="bold"
+                />
+
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>
