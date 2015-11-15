@@ -26,7 +26,7 @@
     <string name="title_activity_register">Регистрация</string>
     <string name="title_activity_main">SmartBiz</string>
     <string name="scan_barcode_button">Сканировать штрих-код</string>
-    <string name="title_activity_add_product">Добавление товаров</string>
+    <string name="title_activity_add_product">Добавление продукта</string>
     <string name="title_activity_list_added_products">Добавленные товары</string>
     <string name="content_main_button_new_check">Продать</string>
     <string name="title_activity_purchase">Список продуктов</string>
@@ -47,4 +47,5 @@
     <string name="activity_payment_button_pay">Оплатить</string>
     <string name="content_main_button_show_products">Список продуктов</string>
     <string name="add_product">Добавить</string>
+    <string name="title_activity_edit_product">Информация о продукте</string>
 </resources>

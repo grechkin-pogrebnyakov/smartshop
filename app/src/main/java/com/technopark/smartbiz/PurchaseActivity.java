@@ -115,6 +115,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 				}
 				break;
 		}
+		adapter.notifyDataSetChanged();
 		// список теперь содержит данные на экране
 	}
 

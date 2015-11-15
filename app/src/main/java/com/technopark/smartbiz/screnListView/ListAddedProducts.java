@@ -2,16 +2,21 @@ package com.technopark.smartbiz.screnListView;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.technopark.smartbiz.EditProductActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.Product;
 
 
@@ -19,6 +24,7 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
 
     private ListView listViewAddedProducts;
     private final String LOG_TAG = "ListAddedProducts";
+    public static final String SEND_PRODUCT_NAME = "SendProductName";
     // Уникальный идентификатор загрузчика
     private static final int LOADER_ID = 1;
     private ProductAdapter adapter;
@@ -44,10 +50,19 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
         listViewAddedProducts = (ListView) findViewById( R.id.clap_name_product_textView );
         adapter = new ProductAdapter( this );
         listViewAddedProducts.setAdapter( adapter );
-        listViewAddedProducts.setOnScrollListener( new EndlessScrollListener() {
+        listViewAddedProducts.setOnScrollListener(new EndlessScrollListener() {
             @Override
-            public void loadData( int offset ) {
+            public void loadData(int offset) {
 
+            }
+        });
+
+        listViewAddedProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getApplicationContext(), EditProductActivity.class);
+                intent.putExtra(SEND_PRODUCT_NAME, (Product)adapter.getListItems().get(i));
+                startActivity(intent);
             }
         });
     }
@@ -76,13 +91,15 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
                         int pricePurchaseProduct = cursor.getInt(cursor.getColumnIndex("price_cost_product"));
                         int productBarcode = cursor.getInt(cursor.getColumnIndex("barcode"));
                         int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
+                        long id = cursor.getInt(cursor.getColumnIndex("_id"));
                         Product product = new Product(nameProduct, descriptionProduct, photoPath, priceSellingProduct,
-                                pricePurchaseProduct, productBarcode, countProduct);
+                                pricePurchaseProduct, productBarcode, countProduct, id);
                         adapter.addItem( product );
                     } while ( cursor.moveToNext() );
                 }
                 break;
         }
+        adapter.notifyDataSetChanged();
         // список теперь содержит данные на экране
     }
 

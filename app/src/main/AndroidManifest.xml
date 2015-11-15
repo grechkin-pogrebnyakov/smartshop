@@ -56,6 +56,15 @@
             >
         </activity>
 
+        <activity
+            android:name=".EditProductActivity"
+            android:label="@string/title_activity_edit_product"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
+
+        </activity>
+
+
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
         <provider

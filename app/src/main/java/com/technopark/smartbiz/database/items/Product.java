@@ -1,9 +1,12 @@
 package com.technopark.smartbiz.database.items;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Abovyan on 18.10.15.
  */
-public class Product implements ItemForProductAdapter {
+public class Product implements Parcelable, ItemForProductAdapter {
 
     private String productName;
     private String descriptionProduct;
@@ -34,6 +37,17 @@ public class Product implements ItemForProductAdapter {
         this.priceSellingProduct = priceSellingProduct;
         this.pricePurchaseProduct = pricePurchaseProduct;
         this.id = id;
+    }
+
+    public Product(Parcel source) {
+        productName = source.readString();
+        descriptionProduct = source.readString();
+        photoPath = source.readString();
+        priceSellingProduct = source.readInt();
+        pricePurchaseProduct = source.readInt();
+        productBarcode = source.readInt();
+        count = source.readInt();
+        id = source.readLong();
     }
 
     public int getProductBarcode() {
@@ -68,6 +82,14 @@ public class Product implements ItemForProductAdapter {
         return pricePurchaseProduct;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public void setPricePurchaseProduct(int pricePurchaseProduct) {
         this.pricePurchaseProduct = pricePurchaseProduct;
     }
@@ -95,4 +117,33 @@ public class Product implements ItemForProductAdapter {
     public void setProductBarcode(int productBarcode) {
         this.productBarcode = productBarcode;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(productName);
+        dest.writeString(descriptionProduct);
+        dest.writeString(photoPath);
+        dest.writeInt(priceSellingProduct);
+        dest.writeInt(pricePurchaseProduct);
+        dest.writeInt(productBarcode);
+        dest.writeInt(count);
+        dest.writeLong(id);
+    }
+
+    public static final Parcelable.Creator<Product> CREATOR = new Creator<Product>() {
+        @Override
+        public Product createFromParcel(Parcel source) {
+            return new Product(source);
+        }
+
+        @Override
+        public Product[] newArray(int size) {
+            return new Product[size];
+        }
+    };
 }
