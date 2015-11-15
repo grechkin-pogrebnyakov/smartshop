@@ -140,4 +140,8 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 
 		addButtonCallback.callback();
 	}
+
+	public float getProductPrice() {
+		return productPrice;
+	}
 }

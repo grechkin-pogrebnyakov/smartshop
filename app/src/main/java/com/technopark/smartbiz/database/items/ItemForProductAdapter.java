@@ -5,7 +5,10 @@ package com.technopark.smartbiz.database.items;
  */
 public interface ItemForProductAdapter {
 	public String getProductName();
+
 	public int getCount();
+
 	public int getPriceSellingProduct();
+
 	public String getPhotoPath();
 }

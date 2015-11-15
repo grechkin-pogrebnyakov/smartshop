@@ -10,19 +10,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.database.items.Check;
-import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.screnListView.EndlessScrollListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class PurchaseActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
+public class PurchaseActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private String DIALOG = "purchaseDialogFragment";
 	public static String KEY_RESPONCE_OBJECT = "check";
@@ -44,8 +39,8 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 		public void callback() {
 			Intent result = new Intent();
 			Check check = purchaseDialogFragment.getCheck();
-			check.setCount( purchaseDialogFragment.getProductCount() );
-			check.setPriceSellingProduct((int) ( purchaseDialogFragment.getTotalPrice() ) );
+			check.setCount(purchaseDialogFragment.getProductCount());
+			check.setPriceSellingProduct((int) (purchaseDialogFragment.getProductPrice()));
 			result.putExtra(KEY_RESPONCE_OBJECT, check);
 			// TODO Add data to result
 			setResult(RESULT_OK, result);
@@ -65,8 +60,8 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 		LoaderManager lm = getLoaderManager();
 		lm.initLoader(LOADER_ID, null, mCallbacks);
 
-		listViewAddedProducts = (ListView) findViewById( R.id.activity_purchase_listview );
-		adapter = new ProductAdapter( this );
+		listViewAddedProducts = (ListView) findViewById(R.id.activity_purchase_listview);
+		adapter = new ProductAdapter(this);
 		listViewAddedProducts.setAdapter(adapter);
 		listViewAddedProducts.setOnScrollListener(new EndlessScrollListener() {
 			@Override
@@ -77,7 +72,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 		listViewAddedProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				Check check = ((Product) adapter.getListItems().get(i) ).getCheck();
+				Check check = ((Product) adapter.getListItems().get(i)).getCheck();
 				showDialog(check);
 			}
 		});
@@ -88,31 +83,35 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 	@Override
 	public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 		// Создаем новый CursorLoader с нужными параметрами.
-		return new CursorLoader( this.getApplicationContext(), CONTENT_URI,
-				null, null, null, null );
+		return new CursorLoader(this.getApplicationContext(), CONTENT_URI,
+				null, null, null, null);
 	}
 
 	@Override
-	public void onLoadFinished( Loader<Cursor> loader, Cursor cursor ) {
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		// Если используется несколько загрузчиков, то удобнее через оператор switch-case
-		switch ( loader.getId() ) {
+		switch (loader.getId()) {
 			case LOADER_ID:
 				// Данные загружены и готовы к использованию
 				//simpleCursorAdapter.swapCursor( cursor );
-				if ( cursor.moveToFirst() ) {
+				if (cursor.moveToFirst()) {
 					do {
 						String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
-						String descriptionProduct = cursor.getString(cursor.getColumnIndex("description"));
+						String descriptionProduct = cursor.getString(cursor
+								.getColumnIndex("description"));
 						String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
-						int priceSellingProduct = cursor.getInt(cursor.getColumnIndex("price_selling_product"));
-						int pricePurchaseProduct = cursor.getInt(cursor.getColumnIndex("price_cost_product"));
+						int priceSellingProduct = cursor.getInt(cursor
+								.getColumnIndex("price_selling_product"));
+						int pricePurchaseProduct = cursor.getInt(cursor
+								.getColumnIndex("price_cost_product"));
 						int productBarcode = cursor.getInt(cursor.getColumnIndex("barcode"));
 						int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
 						long id = cursor.getLong(cursor.getColumnIndex("_id"));
 						Product product = new Product(nameProduct, descriptionProduct, photoPath, priceSellingProduct,
 								pricePurchaseProduct, productBarcode, countProduct, id);
-						adapter.addItem( product );
-					} while ( cursor.moveToNext() );
+						adapter.addItem(product);
+					}
+					while (cursor.moveToNext());
 				}
 				break;
 		}
@@ -120,7 +119,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 	}
 
 	@Override
-	public void onLoaderReset( Loader<Cursor> loader ) {
+	public void onLoaderReset(Loader<Cursor> loader) {
 		// Если по какой-то причине данные не доступны, то удаляем ссылки на старые данные,
 		// заменяя их пустым курсором
 		//simpleCursorAdapter.swapCursor(null);

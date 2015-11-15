@@ -9,16 +9,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
-import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.screnListView.EndlessScrollListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Locale;
 
 
 public class CheckActivity extends AppCompatActivity {
@@ -42,8 +41,8 @@ public class CheckActivity extends AppCompatActivity {
 
 		initializationButtons();
 
-		checkList = (ListView) findViewById( R.id.activity_check_listview );
-		adapter = new ProductAdapter( this );
+		checkList = (ListView) findViewById(R.id.activity_check_listview);
+		adapter = new ProductAdapter(this);
 
 		checkList.setAdapter(adapter);
 		checkList.setOnScrollListener(new EndlessScrollListener() {
@@ -54,7 +53,7 @@ public class CheckActivity extends AppCompatActivity {
 		});
 	}
 
-	private void initializationButtons () {
+	private void initializationButtons() {
 		checkButtonSubmit = (Button) findViewById(R.id.activity_check_button_submit);
 		checkButtonSubmit.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -75,10 +74,10 @@ public class CheckActivity extends AppCompatActivity {
 		return checkList;
 	}
 
-	private int calculateSumCheck () {
+	private int calculateSumCheck() {
 		int sum = 0;
 		for (ItemForProductAdapter temp : adapter.getListItems()) {
-			sum += temp.getPriceSellingProduct();
+			sum += temp.getPriceSellingProduct() * temp.getCount();
 		}
 		return sum;
 	}
@@ -103,6 +102,13 @@ public class CheckActivity extends AppCompatActivity {
 			Check check = data.getParcelableExtra(PurchaseActivity.KEY_RESPONCE_OBJECT);
 			adapter.addItem(check);
 			adapter.notifyDataSetChanged();
+
+			setTotalPrice(calculateSumCheck());
 		}
+	}
+
+	private void setTotalPrice(float totalPrice) {
+		TextView totalTextView = (TextView) findViewById(R.id.activity_check_total);
+		totalTextView.setText(String.format(Locale.US, "%.2f", totalPrice));
 	}
 }
