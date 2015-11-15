@@ -16,6 +16,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.buisnessLogic.addProduct.AddProductActivity;
@@ -23,6 +27,8 @@ import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.screnListView.ListAddedProducts;
 import com.technopark.smartbiz.userIdentification.LoginActivity;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
 	private CheckContentObserver checkContentObserver = new CheckContentObserver();
 	private DatabaseHelper dbHelper;
+
+	private LineChart mainChart;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		LineChart mainChart = (LineChart) findViewById(R.id.content_main_chart);
+		mainChart = (LineChart) findViewById(R.id.content_main_chart);
+		setupChart();
+		fillChart();
 
 		Button logOut = (Button) findViewById(R.id.button_logout);
 		logOut.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +105,47 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(show);
 			}
 		});
+	}
+
+	private void setupChart() {
+		mainChart.setDescription("");
+
+		XAxis xAxis = mainChart.getXAxis();
+		xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+	}
+
+	private void fillChart() {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+		String[] columns = new String[]{
+				"strftime('%d-%m-%Y', date_time) as date",
+				"sum(price_selling_product * count) as total_price"
+		};
+
+		Cursor cursor = db
+				.query(DatabaseHelper.CHECKS_TABLE_NAME, columns, null, null, "date", null, null);
+
+		ArrayList<Entry> entries = new ArrayList<>();
+		ArrayList<String> labels = new ArrayList<>();
+
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				int setSize = cursor.getCount();
+				for (int i = 0; i < setSize; ++i) {
+					entries.add(new Entry(cursor.getInt(cursor.getColumnIndex("total_price")), i));
+					labels.add(cursor.getString(cursor.getColumnIndex("date")));
+					cursor.moveToNext();
+				}
+			}
+			cursor.close();
+		}
+		dbHelper.close();
+
+		LineDataSet dataSet = new LineDataSet(entries, "Оборот");
+		LineData lineData = new LineData(labels, dataSet);
+
+		mainChart.setData(lineData);
+		mainChart.invalidate();
 	}
 
 	@Override
@@ -144,33 +195,6 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public void onChange(boolean selfChange, Uri uri) {
 			Log.d(CHECK_CONTENT_OBSERVER_LOG, "onChangeUri");
-
-			SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-			String[] columns = new String[]{
-					"strftime('%d-%m-%Y', date_time) as date",
-					"sum(price_selling_product * count) as total_price"
-			};
-
-			Cursor cursor = db
-					.query(DatabaseHelper.CHECKS_TABLE_NAME, columns, null, null, "date", null, null);
-
-			if (cursor != null) {
-				if (cursor.moveToFirst()) {
-					String s = "";
-					do {
-						for (String cn : cursor.getColumnNames()) {
-							s = s.concat(cn + " = " + cursor
-									.getString(cursor.getColumnIndex(cn)) + ";");
-						}
-						Log.e("cursor", s);
-					}
-					while (cursor.moveToNext());
-				}
-				cursor.close();
-			}
-
-			dbHelper.close();
 		}
 	}
 }
