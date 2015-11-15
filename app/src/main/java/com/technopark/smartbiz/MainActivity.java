@@ -13,15 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.buisnessLogic.addProduct.AddProductActivity;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
@@ -93,6 +90,16 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				Intent show = new Intent(getApplicationContext(), ListAddedProducts.class);
+				startActivity(show);
+			}
+		});
+
+		Button editShopProfileButton = (Button) findViewById(R.id.content_main_button_edit_shop_profile);
+		editShopProfileButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent show = new Intent(getApplicationContext(), ShopProfileActivity.class);
+				show.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(show);
 			}
 		});

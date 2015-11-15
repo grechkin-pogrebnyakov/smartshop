@@ -47,4 +47,6 @@
     <string name="activity_payment_button_pay">Оплатить</string>
     <string name="content_main_button_show_products">Список продуктов</string>
     <string name="add_product">Добавить</string>
+    <string name="content_main_button_edit_shop_profile">Редактировать профиль магазина</string>
+    <string name="title_activity_shop_profile">Профиль магазина</string>
 </resources>
