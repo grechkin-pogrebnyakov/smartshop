@@ -108,10 +108,11 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 			mNewValues.put("count", check.getCount());
 
 			mNewUri = getContentResolver().insert(
-					SmartShopContentProvider.PRODUCTS_CONTENT_URI,   // the user dictionary content URI
+					SmartShopContentProvider.CHECKS_CONTENT_URI,   // the user dictionary content URI
 					mNewValues                          // the values to insert
 			);
 		}
+		getContentResolver().notifyChange(SmartShopContentProvider.CHECKS_CONTENT_URI, null);
 		return mNewUri;
 	}
 }
