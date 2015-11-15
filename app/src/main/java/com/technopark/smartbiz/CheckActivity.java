@@ -2,6 +2,7 @@ package com.technopark.smartbiz;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,7 +12,14 @@ import android.widget.ListView;
 
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.database.items.Check;
+import com.technopark.smartbiz.database.items.ItemForProductAdapter;
+import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.screnListView.EndlessScrollListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 public class CheckActivity extends AppCompatActivity {
 
@@ -22,8 +30,8 @@ public class CheckActivity extends AppCompatActivity {
 	// Уникальный идентификатор загрузчика
 	private ProductAdapter adapter;
 
-	private float totalPrice = 123.45f;
 	public static String TOTAL_PRICE = "TotalPrice";
+	public static String CHECK_LIST_NAME = "CheckListName";
 
 	private Button checkButtonSubmit;
 
@@ -44,9 +52,6 @@ public class CheckActivity extends AppCompatActivity {
 
 			}
 		});
-		Check check = new Check("hdbc", "", 34, 34, 34, 54);
-		adapter.addItem(check);
-
 	}
 
 	private void initializationButtons () {
@@ -55,10 +60,27 @@ public class CheckActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				Intent submit = new Intent(getApplicationContext(), PaymentActivity.class);
-				submit.putExtra(TOTAL_PRICE, totalPrice);
+				submit.putExtra(TOTAL_PRICE, calculateSumCheck());
+				submit.putParcelableArrayListExtra(CHECK_LIST_NAME, getCheckList());
 				startActivity(submit);
 			}
 		});
+	}
+
+	private ArrayList<? extends Parcelable> getCheckList() {
+		ArrayList<Check> checkList = new ArrayList<>();
+		for (ItemForProductAdapter temp : adapter.getListItems()) {
+			checkList.add((Check) temp);
+		}
+		return checkList;
+	}
+
+	private int calculateSumCheck () {
+		int sum = 0;
+		for (ItemForProductAdapter temp : adapter.getListItems()) {
+			sum += temp.getPriceSellingProduct();
+		}
+		return sum;
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CHECKS_TABLE_CREATE =
             "CREATE TABLE " + CHECKS_TABLE_NAME +
                     " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    " id_from_products_table INTEGER UNIQUE," +
+                    " id_from_products_table INTEGER," +
                     " photo_path TEXT, " +
                     " name TEXT, " +
                     " price_selling_product INTEGER, " +

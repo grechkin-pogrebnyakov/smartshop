@@ -1,7 +1,10 @@
 package com.technopark.smartbiz;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.technopark.smartbiz.database.SmartShopContentProvider;
+import com.technopark.smartbiz.database.items.Check;
+import com.technopark.smartbiz.database.items.ItemForProductAdapter;
+
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class PaymentActivity extends AppCompatActivity implements TextWatcher {
@@ -28,7 +36,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			totalPrice = extras.getFloat(CheckActivity.TOTAL_PRICE);
+			totalPrice = extras.getInt(CheckActivity.TOTAL_PRICE);
 		}
 
 		TextView totalTextView = (TextView) findViewById(R.id.activity_payment_textview_total);
@@ -47,6 +55,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 				if (oddMoney >= 0) {
 					Intent submit = new Intent(getApplicationContext(), MainActivity.class);
 					submit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					addRecord(getIntent().getParcelableArrayListExtra(CheckActivity.CHECK_LIST_NAME));
 					startActivity(submit);
 				}
 			}
@@ -75,5 +84,34 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 
 		this.payment = Float.valueOf(paymentString.toString());
 		updateOddMoneyEditText();
+	}
+
+	private Uri addRecord(ArrayList<Parcelable> checkList) {
+		// Defines a new Uri object that receives the result of the insertion
+		Uri mNewUri = null;
+		Check check;
+		// Defines an object to contain the new values to insert
+		ContentValues mNewValues = new ContentValues();
+
+        /*
+        * Sets the values of each column and inserts the word. The arguments to the "put"
+        * method are "column name" and "value"
+        */
+
+		for (Parcelable temp : checkList) {
+			check = (Check) temp;
+			mNewValues.put("id_from_products_table", check.getIdFromProductsTable());
+			mNewValues.put("photo_path", check.getPhotoPath());
+			mNewValues.put("name", check.getProductName());
+			mNewValues.put("price_selling_product", check.getPriceSellingProduct());
+			mNewValues.put("price_cost_product", check.getPricePurchaseProduct());
+			mNewValues.put("count", check.getCount());
+
+			mNewUri = getContentResolver().insert(
+					SmartShopContentProvider.PRODUCTS_CONTENT_URI,   // the user dictionary content URI
+					mNewValues                          // the values to insert
+			);
+		}
+		return mNewUri;
 	}
 }

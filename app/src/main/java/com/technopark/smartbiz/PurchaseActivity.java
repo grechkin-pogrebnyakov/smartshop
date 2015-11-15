@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.technopark.smartbiz.adapters.ProductAdapter;
@@ -42,7 +43,10 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 		@Override
 		public void callback() {
 			Intent result = new Intent();
-			result.putExtra(KEY_RESPONCE_OBJECT, purchaseDialogFragment.getCheck());
+			Check check = purchaseDialogFragment.getCheck();
+			check.setCount( purchaseDialogFragment.getProductCount() );
+			check.setPriceSellingProduct((int) ( purchaseDialogFragment.getTotalPrice() ) );
+			result.putExtra(KEY_RESPONCE_OBJECT, check);
 			// TODO Add data to result
 			setResult(RESULT_OK, result);
 			finish();
@@ -73,8 +77,8 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 		listViewAddedProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				Product product = (Product) adapter.getListItems().get(i);
-				showDialog(product.getCheck());
+				Check check = ((Product) adapter.getListItems().get(i) ).getCheck();
+				showDialog(check);
 			}
 		});
 

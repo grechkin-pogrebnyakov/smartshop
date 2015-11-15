@@ -3,6 +3,9 @@ package com.technopark.smartbiz.database.items;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
+
 /**
  * Created by Abovyan on 14.11.15.
  */
