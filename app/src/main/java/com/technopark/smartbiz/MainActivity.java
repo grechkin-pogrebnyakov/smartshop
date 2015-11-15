@@ -3,9 +3,14 @@ package com.technopark.smartbiz;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,6 +19,8 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.buisnessLogic.addProduct.AddProductActivity;
+import com.technopark.smartbiz.database.DatabaseHelper;
+import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.screnListView.ListAddedProducts;
 import com.technopark.smartbiz.userIdentification.LoginActivity;
 
@@ -25,12 +32,19 @@ public class MainActivity extends AppCompatActivity {
 	public static final String APP_PREFERENCES = "mysettings";
 	public static final String TOKEN_AUTORIZATION = "token";
 
+	private CheckContentObserver checkContentObserver = new CheckContentObserver();
+	private DatabaseHelper dbHelper;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+
+		getContentResolver()
+				.registerContentObserver(SmartShopContentProvider.CHECKS_CONTENT_URI, false, checkContentObserver);
+		dbHelper = new DatabaseHelper(this);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
@@ -84,6 +98,12 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		getContentResolver().unregisterContentObserver(checkContentObserver);
+	}
+
+	@Override
 	public void onBackPressed() {
 		moveTaskToBack(true);
 	}
@@ -103,4 +123,54 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	private class CheckContentObserver extends ContentObserver {
+
+		private String CHECK_CONTENT_OBSERVER_LOG = "CheckContentObserver";
+
+		public CheckContentObserver() {
+			super(null);
+		}
+
+		@Override
+		public boolean deliverSelfNotifications() {
+			return false;
+		}
+
+		@Override
+		public void onChange(boolean selfChange) {
+			Log.d(CHECK_CONTENT_OBSERVER_LOG, "onChange");
+		}
+
+		@Override
+		public void onChange(boolean selfChange, Uri uri) {
+			Log.d(CHECK_CONTENT_OBSERVER_LOG, "onChangeUri");
+
+			SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+			String[] columns = new String[]{
+					"strftime('%d-%m-%Y', date_time) as date",
+					"sum(price_selling_product * count) as total_price"
+			};
+
+			Cursor cursor = db
+					.query(DatabaseHelper.CHECKS_TABLE_NAME, columns, null, null, "date", null, null);
+
+			if (cursor != null) {
+				if (cursor.moveToFirst()) {
+					String s = "";
+					do {
+						for (String cn : cursor.getColumnNames()) {
+							s = s.concat(cn + " = " + cursor
+									.getString(cursor.getColumnIndex(cn)) + ";");
+						}
+						Log.e("cursor", s);
+					}
+					while (cursor.moveToNext());
+				}
+				cursor.close();
+			}
+
+			dbHelper.close();
+		}
+	}
 }

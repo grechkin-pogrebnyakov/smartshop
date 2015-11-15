@@ -27,15 +27,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " description TEXT, " +
                     " count INTEGER );";
 
-    private static final String CHECKS_TABLE_CREATE =
-            "CREATE TABLE " + CHECKS_TABLE_NAME +
-                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    " id_from_products_table INTEGER," +
-                    " photo_path TEXT, " +
-                    " name TEXT, " +
-                    " price_selling_product INTEGER, " +
-                    " price_cost_product INTEGER, " +
-                    " count INTEGER );";
+	private static final String CHECKS_TABLE_CREATE =
+			"CREATE TABLE " + CHECKS_TABLE_NAME +
+					" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+					" id_from_products_table INTEGER," +
+					" photo_path TEXT, " +
+					" name TEXT, " +
+					" price_selling_product INTEGER, " +
+					" price_cost_product INTEGER, " +
+					" count INTEGER," +
+					" date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
+					" );";
 
     DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
