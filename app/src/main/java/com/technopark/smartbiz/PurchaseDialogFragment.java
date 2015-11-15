@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.technopark.smartbiz.database.items.Check;
-import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 
 import java.util.Locale;
 
@@ -32,7 +31,7 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 	private View view = null;
 	private TextView productNameTextView;
 	private EditText countEditText;
-	private EditText productPriceEditText;
+	private TextView productPriceTextView;
 
 	private DialogFragmentCallback addButtonCallback = null;
 
@@ -63,15 +62,15 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		getDialog().setTitle("Количество");
 		view = inflater.inflate(R.layout.dialog_purchase_add_product, null);
 
-		productNameTextView = (TextView) view
-				.findViewById(R.id.dialog_purchase_add_product_textview_product_name);
+		productNameTextView = (TextView)
+				view.findViewById(R.id.dialog_purchase_add_product_textview_product_name);
 
-		countEditText = (EditText) view
-				.findViewById(R.id.dialog_purchase_add_product_edittext_count);
+		countEditText =
+				(EditText) view.findViewById(R.id.dialog_purchase_add_product_edittext_count);
 		countEditText.addTextChangedListener(countTextWatcher);
 
-		productPriceEditText = (EditText) view
-				.findViewById(R.id.dialog_purchase_add_product_edittext_price);
+		productPriceTextView =
+				(TextView) view.findViewById(R.id.dialog_purchase_add_product_textview_price);
 
 		Button addButton = (Button) view.findViewById(R.id.dialog_purchase_add_product_button_add);
 		addButton.setOnClickListener(this);
@@ -85,7 +84,7 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 
 		productNameTextView.setText(productName);
 		countEditText.setText(String.valueOf(productCount));
-		productPriceEditText.setText(String.format(Locale.US, "%.2f", productPrice));
+		productPriceTextView.setText(String.format(Locale.US, "%.2f", productPrice));
 
 		updateTotalPrice();
 	}
@@ -106,7 +105,7 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		this.addButtonCallback = addButtonCallback;
 	}
 
-	public void setCheck (Check check) {
+	public void setCheck(Check check) {
 		this.check = check;
 	}
 
@@ -118,7 +117,7 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		totalTextView.setText(String.format(Locale.US, "%.2f", totalPrice));
 	}
 
-	public Check getCheck () {
+	public Check getCheck() {
 		return check;
 	}
 
