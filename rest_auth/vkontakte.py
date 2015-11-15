@@ -7,6 +7,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 class VkLogin(SocialLoginView):
     adapter_class = VKProvider
     client_class = OAuth2Client
-    callback_url = 'https://smartshop1.ddns.net:81/api/auth/vk/'
+    callback_url = 'https://localhost:8000/api/auth/accounts/vk/login/'
+    redirect_url = 'https://localhost:8000/api/auth/accounts/vk/login/'
 
 

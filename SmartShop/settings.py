@@ -157,6 +157,7 @@ REST_FRAMEWORK = {
 
 VKAPP_APP_ID = "5093720"
 VKAPP_API_SECRET = "bFCtfRc6NhGBhuFy7CYw"
+SITE_ID = 2
 
 TEMPLATE_CONTEXT_PROCESSORS = {
     'allauth.socialaccount.context_processors.socialaccount'
