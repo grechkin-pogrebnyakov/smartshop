@@ -79,15 +79,6 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
-		Button scanBarcode = (Button) findViewById(R.id.scan_button);
-		scanBarcode.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
-				integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
-			}
-		});
-
 		Button purchaseButton = (Button) findViewById(R.id.content_main_button_purchase);
 		purchaseButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -157,21 +148,6 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public void onBackPressed() {
 		moveTaskToBack(true);
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-		if (result != null) {
-			String contents = result.getContents();
-			if (contents != null) {
-				Toast.makeText(getApplicationContext(), "Sucssed scan" + result.toString(),
-						Toast.LENGTH_LONG).show();
-			}
-			else {
-				Toast.makeText(getApplicationContext(), "failed scan", Toast.LENGTH_LONG).show();
-			}
-		}
 	}
 
 	private class CheckContentObserver extends ContentObserver {

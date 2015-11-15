@@ -40,22 +40,11 @@
                 />
 
             <Button
-                android:id="@+id/scan_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/button_logout"
-                android:layout_marginTop="16dp"
-                android:text="@string/scan_barcode_button"
-                android:textStyle="bold"
-                />
-
-            <Button
                 android:id="@+id/go_to_add_product"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/scan_button"
+                android:layout_below="@id/button_logout"
                 android:layout_marginTop="16dp"
                 android:text="Добавить продукт"
                 android:textStyle="bold"
