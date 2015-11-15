@@ -156,7 +156,7 @@ public class SmartShopContentProvider extends ContentProvider {
 
         // просим ContentResolver уведомлять этот курсор
         // об изменениях данных в PRODUCTS_CONTENT_URI
-        getContext().getContentResolver().notifyChange(uri, null);
+//        getContext().getContentResolver().notifyChange(uri, null);
         return cursor;
     }
 

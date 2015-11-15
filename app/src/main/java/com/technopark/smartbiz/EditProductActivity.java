@@ -1,5 +1,6 @@
 package com.technopark.smartbiz;
 
+
 import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -260,7 +261,7 @@ public class EditProductActivity extends AppCompatActivity {
 	}
 
 	private void setPic() {
-		if (photoPath != null && !photoPath.isEmpty() ) {
+		if (photoPath != null && !photoPath.isEmpty()) {
 			// Get the dimensions of the View
 			int targetW = 150; //addProductPhotoButton.getWidth();
 			int targetH = 150; //addProductPhotoButton.getHeight();
