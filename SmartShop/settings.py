@@ -125,27 +125,79 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGGING = {
-            'version': 1,
-                'disable_existing_loggers': False,
-                    'filters': {
-                                'require_debug_false': {
-                                                '()': 'django.utils.log.RequireDebugFalse'
-                                                        }
-                                    },
-                        'handlers': {
-                                    'console': {
-                                                    'level': 'ERROR',
-                                                                'class': 'logging.StreamHandler',
-                                                                        }
-                                        },
-                            'loggers': {
-                                        'django': {
-                                                        'handlers': ['console'],
-                                                                    'level': 'ERROR',
-                                                                                'propagate': True,
-                                                                                        }
-                                            }
-                            }
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+	'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'formatters': {
+        'error': {
+            'format': '%(asctime)s [%(levelname)s pid:%(process)d tid:%(thread)d] %(message)s (%(pathname)s:%(lineno)d)'
+        },
+        'access': {
+            'format': '%(asctime)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+        },
+        'error_log_file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/smartshop/error.log',
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 7,
+            'formatter': 'error',
+	    'filters': ['require_debug_true'],
+        },
+        'error_log_file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/smartshop/error.log',
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 7,
+            'formatter': 'error',
+	    'filters': ['require_debug_false'],
+        },
+        'django_log_file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/smartshop/django_error.log',
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 7,
+            'formatter': 'error',
+	    'filters': ['require_debug_true'],
+        },
+        'django_log_file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/smartshop/django_error.log',
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 7,
+            'formatter': 'error',
+	    'filters': ['require_debug_false'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'django_log_file', 'django_log_file_debug'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'smartshop.log':{
+            'handlers': ['error_log_file', 'error_log_file_debug'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+    }
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

@@ -19,6 +19,10 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
 from storeManage.serializers import ShopSerializer,ShopItemSerializer
+import logging
+from my_utils import get_client_ip
+
+log = logging.getLogger('smartshop.log')
 
 
 class JSONResponse(HttpResponse):

@@ -8,6 +8,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
+import logging
+from my_utils import get_client_ip
+
+log = logging.getLogger('smartshop.log')
 
 from .app_settings import (
     TokenSerializer, UserDetailsSerializer, LoginSerializer,
@@ -52,6 +56,7 @@ class LoginView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=self.request.data)
         if not self.serializer.is_valid():
+            log.info('invalid data. client_ip {0}'.format(get_client_ip(self.request)))
             return self.get_error_response()
         self.login()
         return self.get_response()
@@ -71,7 +76,7 @@ class LogoutView(APIView):
         try:
             request.user.auth_token.delete()
         except:
-            pass
+            log.warn('logout whithout auth_token. client_ip {0}, login "{1}"'.format(get_client_ip(self.request), request.user.username))
 
         logout(request)
 
@@ -114,6 +119,7 @@ class PasswordResetView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
 
         if not serializer.is_valid():
+            log.info('invalid password to reset. client ip {0}, login "{1}"'.format(get_client_ip(self.request), request.user.username))
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
@@ -140,6 +146,7 @@ class PasswordResetConfirmView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
+            log.info('invalid data to confirm reset. client ip {0}, login "{1}"'.format(get_client_ip(self.request), request.user.username))
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
@@ -162,6 +169,7 @@ class PasswordChangeView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
+            log.info('invalid password to change. client ip {0}, login "{1}"'.format(get_client_ip(self.request), request.user.username))
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )

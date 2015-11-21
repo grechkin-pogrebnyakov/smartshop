@@ -12,7 +12,10 @@ from allauth.account import app_settings
 from rest_auth.app_settings import TokenSerializer
 from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.views import LoginView
+import logging
+from my_utils import get_client_ip
 
+log = logging.getLogger('smartshop.log')
 
 class RegisterView(APIView, SignupView):
     """
@@ -31,9 +34,11 @@ class RegisterView(APIView, SignupView):
     serializer_class = TokenSerializer
 
     def get(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def put(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def form_valid(self, form):
@@ -62,6 +67,7 @@ class RegisterView(APIView, SignupView):
             self.form_valid(self.form)
             return self.get_response()
         else:
+            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
             return self.get_response_with_errors()
 
     def get_response(self):
@@ -80,6 +86,7 @@ class VerifyEmailView(APIView, ConfirmEmailView):
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 
     def get(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def post(self, request, *args, **kwargs):
