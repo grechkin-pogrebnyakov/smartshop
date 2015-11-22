@@ -84,7 +84,7 @@ public class AddProductActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View view) {
 				IntentIntegrator integrator = new IntentIntegrator(AddProductActivity.this);
-				integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
+				integrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES);
 			}
 		});
 
