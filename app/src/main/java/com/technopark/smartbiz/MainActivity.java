@@ -103,6 +103,15 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(show);
 			}
 		});
+
+		Button supplyButton = (Button) findViewById(R.id.content_main_button_supply);
+		supplyButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), SupplyActivity.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 	private void setupChart() {
@@ -137,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 			}
 			cursor.close();
 		}
-		dbHelper.close();
+		db.close();
 
 		LineDataSet dataSet = new LineDataSet(entries, "Оборот");
 		LineData lineData = new LineData(labels, dataSet);

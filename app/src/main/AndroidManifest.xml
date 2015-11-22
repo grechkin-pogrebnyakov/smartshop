@@ -61,17 +61,14 @@
             android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
-
         <activity
             android:name=".EditProductActivity"
             android:label="@string/title_activity_edit_product"
             android:theme="@style/AppTheme.NoActionBar"
             >
-
         </activity>
 
-
-        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
         <provider
             android:name=".database.SmartShopContentProvider"
@@ -96,6 +93,11 @@
         <activity
             android:name=".ShopProfileActivity"
             android:label="@string/title_activity_shop_profile"
+            >
+        </activity>
+        <activity
+            android:name=".SupplyActivity"
+            android:label="Поставка"
             >
         </activity>
     </application>
