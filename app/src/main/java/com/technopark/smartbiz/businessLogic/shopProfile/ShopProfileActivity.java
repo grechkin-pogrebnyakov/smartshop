@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.buisnessLogic.shopProfile;
+package com.technopark.smartbiz.businessLogic.shopProfile;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.technopark.smartbiz.buisnessLogic.main.MainActivity;
+import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
 
 public class ShopProfileActivity extends AppCompatActivity {

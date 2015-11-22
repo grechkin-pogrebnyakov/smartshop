@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.buisnessLogic.productSales;
+package com.technopark.smartbiz.businessLogic.productSales;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +15,7 @@ import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
-import com.technopark.smartbiz.screnListView.EndlessScrollListener;
+import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
 
 import java.util.ArrayList;
 import java.util.Locale;

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.technopark.smartbiz.screnListView.ListAddedProducts"
+    tools:context=".businessLogic.showProducts.ListAddedProducts"
     >
 
     <android.support.design.widget.AppBarLayout

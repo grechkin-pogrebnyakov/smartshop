@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.screnListView;
+package com.technopark.smartbiz.businessLogic.showProducts;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -14,8 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.technopark.smartbiz.buisnessLogic.deleteProduct.DeleteProductFromListDialogFragment;
-import com.technopark.smartbiz.buisnessLogic.editProduct.EditProductActivity;
+import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteProductFromListDialogFragment;
+import com.technopark.smartbiz.businessLogic.editProduct.EditProductActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.database.SmartShopContentProvider;

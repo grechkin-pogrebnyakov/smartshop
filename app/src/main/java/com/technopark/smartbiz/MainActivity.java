@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.buisnessLogic.main;
+package com.technopark.smartbiz;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,27 +19,25 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.technopark.smartbiz.R;
-import com.technopark.smartbiz.buisnessLogic.addProduct.AddProductActivity;
-import com.technopark.smartbiz.buisnessLogic.discard.DiscardActivity;
-import com.technopark.smartbiz.buisnessLogic.productSales.CheckActivity;
-import com.technopark.smartbiz.buisnessLogic.shopProfile.ShopProfileActivity;
-import com.technopark.smartbiz.buisnessLogic.supply.SupplyActivity;
+import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
+import com.technopark.smartbiz.businessLogic.discard.DiscardActivity;
+import com.technopark.smartbiz.businessLogic.productSales.CheckActivity;
+import com.technopark.smartbiz.businessLogic.shopProfile.ShopProfileActivity;
+import com.technopark.smartbiz.businessLogic.supply.SupplyActivity;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
-import com.technopark.smartbiz.screnListView.ListAddedProducts;
-import com.technopark.smartbiz.userIdentification.LoginActivity;
+import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
+import com.technopark.smartbiz.businessLogic.userIdentification.LoginActivity;
 
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
-	private SharedPreferences sharedPreferences;
-
 	public static final String APP_PREFERENCES = "mysettings";
-	public static final String TOKEN_AUTORIZATION = "token";
+	public static final String TOKEN_AUTHORIZATION = "token";
 
+	private SharedPreferences sharedPreferences;
 	private CheckContentObserver checkContentObserver = new CheckContentObserver();
 	private DatabaseHelper dbHelper;
 
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 		logOut.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				sharedPreferences.edit().remove(TOKEN_AUTORIZATION).commit();
+				sharedPreferences.edit().remove(TOKEN_AUTHORIZATION).apply();
 				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 			}
 		});

@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.userIdentification;
+package com.technopark.smartbiz.businessLogic.userIdentification;
 
 
 import android.accounts.Account;
@@ -35,7 +35,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.technopark.smartbiz.buisnessLogic.main.MainActivity;
+import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
 
 import org.json.JSONException;
@@ -588,8 +588,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				//                if (!requesrUrl.equals("https://smartshop1.ddns.net/api/auth/registration/")) {
 				//                    String token = jsonResponseObject.getString("key");//conn.getHeaderFields().get("Key").get(0);
 				//                    Log.e("cookie", token);
-				//                    sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
-				//                    Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+				//                    sharedPreferences.edit().putString(TOKEN_AUTHORIZATION, token).commit();
+				//                    Log.e("session", sharedPreferences.getString(TOKEN_AUTHORIZATION, "default"));
 				//                }
 
 

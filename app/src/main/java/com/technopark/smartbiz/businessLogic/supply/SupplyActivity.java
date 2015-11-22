@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.buisnessLogic.supply;
+package com.technopark.smartbiz.businessLogic.supply;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,14 +11,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.technopark.smartbiz.buisnessLogic.main.MainActivity;
+import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
-import com.technopark.smartbiz.buisnessLogic.productSales.PurchaseActivity;
+import com.technopark.smartbiz.businessLogic.productSales.PurchaseActivity;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
-import com.technopark.smartbiz.screnListView.EndlessScrollListener;
+import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
 
 public class SupplyActivity extends AppCompatActivity {
 

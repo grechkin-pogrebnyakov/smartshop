@@ -1,5 +1,4 @@
-package com.technopark.smartbiz.buisnessLogic.editProduct;
-
+package com.technopark.smartbiz.businessLogic.addProduct;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -12,42 +11,34 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
-import com.technopark.smartbiz.database.items.Product;
-import com.technopark.smartbiz.screnListView.ListAddedProducts;
+import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by Abovyan on 15.11.15.
- */
-public class EditProductActivity extends AppCompatActivity {
+public class AddProductActivity extends AppCompatActivity {
+
 	static final int REQUEST_TAKE_PHOTO = 1;
 
-	private String name, priceCostProduct, priceSellingProduct, count, barcode, description, photoPath;
+	String name, priceCostProduct, priceSellingProduct, count, barcode, description, photoPath;
 
-	private ImageButton addProductPhotoButton;
-	private TextView titleTextView;
-	private Button addProductButton;
-	private Button scanBarcodeButton;
+	ImageButton addProductPhotoButton;
+	Button addProductButton;
+	Button scanBarcodeButton;
 
-	private EditText nameEditText, priceCostProductEditText, priceSellingProductEditText,
+	EditText nameEditText, priceCostProductEditText, priceSellingProductEditText,
 			barcodeEditText, countEditText, descriptionEditText;
-
-	private Product product;
 
 
 	@Override
@@ -57,86 +48,42 @@ public class EditProductActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		titleTextView = (TextView) findViewById(R.id.content_add_product_textView_description_operation);
-		titleTextView.setVisibility(View.GONE);
+		photoPath = "";
 
 		initializationEditTextFields();
 		initializationButtons();
 
 		initializationButtonsListener();
 
-		photoPath = product.getPhotoPath();
-		setPic();
-
 	}
 
 	private void initializationEditTextFields() {
 		nameEditText = (EditText) findViewById(R.id.content_add_product_name_textField);
-		priceCostProductEditText = (AutoCompleteTextView) findViewById(R.id.content_add_product_price_cost_textField);
+		priceCostProductEditText = (EditText) findViewById(R.id.content_add_product_price_cost_textField);
 		priceSellingProductEditText = (EditText) findViewById(R.id.content_add_product_price_selling);
 		barcodeEditText = (EditText) findViewById(R.id.content_add_product_barcode);
 		countEditText = (EditText) findViewById(R.id.content_add_product_count);
 		descriptionEditText = (EditText) findViewById(R.id.content_add_product_description);
-
-		Bundle extra = getIntent().getExtras();
-		if (extra != null) {
-			product = (Product) extra.get(ListAddedProducts.SEND_PRODUCT_NAME);
-		}
-
-		nameEditText.setText(product.getProductName());
-		priceCostProductEditText.setText(String.valueOf(product.getPricePurchaseProduct()));
-		priceSellingProductEditText.setText(String.valueOf(product.getPriceSellingProduct()));
-		barcodeEditText.setText(String.valueOf(product.getProductBarcode()));
-		countEditText.setText(String.valueOf(product.getCount()));
-		descriptionEditText.setText(product.getDescriptionProduct());
-
-		nameEditText.setEnabled(false);
-		priceCostProductEditText.setEnabled(false);
-		priceSellingProductEditText.setEnabled(false);
-		barcodeEditText.setEnabled(false);
-		countEditText.setEnabled(false);
-		descriptionEditText.setEnabled(false);
 	}
 
 	private void initializationButtons() {
 		addProductPhotoButton = (ImageButton) findViewById(R.id.content_add_product_photo);
 		addProductButton = (Button) findViewById(R.id.content_add_product_button_add_product);
 		scanBarcodeButton = (Button) findViewById(R.id.content_add_product_scan_barcode);
-
-		addProductButton.setText("Редактировать");
-
-		addProductPhotoButton.setEnabled(false);
-		scanBarcodeButton.setEnabled(false);
 	}
 
 	private void initializationButtonsListener() {
 		addProductButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				switch (addProductButton.getText().toString()) {
-					case "Редактировать":
-						nameEditText.setEnabled(true);
-						priceCostProductEditText.setEnabled(true);
-						priceSellingProductEditText.setEnabled(true);
-						barcodeEditText.setEnabled(true);
-						countEditText.setEnabled(true);
-						descriptionEditText.setEnabled(true);
-
-						addProductPhotoButton.setEnabled(true);
-						scanBarcodeButton.setEnabled(true);
-						addProductButton.setText("Сохранить");
-						break;
-					case "Сохранить":
-						actionForSaveChangeProductButton();
-				}
-
+				actionForAddProductButton();
 			}
 		});
 
 		scanBarcodeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				IntentIntegrator integrator = new IntentIntegrator(EditProductActivity.this);
+				IntentIntegrator integrator = new IntentIntegrator(AddProductActivity.this);
 				integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
 			}
 		});
@@ -149,7 +96,7 @@ public class EditProductActivity extends AppCompatActivity {
 		});
 	}
 
-	private void actionForSaveChangeProductButton() {
+	private void actionForAddProductButton() {
 		name = nameEditText.getText().toString();
 		priceCostProduct = priceCostProductEditText.getText().toString();
 		priceSellingProduct = priceSellingProductEditText.getText().toString();
@@ -157,15 +104,15 @@ public class EditProductActivity extends AppCompatActivity {
 		barcode = barcodeEditText.getText().toString();
 		description = descriptionEditText.getText().toString();
 
-		if (updateRecord(product.getId(), name, priceCostProduct, priceSellingProduct, count, barcode, description,
-				photoPath) != 0) {
-			Toast.makeText(getApplicationContext(), "Изменения сохранены !", Toast.LENGTH_LONG).show();
+		if (!addRecord(name, priceCostProduct, priceSellingProduct, count, barcode, description,
+				photoPath).toString().contains("-1")) {
+			Toast.makeText(getApplicationContext(), "Продукт добавлен", Toast.LENGTH_LONG).show();
 			Intent goToListAddedProduct = new Intent(getApplicationContext(), ListAddedProducts.class);
 			startActivity(goToListAddedProduct);
 			finish();
 		}
 		else {
-			Toast.makeText(getApplicationContext(), "Ошибка сохранения !",
+			Toast.makeText(getApplicationContext(), "Ошибка добавления продукта",
 					Toast.LENGTH_LONG).show();
 		}
 	}
@@ -194,10 +141,10 @@ public class EditProductActivity extends AppCompatActivity {
 		}
 	}
 
-	private int updateRecord(long id, String name, String priceCostProduct, String priceSellingProduct,
-	                         String count, String barcode, String description, String photoPath) {
+	private Uri addRecord(String name, String priceCostProduct, String priceSellingProduct,
+			String count, String barcode, String description, String photoPath) {
 		// Defines a new Uri object that receives the result of the insertion
-		int mNewUri;
+		Uri mNewUri;
 
 		// Defines an object to contain the new values to insert
 		ContentValues mNewValues = new ContentValues();
@@ -214,11 +161,10 @@ public class EditProductActivity extends AppCompatActivity {
 		mNewValues.put("description", description);
 		mNewValues.put("count", count);
 
-		String mSelectionClause = "_id = ?";
-		String[] mSelectionArgs = {String.valueOf(product.getId())};
-
-		mNewUri = getContentResolver().update(SmartShopContentProvider.PRODUCTS_CONTENT_URI, mNewValues,
-				mSelectionClause, mSelectionArgs);
+		mNewUri = getContentResolver().insert(
+				SmartShopContentProvider.PRODUCTS_CONTENT_URI,   // the user dictionary content URI
+				mNewValues                          // the values to insert
+		);
 		return mNewUri;
 	}
 
@@ -265,7 +211,7 @@ public class EditProductActivity extends AppCompatActivity {
 		if (photoPath != null && !photoPath.isEmpty()) {
 			// Get the dimensions of the View
 			int targetW = 150; //addProductPhotoButton.getWidth();
-			int targetH = 150; //addProductPhotoButton.getHeight();
+			int targetH = 150;  //addProductPhotoButton.getHeight();
 
 			// Get the dimensions of the bitmap
 			BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -273,7 +219,6 @@ public class EditProductActivity extends AppCompatActivity {
 			BitmapFactory.decodeFile(photoPath, bmOptions);
 			int photoW = bmOptions.outWidth;
 			int photoH = bmOptions.outHeight;
-
 
 			// Determine how much to scale down the image
 			int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
@@ -287,4 +232,5 @@ public class EditProductActivity extends AppCompatActivity {
 			addProductPhotoButton.setImageBitmap(bitmap);
 		}
 	}
+
 }

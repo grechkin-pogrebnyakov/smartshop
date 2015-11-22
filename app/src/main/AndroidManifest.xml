@@ -29,7 +29,7 @@
         android:theme="@style/AppTheme"
         >
         <activity
-            android:name=".userIdentification.LoginActivity"
+            android:name=".businessLogic.userIdentification.LoginActivity"
             android:label="@string/app_name"
             >
             <intent-filter>
@@ -44,25 +44,25 @@
             android:theme="@style/VK.Transparent"
             />
         <activity
-            android:name=".buisnessLogic.main.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
-            android:name=".buisnessLogic.addProduct.AddProductActivity"
+            android:name=".businessLogic.addProduct.AddProductActivity"
             android:label="@string/title_activity_add_product"
             android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
-            android:name=".screnListView.ListAddedProducts"
+            android:name=".businessLogic.showProducts.ListAddedProducts"
             android:label="@string/title_activity_list_added_products"
             android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
-            android:name=".buisnessLogic.editProduct.EditProductActivity"
+            android:name=".businessLogic.editProduct.EditProductActivity"
             android:label="@string/title_activity_edit_product"
             android:theme="@style/AppTheme.NoActionBar"
             >
@@ -76,32 +76,32 @@
             />
 
         <activity
-            android:name=".buisnessLogic.productSales.PurchaseActivity"
+            android:name=".businessLogic.productSales.PurchaseActivity"
             android:label="@string/title_activity_purchase"
             >
         </activity>
         <activity
-            android:name=".buisnessLogic.productSales.CheckActivity"
+            android:name=".businessLogic.productSales.CheckActivity"
             android:label="@string/title_activity_check"
             >
         </activity>
         <activity
-            android:name=".buisnessLogic.productSales.PaymentActivity"
+            android:name=".businessLogic.productSales.PaymentActivity"
             android:label="@string/title_activity_payment"
             >
         </activity>
         <activity
-            android:name=".buisnessLogic.shopProfile.ShopProfileActivity"
+            android:name=".businessLogic.shopProfile.ShopProfileActivity"
             android:label="@string/title_activity_shop_profile"
             >
         </activity>
         <activity
-            android:name=".buisnessLogic.supply.SupplyActivity"
+            android:name=".businessLogic.supply.SupplyActivity"
             android:label="Поставка"
             >
         </activity>
         <activity
-            android:name=".buisnessLogic.discard.DiscardActivity"
+            android:name=".businessLogic.discard.DiscardActivity"
             android:label="Списание"
             >
         </activity>

@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.screnListView;
+package com.technopark.smartbiz.businessLogic.showProducts;
 
 import android.widget.AbsListView;
 
