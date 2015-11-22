@@ -1,7 +1,6 @@
 package com.technopark.smartbiz.buisnessLogic.productSales;
 
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -91,24 +90,18 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		updateTotalPrice();
 	}
 
-	public void setProductPrice(float productPrice) {
-		this.productPrice = productPrice;
+	@Override
+	public void onClick(View v) {
+		dismiss();
+		addButtonCallback.callback();
 	}
 
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
 
-	public void setProductCount(int productCount) {
-		this.productCount = productCount;
-	}
-
 	public void setAddButtonCallback(DialogFragmentCallback addButtonCallback) {
 		this.addButtonCallback = addButtonCallback;
-	}
-
-	public void setCheck(Check check) {
-		this.check = check;
 	}
 
 	private void updateTotalPrice() {
@@ -123,6 +116,10 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		return check;
 	}
 
+	public void setCheck(Check check) {
+		this.check = check;
+	}
+
 	public float getTotalPrice() {
 		return totalPrice;
 	}
@@ -131,19 +128,15 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		return productCount;
 	}
 
-	@Override
-	public void onClick(View v) {
-		dismiss();
-	}
-
-	@Override
-	public void onDismiss(DialogInterface dialog) {
-		super.onDismiss(dialog);
-
-		addButtonCallback.callback();
+	public void setProductCount(int productCount) {
+		this.productCount = productCount;
 	}
 
 	public float getProductPrice() {
 		return productPrice;
+	}
+
+	public void setProductPrice(float productPrice) {
+		this.productPrice = productPrice;
 	}
 }
