@@ -13,9 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.technopark.smartbiz.MainActivity;
+import com.technopark.smartbiz.buisnessLogic.main.MainActivity;
 import com.technopark.smartbiz.R;
-import com.technopark.smartbiz.buisnessLogic.productSales.CheckActivity;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 

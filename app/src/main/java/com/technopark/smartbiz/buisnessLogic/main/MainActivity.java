@@ -1,4 +1,4 @@
-package com.technopark.smartbiz;
+package com.technopark.smartbiz.buisnessLogic.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,8 +19,12 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.buisnessLogic.addProduct.AddProductActivity;
+import com.technopark.smartbiz.buisnessLogic.discard.DiscardActivity;
 import com.technopark.smartbiz.buisnessLogic.productSales.CheckActivity;
+import com.technopark.smartbiz.buisnessLogic.shopProfile.ShopProfileActivity;
+import com.technopark.smartbiz.buisnessLogic.supply.SupplyActivity;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.screnListView.ListAddedProducts;

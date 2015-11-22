@@ -1,4 +1,4 @@
-package com.technopark.smartbiz;
+package com.technopark.smartbiz.buisnessLogic.editProduct;
 
 
 import android.content.ContentValues;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.screnListView.ListAddedProducts;

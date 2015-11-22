@@ -35,7 +35,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.technopark.smartbiz.MainActivity;
+import com.technopark.smartbiz.buisnessLogic.main.MainActivity;
 import com.technopark.smartbiz.R;
 
 import org.json.JSONException;

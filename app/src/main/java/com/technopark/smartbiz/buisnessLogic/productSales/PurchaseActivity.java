@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.technopark.smartbiz.DialogFragmentCallback;
+import com.technopark.smartbiz.buisnessLogic.deleteProduct.DialogFragmentCallback;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.database.items.Check;

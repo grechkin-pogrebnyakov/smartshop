@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.technopark.smartbiz.DialogFragmentCallback;
+import com.technopark.smartbiz.buisnessLogic.deleteProduct.DialogFragmentCallback;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.database.items.Check;
 

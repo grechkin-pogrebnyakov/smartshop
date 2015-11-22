@@ -1,4 +1,4 @@
-package com.technopark.smartbiz;
+package com.technopark.smartbiz.buisnessLogic.deleteProduct;
 
 import android.app.Activity;
 import android.app.Dialog;

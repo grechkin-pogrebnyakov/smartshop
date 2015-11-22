@@ -1,4 +1,4 @@
-package com.technopark.smartbiz;
+package com.technopark.smartbiz.buisnessLogic.supply;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,13 +11,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.technopark.smartbiz.buisnessLogic.main.MainActivity;
+import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.buisnessLogic.productSales.PurchaseActivity;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 import com.technopark.smartbiz.screnListView.EndlessScrollListener;
 
-public class DiscardActivity extends AppCompatActivity {
+public class SupplyActivity extends AppCompatActivity {
 
 	private int SELECT_PRODUCT = 1;
 
@@ -27,13 +30,13 @@ public class DiscardActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_discard);
+		setContentView(R.layout.activity_supply);
 
 		dbHelper = new DatabaseHelper(this);
 
 		adapter = new ProductAdapter(this);
 
-		ListView checkList = (ListView) findViewById(R.id.activity_discard_listview);
+		ListView checkList = (ListView) findViewById(R.id.activity_supply_listview);
 		checkList.setAdapter(adapter);
 		checkList.setOnScrollListener(new EndlessScrollListener() {
 			@Override
@@ -41,11 +44,11 @@ public class DiscardActivity extends AppCompatActivity {
 			}
 		});
 
-		Button doneDiscardButton = (Button) findViewById(R.id.activity_discard_button_done);
-		doneDiscardButton.setOnClickListener(new View.OnClickListener() {
+		Button doneSupplyButton = (Button) findViewById(R.id.activity_supply_button_done);
+		doneSupplyButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				doDiscard();
+				doSupply();
 
 				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -56,7 +59,7 @@ public class DiscardActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_discard, menu);
+		getMenuInflater().inflate(R.menu.activity_supply, menu);
 		return true;
 	}
 
@@ -77,12 +80,12 @@ public class DiscardActivity extends AppCompatActivity {
 		}
 	}
 
-	private void doDiscard() {
+	private void doSupply() {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 
 		String queryString;
 		String formatString = "UPDATE " + DatabaseHelper.PRODUCTS_TABLE_NAME + " " +
-				"SET count = count - %d " +
+				"SET count = count + %d " +
 				"WHERE _id = %d" +
 				";";
 
@@ -94,10 +97,9 @@ public class DiscardActivity extends AppCompatActivity {
 			);
 			db.execSQL(queryString);
 
-			Log.d("Discard update", queryString);
+			Log.d("Supply update", queryString);
 		}
 
 		db.close();
-
 	}
 }

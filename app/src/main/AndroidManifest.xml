@@ -44,7 +44,7 @@
             android:theme="@style/VK.Transparent"
             />
         <activity
-            android:name=".MainActivity"
+            android:name=".buisnessLogic.main.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar"
             >
@@ -62,7 +62,7 @@
             >
         </activity>
         <activity
-            android:name=".EditProductActivity"
+            android:name=".buisnessLogic.editProduct.EditProductActivity"
             android:label="@string/title_activity_edit_product"
             android:theme="@style/AppTheme.NoActionBar"
             >
@@ -91,17 +91,17 @@
             >
         </activity>
         <activity
-            android:name=".ShopProfileActivity"
+            android:name=".buisnessLogic.shopProfile.ShopProfileActivity"
             android:label="@string/title_activity_shop_profile"
             >
         </activity>
         <activity
-            android:name=".SupplyActivity"
+            android:name=".buisnessLogic.supply.SupplyActivity"
             android:label="Поставка"
             >
         </activity>
         <activity
-            android:name=".DiscardActivity"
+            android:name=".buisnessLogic.discard.DiscardActivity"
             android:label="Списание"
             >
         </activity>

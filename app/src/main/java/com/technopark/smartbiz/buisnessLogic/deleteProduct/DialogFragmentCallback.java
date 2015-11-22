@@ -1,4 +1,4 @@
-package com.technopark.smartbiz;
+package com.technopark.smartbiz.buisnessLogic.deleteProduct;
 
 /**
  * Created by titaevskiy.s on 14.11.15.
