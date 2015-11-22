@@ -112,6 +112,15 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+
+		Button discardButton = (Button) findViewById(R.id.content_main_button_discarding);
+		discardButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), DiscardActivity.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 	private void setupChart() {

@@ -52,4 +52,6 @@
     <string name="title_activity_edit_product">Информация о продукте</string>
     <string name="content_main_button_supply">Поставка товара</string>
     <string name="activity_supply_button_done">Оформить поставку</string>
+    <string name="content_main_button_discarding">Списание</string>
+    <string name="activity_discard_button_done">Оформить списание</string>
 </resources>

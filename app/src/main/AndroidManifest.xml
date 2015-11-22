@@ -100,6 +100,11 @@
             android:label="Поставка"
             >
         </activity>
+        <activity
+            android:name=".DiscardActivity"
+            android:label="Списание"
+            >
+        </activity>
     </application>
 
 </manifest>

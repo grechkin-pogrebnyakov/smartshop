@@ -92,6 +92,18 @@
                 android:text="@string/content_main_button_supply"
                 android:textStyle="bold"
                 />
+
+            <Button
+                android:id="@+id/content_main_button_discarding"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/content_main_button_supply"
+                android:layout_marginTop="16dp"
+                android:text="@string/content_main_button_discarding"
+                android:textStyle="bold"
+                />
+
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>
