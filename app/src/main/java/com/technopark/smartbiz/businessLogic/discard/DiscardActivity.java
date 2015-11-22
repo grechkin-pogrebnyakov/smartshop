@@ -101,6 +101,5 @@ public class DiscardActivity extends AppCompatActivity {
 		}
 
 		db.close();
-
 	}
 }

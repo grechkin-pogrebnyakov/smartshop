@@ -2,12 +2,13 @@ package com.technopark.smartbiz.businessLogic.productSales;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 
@@ -29,6 +31,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 
 	private EditText paymentEditText;
 	private TextView oddMoneyTextView;
+	private DatabaseHelper dbHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +57,42 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 			@Override
 			public void onClick(View v) {
 				if (oddMoney >= 0) {
+					ArrayList<Check> checkArrayList =
+							getIntent().getParcelableArrayListExtra(CheckActivity.CHECK_LIST_NAME);
+					addRecord(checkArrayList);
+					updateProductsDatabase(checkArrayList);
+
 					Intent submit = new Intent(getApplicationContext(), MainActivity.class);
 					submit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					addRecord(getIntent().getParcelableArrayListExtra(CheckActivity.CHECK_LIST_NAME));
 					startActivity(submit);
 				}
 			}
 		});
+
+		dbHelper = new DatabaseHelper(this);
+	}
+
+	private void updateProductsDatabase(ArrayList<Check> checkArrayList) {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+		String queryString;
+		String formatString = "UPDATE " + DatabaseHelper.PRODUCTS_TABLE_NAME + " " +
+				"SET count = count - %d " +
+				"WHERE _id = %d" +
+				";";
+
+		for (Check check : checkArrayList) {
+			queryString = String.format(
+					formatString,
+					check.getCount(),
+					check.getIdFromProductsTable()
+			);
+			db.execSQL(queryString);
+
+			Log.d("Payment update", queryString);
+		}
+
+		db.close();
 	}
 
 	private void updateOddMoneyEditText() {
@@ -87,7 +119,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 		updateOddMoneyEditText();
 	}
 
-	private Uri addRecord(ArrayList<Parcelable> checkList) {
+	private Uri addRecord(ArrayList<Check> checkList) {
 		// Defines a new Uri object that receives the result of the insertion
 		Uri mNewUri = null;
 		Check check;
@@ -99,8 +131,8 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
         * method are "column name" and "value"
         */
 
-		for (Parcelable temp : checkList) {
-			check = (Check) temp;
+		for (Check temp : checkList) {
+			check = temp;
 			mNewValues.put("id_from_products_table", check.getIdFromProductsTable());
 			mNewValues.put("photo_path", check.getPhotoPath());
 			mNewValues.put("name", check.getProductName());
