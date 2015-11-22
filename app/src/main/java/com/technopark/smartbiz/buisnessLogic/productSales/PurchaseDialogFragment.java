@@ -1,4 +1,4 @@
-package com.technopark.smartbiz;
+package com.technopark.smartbiz.buisnessLogic.productSales;
 
 import android.app.DialogFragment;
 import android.content.DialogInterface;
@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.technopark.smartbiz.DialogFragmentCallback;
+import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.database.items.Check;
 
 import java.util.Locale;

@@ -79,17 +79,17 @@
             />
 
         <activity
-            android:name=".PurchaseActivity"
+            android:name=".buisnessLogic.productSales.PurchaseActivity"
             android:label="@string/title_activity_purchase"
             >
         </activity>
         <activity
-            android:name=".CheckActivity"
+            android:name=".buisnessLogic.productSales.CheckActivity"
             android:label="@string/title_activity_check"
             >
         </activity>
         <activity
-            android:name=".PaymentActivity"
+            android:name=".buisnessLogic.productSales.PaymentActivity"
             android:label="@string/title_activity_payment"
             >
         </activity>

@@ -1,4 +1,4 @@
-package com.technopark.smartbiz;
+package com.technopark.smartbiz.buisnessLogic.productSales;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.technopark.smartbiz.DialogFragmentCallback;
+import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.Product;

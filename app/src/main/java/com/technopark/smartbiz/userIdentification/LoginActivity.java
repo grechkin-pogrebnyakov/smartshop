@@ -404,8 +404,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	 */
 	public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
 		private static final String DEBUG_TAG = "HttpExample";
-		private static final String urlAuthorization = "https://smartshop1.ddns.net/api/auth/login/";//"https://smartshop1.ddns.net:8000/api/login";
-		private static final String urlRegistration = "https://smartshop1.ddns.net/api/auth/registration/";//"https://smartshop1.ddns.net:8000/api/registration";
+		private static final String urlAuthorization = "https://smartshop1.ddns.net/api/auth/login/"; // 192.168.43.241:80/api/auth/login/";//"https://smartshop1.ddns.net:8000/api/login";
+		private static final String urlRegistration = "https://smartshop1.ddns.net/api/auth/registration/"; //"https://192.168.43.241:80/api/auth/registration/"; //"https://smartshop1.ddns.net:8000/api/registration";
 		private final String mEmail;
 		private final String mPassword;
 
