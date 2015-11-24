@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartBiz</string>
+    <string name="app_name">SmartShop</string>
 
     <!-- Strings related to login -->
     <string name="login">Логин</string>
@@ -24,7 +24,7 @@
     <string name="action_settings">Settings</string>
     <integer name="com_vk_sdk_AppId">5093720</integer>
     <string name="title_activity_register">Регистрация</string>
-    <string name="title_activity_main">SmartBiz</string>
+    <string name="title_activity_main">SmartShop</string>
     <string name="scan_barcode_button">Сканировать штрих-код</string>
     <string name="title_activity_add_product">Добавление продукта</string>
     <string name="title_activity_list_added_products">Добавленные товары</string>

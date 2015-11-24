@@ -17,7 +17,7 @@ public abstract class EndlessScrollListener implements AbsListView.OnScrollListe
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if (firstVisibleItem + visibleItemCount == totalItemCount) {
+        if (firstVisibleItem + visibleItemCount >= totalItemCount) {
             loadData(totalItemCount);
         }
     }
