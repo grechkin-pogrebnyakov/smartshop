@@ -21,13 +21,14 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
 import com.technopark.smartbiz.businessLogic.discard.DiscardActivity;
+import com.technopark.smartbiz.businessLogic.employees.EmployeeListActivity;
 import com.technopark.smartbiz.businessLogic.productSales.CheckActivity;
 import com.technopark.smartbiz.businessLogic.shopProfile.ShopProfileActivity;
+import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
 import com.technopark.smartbiz.businessLogic.supply.SupplyActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.LoginActivity;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
-import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
-import com.technopark.smartbiz.businessLogic.userIdentification.LoginActivity;
 
 import java.util.ArrayList;
 
@@ -121,6 +122,16 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(), DiscardActivity.class);
+				startActivity(intent);
+			}
+		});
+
+		Button employeesButton = (Button) findViewById(R.id.content_main_button_employees);
+		employeesButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), EmployeeListActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(intent);
 			}
 		});

@@ -104,6 +104,11 @@
             android:label="Списание"
             >
         </activity>
+        <activity
+            android:name=".businessLogic.employees.EmployeeListActivity"
+            android:label="Список сотрудников"
+            >
+        </activity>
     </application>
 
 </manifest>

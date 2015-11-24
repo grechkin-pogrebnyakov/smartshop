@@ -54,4 +54,5 @@
     <string name="activity_supply_button_done">Оформить поставку</string>
     <string name="content_main_button_discarding">Списание</string>
     <string name="activity_discard_button_done">Оформить списание</string>
+    <string name="content_main_button_employees">Список сотрудников</string>
 </resources>
