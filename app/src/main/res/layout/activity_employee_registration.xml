@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.technopark.smartbiz.businessLogic.employees.EmployeeRegistrationActivity"
+    >
+
+    <EditText
+        android:id="@+id/activity_employee_registration_last_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Фамилия"
+        android:inputType="textPersonName"
+        />
+
+    <EditText
+        android:id="@+id/activity_employee_registration_first_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/activity_employee_registration_last_name"
+        android:ems="10"
+        android:hint="Имя"
+        android:inputType="textPersonName"
+        />
+
+    <EditText
+        android:id="@+id/activity_employee_registration_father_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/activity_employee_registration_first_name"
+        android:ems="10"
+        android:hint="Отчество (не обязательно)"
+        android:inputType="textPersonName"
+        />
+
+    <Button
+        android:id="@+id/activity_employee_registration_button_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/activity_employee_registration_father_name"
+        android:text="Зарегистрировать"
+        />
+</RelativeLayout>

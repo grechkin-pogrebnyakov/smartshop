@@ -109,6 +109,11 @@
             android:label="Список сотрудников"
             >
         </activity>
+        <activity
+            android:name=".businessLogic.employees.EmployeeRegistrationActivity"
+            android:label="Регистрация сотрудника"
+            >
+        </activity>
     </application>
 
 </manifest>
