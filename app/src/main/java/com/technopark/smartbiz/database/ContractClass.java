@@ -23,16 +23,18 @@ public final class ContractClass {
 		public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE_NAME;
 		public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE_NAME;
 
-		public static final String COLUMN_NAME_NAME = "name";
-		public static final String COLUMN_NAME_SURNAME = "surname";
+		public static final String COLUMN_NAME_FIRST_NAME = "first_name";
+		public static final String COLUMN_NAME_LAST_NAME = "last_name";
+		public static final String COLUMN_NAME_FATHER_NAME = "father_name";
 		public static final String COLUMN_NAME_LOGIN = "login";
 
-		public static final String DEFAULT_SORT_ORDER = COLUMN_NAME_SURNAME + " ASC";
+		public static final String DEFAULT_SORT_ORDER = COLUMN_NAME_LAST_NAME + " ASC";
 
 		public static final String[] DEFAULT_PROJECTION = new String[]{
 				Employees._ID,
-				Employees.COLUMN_NAME_NAME,
-				Employees.COLUMN_NAME_SURNAME,
+				Employees.COLUMN_NAME_FIRST_NAME,
+				Employees.COLUMN_NAME_LAST_NAME,
+				Employees.COLUMN_NAME_FATHER_NAME,
 				Employees.COLUMN_NAME_LOGIN,
 		};
 

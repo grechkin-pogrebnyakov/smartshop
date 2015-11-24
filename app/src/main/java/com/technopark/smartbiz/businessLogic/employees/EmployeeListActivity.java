@@ -24,13 +24,15 @@ public class EmployeeListActivity extends AppCompatActivity implements LoaderMan
 		setContentView(R.layout.activity_employee_list);
 
 		final String[] from = new String[]{
-				ContractClass.Employees.COLUMN_NAME_NAME,
-				ContractClass.Employees.COLUMN_NAME_SURNAME,
+				ContractClass.Employees.COLUMN_NAME_FIRST_NAME,
+				ContractClass.Employees.COLUMN_NAME_LAST_NAME,
+				ContractClass.Employees.COLUMN_NAME_FATHER_NAME,
 				ContractClass.Employees.COLUMN_NAME_LOGIN,
 		};
 		final int[] to = new int[]{
-				R.id.employee_item_layout_name,
-				R.id.employee_item_layout_surname,
+				R.id.employee_item_layout_first_name,
+				R.id.employee_item_layout_last_name,
+				R.id.employee_item_layout_father_name,
 				R.id.employee_item_layout_login,
 		};
 		adapter = new SimpleCursorAdapter(this, R.layout.employee_item_layout, null, from, to, 0);

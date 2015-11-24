@@ -48,8 +48,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			"CREATE TABLE " + ContractClass.Employees.TABLE_NAME + " " +
 					"(" +
 					ContractClass.Employees._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-					ContractClass.Employees.COLUMN_NAME_NAME + " TEXT NOT NULL, " +
-					ContractClass.Employees.COLUMN_NAME_SURNAME + " TEXT NOT NULL, " +
+					ContractClass.Employees.COLUMN_NAME_FIRST_NAME + " TEXT NOT NULL, " +
+					ContractClass.Employees.COLUMN_NAME_LAST_NAME + " TEXT NOT NULL, " +
+					ContractClass.Employees.COLUMN_NAME_FATHER_NAME + " TEXT, " +
 					ContractClass.Employees.COLUMN_NAME_LOGIN + " TEXT NOT NULL " +
 					")";
 
