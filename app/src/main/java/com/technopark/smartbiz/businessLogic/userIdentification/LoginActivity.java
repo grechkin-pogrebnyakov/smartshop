@@ -12,6 +12,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -81,6 +82,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	 */
 	public static final String APP_PREFERENCES = "mysettings";
 	public static final String TOKEN_AUTORIZATION = "token";
+	private final String ACTION_AUTHORIZATION = "authorization";
+	private final String ACTION_REGISTRATION = "registration";
+	private final String ACTION_ACTIVATION = "activation";
+	private final String ACTION_VALIDATION = "validation";
+	private String temporaryToken = null;
 	private UserLoginTask mAuthTask = null;
 	private SharedPreferences sharedPreferences;
 	// Ссылки на графические компоненты
@@ -116,7 +122,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
 				if (id == R.id.login || id == EditorInfo.IME_NULL) {
-					attemptLoginOrRegistration();
+					attemptLoginOrRegistration(ACTION_VALIDATION);
 					return true;
 				}
 				return false;
@@ -135,33 +141,40 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		registrtionButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				attemptLoginOrRegistration();
+				attemptLoginOrRegistration(ACTION_REGISTRATION);
 			}
 		});
 
 		final Button newAccountButton = (Button) findViewById(R.id.login_button_new_account);
 		newAccountButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mPasswordRepeatView.setVisibility(View.VISIBLE);
-                newAccountButton.setVisibility(View.GONE);
-                registrtionButton.setVisibility(View.VISIBLE);
-            }
-        });
+			@Override
+			public void onClick(View view) {
+				switch (newAccountButton.getText().toString()) {
+					case "Новый акаунт":
+						mPasswordRepeatView.setVisibility(View.VISIBLE);
+						newAccountButton.setVisibility(View.GONE);
+						registrtionButton.setVisibility(View.VISIBLE);
+						break;
+					case "Установить новый пароль":
+						changePassword();
+						break;
+				}
+			}
+		});
 
 		Button mEmailSignInButton = (Button) findViewById(R.id.login_button_sing_in);
 		mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
-                    mPasswordRepeatView.setVisibility(View.GONE);
-                    registrtionButton.setVisibility(View.GONE);
-                    newAccountButton.setVisibility(View.VISIBLE);
-                }
-                attemptLoginOrRegistration();
+			@Override
+			public void onClick(View view) {
+				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
+					mPasswordRepeatView.setVisibility(View.GONE);
+					registrtionButton.setVisibility(View.GONE);
+					newAccountButton.setVisibility(View.VISIBLE);
+				}
+				attemptLoginOrRegistration(ACTION_AUTHORIZATION);
 
-            }
-        });
+			}
+		});
 
 		Button vkAuthButton = (Button) findViewById(R.id.login_button_vkAuth);
 		Account[] accounts = AccountManager.get(this).getAccountsByType("com.vkontakte.account");
@@ -187,6 +200,47 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 	}
 
+	private void changePassword() {
+		boolean cancel = false;
+		View focusView = null;
+		String password = mPasswordView.getText().toString();
+		String repeatPassword = mPasswordRepeatView.getVisibility() == View.VISIBLE ?
+				mPasswordRepeatView.getText().toString() : null;
+
+		// Проверка правильности пароля.
+		if (!isPasswordValid(password)) {
+			mPasswordView.setError(getString(R.string.error_invalid_password));
+			focusView = mPasswordView;
+			cancel = true;
+		}
+
+		// Проверка правильности повторного ввода пароля.
+		if (repeatPassword != null && !isRepeatPasswordValid(password, repeatPassword)) {
+			mPasswordRepeatView.setError(getString(R.string.error_invalid_repeat_password));
+			focusView = mPasswordRepeatView;
+			cancel = true;
+		}
+		if (cancel) {
+			// Была допущена ошибка; не производиться попытка авторизации и фокус устанавливаеться
+			// на поле ввода с ошибкой.
+			focusView.requestFocus();
+		}
+		else {
+			// Показываем прогресс выполнения задачи аутентификации в background
+			// выполняем попытку входа.
+			showProgress(true);
+
+			if (isNetworkConnected()) {
+				mAuthTask = new UserLoginTask("", password);
+				mAuthTask.execute("setNewPassword");
+			}
+			else {
+				showProgress(false);
+				(Toast.makeText(getApplicationContext(), "Отсутствует соединение с интернетом !", Toast.LENGTH_SHORT)).show();
+			}
+		}
+	}
+
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -203,17 +257,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		getLoaderManager().initLoader(0, null, this);
 	}
 
-    @Override
-    public void onBackPressed() {
-        moveTaskToBack(true);
-    }
+	@Override
+	public void onBackPressed() {
+		moveTaskToBack(true);
+	}
 
 	/**
 	 * Попытка авторизоваться по логину и паролю указанному в форме входа.
 	 * Если есть ошибки (некорректный email, недостающие поля, и т. д.),
 	 * Представляются ошибки и не производиться попытка авторизации.
 	 */
-	private void attemptLoginOrRegistration() {
+	private void attemptLoginOrRegistration(String action) {
 		if (mAuthTask != null) {
 			return;
 		}
@@ -268,11 +322,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 			if (isNetworkConnected()) {
 				mAuthTask = new UserLoginTask(email, password);
-				if (repeatPassword == null) {
-					mAuthTask.execute("authorization");
-				}
-				else {
-					mAuthTask.execute("registration");
+				switch (action) {
+					case "authorization":
+						mAuthTask.execute("authorization");
+						break;
+					case "registration":
+						mAuthTask.execute("registration");
+						break;
 				}
 			}
 			else {
@@ -402,10 +458,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	/**
 	 * Представляет асинхронную задачу аутентификации пользователя.
 	 */
-	public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
+	public class UserLoginTask extends AsyncTask<String, Void, String> {
+		Resources res = getResources();
 		private static final String DEBUG_TAG = "HttpExample";
-		private static final String urlAuthorization = "https://smartshop1.ddns.net/api/auth/login/"; // 192.168.43.241:80/api/auth/login/";//"https://smartshop1.ddns.net:8000/api/login";
-		private static final String urlRegistration = "https://smartshop1.ddns.net/api/auth/registration/"; //"https://192.168.43.241:80/api/auth/registration/"; //"https://smartshop1.ddns.net:8000/api/registration";
+		private final String urlAuthorization = res.getString(R.string.host) + res.getString(R.string.authorization_uri); // 192.168.43.241:80/api/auth/login/";//"https://smartshop1.ddns.net:8000/api/login";
+		private final String urlRegistration = res.getString(R.string.host) + res.getString(R.string.registration_uri); //"https://192.168.43.241:80/api/auth/registration/"; //"https://smartshop1.ddns.net:8000/api/registration";
+		private final String urlChangePassword = res.getString(R.string.host) + res.getString(R.string.change_password_uri); //"https://192.168.43.241:80/api/auth/registration/"; //"https://smartshop1.ddns.net:8000/api/registration";
 		private final String mEmail;
 		private final String mPassword;
 
@@ -415,17 +473,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 
 		@Override
-		protected Boolean doInBackground(String... params) {
+		protected String doInBackground(String... params) {
 			// TODO: реализовать попытку авторизации с помощью сервиса сетевых коммуникаций.
 			switch (params[0]) {
 				case "authorization":
 					return authorization();
 				case "registration":
 					return registration();
+				case "setNewPassword":
+					return setNewPassword();
 				case "refreshAuthorization":
 					return refreshAutorization(params[1]);
 				default:
-					return false;
+					return "fail";
 			}
 
 			// TODO: регистрировать новый акаунт для пользователя.
@@ -433,19 +493,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 
 		@Override
-		protected void onPostExecute(final Boolean success) {
+		protected void onPostExecute(final String result) {
 			mAuthTask = null;
 			showProgress(false);
 
-			if (success) {
-				Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
-				startActivity(goMainActivity);
-				finish();
-			}
-			else {
-				showProgress(false);
-				//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-				//                mPasswordView.requestFocus();
+			switch (result) {
+				case "success":
+					Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+					startActivity(goMainActivity);
+					finish();
+					break;
+				case "changePassword":
+					mEmailView.setVisibility(View.GONE);
+					mPasswordRepeatView.setVisibility(View.VISIBLE);
+					registrtionButton.setVisibility(View.GONE);
+					((Button) findViewById(R.id.login_button_new_account)).setText("Установить новый пароль");
+					((Button) findViewById(R.id.login_button_sing_in)).setVisibility(View.GONE);
+					((Button) findViewById(R.id.login_button_vkAuth)).setVisibility(View.GONE);
+					mPasswordView.setText("");
+					break;
+				case "fail":
+					showProgress(false);
+					break;
 			}
 		}
 
@@ -456,7 +525,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 
 
-		private boolean authorization() {
+		private String authorization() {
 			JSONObject jsonRequest = new JSONObject();
 			try {
 				jsonRequest.accumulate("username", mEmail);
@@ -465,24 +534,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				int responceCode = jsonResponce.getInt("responceCode");
 
 				if (200 <= responceCode && responceCode < 300) {
-					String token = jsonResponce.getString("key");//conn.getHeaderFields().get("Key").get(0);
-					Log.e("cookie", token);
-					sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
-					Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
-					showToast("Успешный вход");
-					return true;
+					if (false/*jsonResponce.getInt("default_password") == 0*/) {
+						String token = jsonResponce.getString("key");
+						Log.e("cookie", token);
+						sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
+						Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+						showToast("Успешный вход");
+						return "success";
+					}
+					else {
+						temporaryToken = jsonResponce.getString("key");
+						return "changePassword";
+					}
 				}
 				else if (300 <= responceCode && responceCode < 400) {
 					showToast("Ошибка авторизации !");
-					return false;
+					return "fail";
 				}
 				else if (400 <= responceCode && responceCode < 500) {
 					showToast("Неправильный логин или пароль !");
-					return false;
+					return "fail";
 				}
 				else if (responceCode >= 500) {
 					showToast("Ошибка сервера !");
-					return false;
+					return "fail";
 				}
 
 			}
@@ -494,10 +569,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				showToast("Ошибка сервера !");
 			}
 			showToast("Неизвестная ошибка !");
-			return false;
+			return "fail";
 		}
 
-		private boolean registration() {
+		private String registration() {
 			JSONObject jsonRequest = new JSONObject();
 			try {
 				jsonRequest.accumulate("username", mEmail);
@@ -508,24 +583,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				int responceCode = jsonResponce.getInt("responceCode");
 
 				if (200 <= responceCode && responceCode < 300) {
-					String token = jsonResponce.getString("key");//conn.getHeaderFields().get("Key").get(0);
+					String token = jsonResponce.getString("key");
 					Log.e("cookie", token);
 					sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
 					Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
 					showToast("Регистрация прошла успешно !");
-					return true;
+					return "success";
 				}
 				else if (300 <= responceCode && responceCode < 400) {
 					showToast("Ошибка регистрации !");
-					return false;
+					return "fail";
 				}
 				else if (400 <= responceCode && responceCode < 500) {
 					showToast("Пользователь уже существует !");
-					return false;
+					return "fail";
 				}
 				else if (responceCode >= 500) {
 					showToast("Ошибка сервера !");
-					return false;
+					return "fail";
 				}
 
 			}
@@ -536,11 +611,56 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				e.printStackTrace();
 			}
 			showToast("Неизвестная ошибка !");
-			return false;
+			return "fail";
 		}
 
-		private boolean refreshAutorization(String sessionId) {
-			return true;
+		private String setNewPassword() {
+			JSONObject jsonRequest = new JSONObject();
+			try {
+				jsonRequest.accumulate("password", mPassword);
+				if (temporaryToken != null) {
+					jsonRequest.accumulate("key", temporaryToken);
+				} else return "fail";
+				JSONObject jsonResponce = requestPostMethod(urlChangePassword, jsonRequest);
+				int responceCode = jsonResponce.getInt("responceCode");
+
+				if (200 <= responceCode && responceCode < 300) {
+
+					String token = jsonResponce.getString("key");
+					Log.e("cookie", token);
+					sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
+					Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+					showToast("Новый пароль успешно установлен !");
+
+					return "success";
+				}
+				else if (300 <= responceCode && responceCode < 400) {
+					showToast("Ошибка изменения пароля !");
+					return "fail";
+				}
+				else if (400 <= responceCode && responceCode < 500) {
+					showToast("Недопустимый пароль !");
+					return "fail";
+				}
+				else if (responceCode >= 500) {
+					showToast("Ошибка сервера !");
+					return "fail";
+				}
+
+			}
+			catch (JSONException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				showToast("Ошибка сервера !");
+			}
+			showToast("Неизвестная ошибка !");
+			return "fail";
+		}
+
+		private String refreshAutorization(String sessionId) {
+			return "fail";
 		}
 
 		private void showToast(final String message) {
