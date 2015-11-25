@@ -5,3 +5,7 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+class DisableCSRF(object):
+    def process_request(self, request):
+        setattr(request, '_dont_enforce_csrf_checks', True)
