@@ -14,8 +14,6 @@ class Item(models.Model):
 
 class Shop(models.Model):
     name = models.CharField(max_length=255)
-    owner = models.ForeignKey(UserProfile,related_name='owner')
-    workers = models.ForeignKey(UserProfile,related_name='workers', null=True)
     items = models.ForeignKey(Item, related_name='shop')
 
 

@@ -168,6 +168,12 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def save(self):
         self.set_password_form.save()
 
+class RegisterEmployeeSerializer(serializers.Serializer):
+    """
+    User model w/o password
+    """
+    name = serializers.CharField(max_length=128)
+    surname = serializers.CharField(max_length=128)
 
 class PasswordChangeSerializer(serializers.Serializer):
 

@@ -1,7 +1,7 @@
 from django.http import HttpRequest
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
@@ -79,6 +79,53 @@ class RegisterView(APIView, SignupView):
     def get_response_with_errors(self):
         return Response(self.form.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class RegisterEmployeeView(APIView):
+    """
+    Accepts the credentials and creates a new user
+    if user does not exist already
+    Return the REST Token if the credentials are valid and authenticated.
+    Calls allauth complete_signup method
+
+    Accept the following POST parameters: username, email, password
+    Return the REST Framework Token Object's key.
+    """
+
+    permission_classes = (IsAuthenticated,)
+    allowed_methods = ('POST', 'OPTIONS', 'HEAD')
+    serializer_class = RegisterEmployeeSerializer
+
+    def get(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def put(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(RegisterView, self).get_form_kwargs(*args, **kwargs)
+        kwargs['data'] = self.request.data
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        self.initial = {}
+        form_class = self.get_form_class()
+        self.form = self.get_form(form_class)
+        if not self.form.is_valid():
+            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
+            return self.get_response_with_errors()
+        login = self.user.username
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def get_response(self):
+        # serializer = self.user_serializer_class(instance=self.user)
+        serializer = self.serializer_class(instance=self.token,
+                                           context={'request': self.request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def get_response_with_errors(self):
+        return Response(self.form.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyEmailView(APIView, ConfirmEmailView):
 
