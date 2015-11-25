@@ -1,6 +1,7 @@
 # coding: utf-8
 from django.http import HttpRequest
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status, authentication, permissions
@@ -11,7 +12,7 @@ from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 
 from rest_auth.app_settings import TokenSerializer
-from rest_auth.registration.serializers import SocialLoginSerializer,RegisterEmployeeSerializer
+from rest_auth.registration.serializers import SocialLoginSerializer,RegisterEmployeeSerializer, UserSerializer
 from rest_auth.views import LoginView
 import logging
 from my_utils import get_client_ip
@@ -32,7 +33,7 @@ class RegisterView(APIView, SignupView):
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
     token_model = Token
-    serializer_class = TokenSerializer
+    serializer_class = UserSerializer
 
     def get(self, *args, **kwargs):
         log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
@@ -72,15 +73,14 @@ class RegisterView(APIView, SignupView):
             return self.get_response_with_errors()
 
     def get_response(self):
-        # serializer = self.user_serializer_class(instance=self.user)
-        serializer = self.serializer_class(instance=self.token,
+        serializer = TokenSerializer(instance=self.token,
                                            context={'request': self.request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_response_with_errors(self):
         return Response(self.form.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class RegisterEmployeeView(APIView):
+class RegisterEmployeeView(GenericAPIView):
     """
     Accepts the credentials and creates a new user
     if user does not exist already
@@ -115,7 +115,7 @@ class RegisterEmployeeView(APIView):
         if not serializer.is_valid():
             log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
             return self.get_response_with_errors()
-        serializer.save()
+        serializer.save(owner=self.request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

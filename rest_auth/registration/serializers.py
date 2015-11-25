@@ -15,6 +15,10 @@ except ImportError:
 if 'allauth.socialaccount' not in settings.INSTALLED_APPS:
     raise ImportError('allauth.socialaccount needs to be added to INSTALLED_APPS.')
 
+class UserSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=128)
+    password1 = serializers.CharField(max_length=128)
+    password2 = serializers.CharField(max_length=128)
 
 class SocialLoginSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=False, allow_blank=True)
@@ -121,16 +125,16 @@ class RegisterEmployeeSerializer(serializers.Serializer):
     father_name = serializers.CharField(max_length=128, required=False)
 
     def create(self, validated_data):
-        oShop = validated_data.get('owner').shop
+        oShop = validated_data.get('owner').userprofile.shop
         number = WorkerProfile.objects.filter(shop = oShop).len()
         login = "{0}_emloyee_{1}".format(validated_data.get('owner').username,number+1)
         password = '123456'
         worker = WorkerProfile()
         worker.user = User(username = login,password = password)
-        worker.father_name=validated_data.get("father_name")
-        worker.last_name = 'khkl'
-        worker.first_name = 'sdfsdg'
-        worker.shop = oShop
-        worker.accountType = 'worker'
+        worker.workerprofile.father_name=validated_data.get("father_name")
+        worker.workerprofile.last_name = 'khkl'
+        worker.workerprofile.first_name = 'sdfsdg'
+        worker.userprofile.shop = oShop
+        worker.userprofile.accountType = 'worker'
         return worker
 
