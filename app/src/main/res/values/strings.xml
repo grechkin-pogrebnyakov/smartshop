@@ -24,7 +24,7 @@
     <string name="action_settings">Settings</string>
     <integer name="com_vk_sdk_AppId">5093720</integer>
     <string name="title_activity_register">Регистрация</string>
-    <string name="title_activity_main">SmartBiz</string>
+    <string name="title_activity_main">SmartShop</string>
     <string name="scan_barcode_button">Сканировать штрих-код</string>
     <string name="title_activity_add_product">Добавление продукта</string>
     <string name="title_activity_list_added_products">Добавленные товары</string>
@@ -54,6 +54,8 @@
     <string name="activity_supply_button_done">Оформить поставку</string>
     <string name="content_main_button_discarding">Списание</string>
     <string name="activity_discard_button_done">Оформить списание</string>
+    <string name="content_main_button_employees">Список сотрудников</string>
+    <string name="content_main_button_employee_registration">Зарегистрировать сотрудника</string>
 
     <string name="host">https://smartshop1.ddns.net</string>
     <string name="authorization_uri">/api/auth/login/</string>

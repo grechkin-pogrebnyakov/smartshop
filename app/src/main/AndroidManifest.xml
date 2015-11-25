@@ -68,11 +68,10 @@
             >
         </activity>
 
-        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
         <provider
             android:name=".database.SmartShopContentProvider"
             android:authorities="ru.tech_mail.smart_biz.data"
+            android:exported="false"
             />
 
         <activity
@@ -103,6 +102,16 @@
         <activity
             android:name=".businessLogic.discard.DiscardActivity"
             android:label="Списание"
+            >
+        </activity>
+        <activity
+            android:name=".businessLogic.employees.EmployeeListActivity"
+            android:label="Список сотрудников"
+            >
+        </activity>
+        <activity
+            android:name=".businessLogic.employees.EmployeeRegistrationActivity"
+            android:label="Регистрация сотрудника"
             >
         </activity>
     </application>
