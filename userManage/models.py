@@ -9,7 +9,7 @@ class UserProfile(models.Model):
     accountType = models.CharField(default='worker',max_length=255)
 
 class OwnerProfile(UserProfile):
-    shop = models.OneToOnefield(Shop,related_name='owner')
+    shop = models.OneToOneField(Shop,related_name='owner')
 
 class WorkerProfile(UserProfile):
     defaultPassword = models.BooleanField(default=False)

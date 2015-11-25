@@ -1,10 +1,9 @@
 from django.db import models
-from userManage.models import UserProfile
 # Create your models here.
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters.html import HtmlFormatter
 from pygments import highlight
-from django.contrib.auth.models import User
+
 
 
 class Item(models.Model):
