@@ -1,13 +1,14 @@
 from django.conf.urls import patterns, url, include
-from rest_auth.registration.views import RegisterView
+from rest_auth.registration.views import RegisterView,RegisterEmployeeView
 from rest_auth.views import (
     LoginView, LogoutView, UserDetailsView, PasswordChangeView,
-    PasswordResetView, PasswordResetConfirmView
+    PasswordResetView, PasswordResetConfirmView,
 )
 
 urlpatterns = patterns(
     '',
     url(r'^registration/$',RegisterView.as_view()),
+    url(r'^employee/register$',RegisterEmployeeView.as_view()),
     # URLs that do not require a session or valid token
     url(r'^password/reset/$', PasswordResetView.as_view(),
         name='rest_password_reset'),

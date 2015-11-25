@@ -1,8 +1,9 @@
+# coding: utf-8
 from django.http import HttpRequest
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import status
+from rest_framework import status, authentication, permissions
 from rest_framework.authtoken.models import Token
 
 from allauth.account.views import SignupView, ConfirmEmailView
@@ -10,7 +11,7 @@ from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 
 from rest_auth.app_settings import TokenSerializer
-from rest_auth.registration.serializers import SocialLoginSerializer
+from rest_auth.registration.serializers import SocialLoginSerializer,RegisterEmployeeSerializer
 from rest_auth.views import LoginView
 import logging
 from my_utils import get_client_ip
@@ -91,6 +92,7 @@ class RegisterEmployeeView(APIView):
     """
 
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
     serializer_class = RegisterEmployeeSerializer
 
@@ -108,13 +110,12 @@ class RegisterEmployeeView(APIView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        self.initial = {}
-        form_class = self.get_form_class()
-        self.form = self.get_form(form_class)
-        if not self.form.is_valid():
+        #TODO проверить что автор хозяин
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
             log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
             return self.get_response_with_errors()
-        login = self.user.username
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

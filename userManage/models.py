@@ -7,6 +7,9 @@ class UserProfile(models.Model):
     registrationType = models.CharField(default="inner",max_length=255)
     user = models.OneToOneField(User,unique=True)
     accountType = models.CharField(default='worker',max_length=255)
+    father_name = models.CharField(default='',max_length=255)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
 
 class OwnerProfile(UserProfile):
     shop = models.OneToOneField(Shop,related_name='owner')

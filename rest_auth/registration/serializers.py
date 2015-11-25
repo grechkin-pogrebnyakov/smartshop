@@ -3,6 +3,8 @@ from django.conf import settings
 
 from rest_framework import serializers
 from requests.exceptions import HTTPError
+
+from userManage.models import UserProfile,User, WorkerProfile
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 try:
@@ -109,3 +111,26 @@ class SocialLoginSerializer(serializers.Serializer):
         attrs['user'] = login.account.user
 
         return attrs
+
+class RegisterEmployeeSerializer(serializers.Serializer):
+    """
+    User model w/o password
+    """
+    first_name = serializers.CharField(max_length=128)
+    last_name = serializers.CharField(max_length=128)
+    father_name = serializers.CharField(max_length=128, required=False)
+
+    def create(self, validated_data):
+        oShop = validated_data.get('owner').shop
+        number = WorkerProfile.objects.filter(shop = oShop).len()
+        login = "{0}_emloyee_{1}".format(validated_data.get('owner').username,number+1)
+        password = '123456'
+        worker = WorkerProfile()
+        worker.user = User(username = login,password = password)
+        worker.father_name=validated_data.get("father_name")
+        worker.last_name = 'khkl'
+        worker.first_name = 'sdfsdg'
+        worker.shop = oShop
+        worker.accountType = 'worker'
+        return worker
+
