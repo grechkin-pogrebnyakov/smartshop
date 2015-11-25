@@ -54,4 +54,9 @@
     <string name="activity_supply_button_done">Оформить поставку</string>
     <string name="content_main_button_discarding">Списание</string>
     <string name="activity_discard_button_done">Оформить списание</string>
+
+    <string name="host">https://smartshop1.ddns.net</string>
+    <string name="authorization_uri">/api/auth/login/</string>
+    <string name="registration_uri">/api/auth/registration/</string>
+    <string name="change_password_uri">/api/auth/changepassword/</string>
 </resources>
