@@ -121,7 +121,7 @@ class RegisterEmployeeView(GenericAPIView):
             log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
             return self.get_response_with_errors()
         serializer.save(owner=self.request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'login': serializer.login, 'password': serializer.password}, status=status.HTTP_201_CREATED)
 
 
     def get_response(self):

@@ -5,6 +5,7 @@ from rest_framework import serializers
 from requests.exceptions import HTTPError
 
 from userManage.models import User, UserProfile
+from my_utils import generate_password
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 try:
@@ -123,14 +124,17 @@ class RegisterEmployeeSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=128)
     last_name = serializers.CharField(max_length=128)
     father_name = serializers.CharField(max_length=128, required=False)
+    login = ''
+    password = ''
 
     def create(self, validated_data):
         owner = validated_data.get('owner')
         oShop = owner.profile.oShop
         number = len(UserProfile.objects.filter(shop=oShop)) + 1
-        login = "{0}_emloyee_{1}".format(validated_data.get('owner').username,number)
-        password = '123456'
-        user = User(username = login,password = password)
+        self.login = "{0}_emloyee_{1}".format(owner.username,number)
+        self.password = generate_password()
+        user = User(username = self.login)
+        user.set_password(self.password)
         user.last_name = validated_data.get("last_name")
         user.first_name = validated_data.get("first_name")
         user.save()
