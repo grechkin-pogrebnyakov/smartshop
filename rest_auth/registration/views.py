@@ -51,7 +51,7 @@ class RegisterView(APIView, SignupView):
         )
         oShop = Shop(name=self.user.username)
         oShop.save()
-        profile = UserProfile(accountType='owner', shop=oShop, user=self.user )
+        profile = UserProfile(accountType='owner', oShop=oShop, user=self.user )
         profile.save()
         if isinstance(self.request, HttpRequest):
             request = self.request

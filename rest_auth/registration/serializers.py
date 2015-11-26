@@ -126,8 +126,8 @@ class RegisterEmployeeSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         owner = validated_data.get('owner')
-        oShop = owner.profile.shop
-        number = len(UserProfile.objects.filter(shop=oShop))
+        oShop = owner.profile.oShop
+        number = len(UserProfile.objects.filter(shop=oShop)) + 1
         login = "{0}_emloyee_{1}".format(validated_data.get('owner').username,number)
         password = '123456'
         user = User(username = login,password = password)
@@ -140,7 +140,7 @@ class RegisterEmployeeSerializer(serializers.Serializer):
             profile.father_name = father_name
         profile.shop = oShop
         profile.accountType = 'worker'
-        profile.defaultpassword=True
+        profile.defaultPassword=True
         profile.user = user
         profile.save()
         return user
