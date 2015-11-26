@@ -534,7 +534,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				int responceCode = jsonResponce.getInt("responceCode");
 
 				if (200 <= responceCode && responceCode < 300) {
-					if (false/*jsonResponce.getInt("default_password") == 0*/) {
+					if (!jsonResponce.has("default_password") || jsonResponce.getInt("default_password") == 0) {
 						String token = jsonResponce.getString("key");
 						Log.e("cookie", token);
 						sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
