@@ -28,6 +28,8 @@ public final class ContractClass {
 		public static final String COLUMN_NAME_FATHER_NAME = "father_name";
 		public static final String COLUMN_NAME_LOGIN = "login";
 
+		public static final String TEMPORARY_PASSWORD = "password";
+
 		public static final String DEFAULT_SORT_ORDER = COLUMN_NAME_LAST_NAME + " ASC";
 
 		public static final String[] DEFAULT_PROJECTION = new String[]{

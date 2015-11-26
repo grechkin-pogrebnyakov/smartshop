@@ -36,7 +36,8 @@ import javax.net.ssl.X509TrustManager;
 public final class HttpsHelper {
 
 	private static final String LOG = "HttpsHelper";
-	private static final String RESPONSE_CODE = "response";
+
+	public static final String RESPONSE_CODE = "response";
 
 	private static String token = "";
 

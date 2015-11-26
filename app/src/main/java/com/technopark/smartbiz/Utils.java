@@ -1,5 +1,7 @@
 package com.technopark.smartbiz;
 
+import android.content.ContentValues;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,5 +30,22 @@ public final class Utils {
 		}
 
 		return mergeJsonObject;
+	}
+
+	public static ContentValues jsonToContentValues(JSONObject jsonObject, String[] names) {
+		ContentValues contentValues = new ContentValues();
+
+		for (String name : names) {
+			if (jsonObject.has(name)) {
+				try {
+					contentValues.put(name, jsonObject.getString(name));
+				}
+				catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return contentValues;
 	}
 }
