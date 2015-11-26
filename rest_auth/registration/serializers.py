@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework import serializers
 from requests.exceptions import HTTPError
 
-from userManage.models import UserProfile,User, WorkerProfile
+from userManage.models import User, UserProfile
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 try:
@@ -125,16 +125,23 @@ class RegisterEmployeeSerializer(serializers.Serializer):
     father_name = serializers.CharField(max_length=128, required=False)
 
     def create(self, validated_data):
-        oShop = validated_data.get('owner').userprofile.shop
-        number = WorkerProfile.objects.filter(shop = oShop).len()
-        login = "{0}_emloyee_{1}".format(validated_data.get('owner').username,number+1)
+        owner = validated_data.get('owner')
+        oShop = owner.profile.shop
+        number = len(UserProfile.objects.filter(shop=oShop))
+        login = "{0}_emloyee_{1}".format(validated_data.get('owner').username,number)
         password = '123456'
-        worker = WorkerProfile()
-        worker.user = User(username = login,password = password)
-        worker.workerprofile.father_name=validated_data.get("father_name")
-        worker.workerprofile.last_name = 'khkl'
-        worker.workerprofile.first_name = 'sdfsdg'
-        worker.userprofile.shop = oShop
-        worker.userprofile.accountType = 'worker'
-        return worker
+        user = User(username = login,password = password)
+        user.last_name = validated_data.get("last_name")
+        user.first_name = validated_data.get("first_name")
+        user.save()
+        profile = UserProfile()
+        father_name = validated_data.get("father_name")
+        if( father_name ):
+            profile.father_name = father_name
+        profile.shop = oShop
+        profile.accountType = 'worker'
+        profile.defaultpassword=True
+        profile.user = user
+        profile.save()
+        return user
 

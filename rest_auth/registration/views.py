@@ -16,6 +16,7 @@ from rest_auth.registration.serializers import SocialLoginSerializer,RegisterEmp
 from rest_auth.views import LoginView
 import logging
 from my_utils import get_client_ip
+from userManage.models import Shop, UserProfile
 
 log = logging.getLogger('smartshop.log')
 
@@ -48,6 +49,10 @@ class RegisterView(APIView, SignupView):
         self.token, created = self.token_model.objects.get_or_create(
             user=self.user
         )
+        oShop = Shop(name=self.user.username)
+        oShop.save()
+        profile = UserProfile(accountType='owner', shop=oShop, user=self.user )
+        profile.save()
         if isinstance(self.request, HttpRequest):
             request = self.request
         else:
