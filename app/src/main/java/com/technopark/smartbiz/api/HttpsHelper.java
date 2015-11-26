@@ -44,12 +44,14 @@ public final class HttpsHelper {
 	private HttpsHelper() {}
 
 	public static void setToken(String token) {
-		Log.d(LOG, token);
+		Log.d(LOG, "Set token " + token);
 
 		HttpsHelper.token = token;
 	}
 
 	public static void resetToken() {
+		Log.d(LOG, "Reset token");
+
 		HttpsHelper.token = "";
 	}
 
@@ -215,6 +217,8 @@ public final class HttpsHelper {
 
 	private static void setAuthorizationToken(HttpsURLConnection urlConnection) {
 		if (token != null && token.length() > 0) {
+			Log.d(LOG, "Send token " + token);
+
 			urlConnection.setRequestProperty("Authorization", "Token " + token);
 		}
 	}
