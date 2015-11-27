@@ -44,8 +44,10 @@ class LoginView(GenericAPIView):
             login(self.request, self.user)
 
     def get_response(self):
+        resp = self.response_serializer(self.token).data
+        resp.update({'is_worker': (self.user.profile.accountType == 'worker'), 'default_password': self.user.profile.defaultPassword})
         return Response(
-            self.response_serializer(self.token).data, status=status.HTTP_200_OK
+            resp, status=status.HTTP_200_OK
         )
 
     def get_error_response(self):
