@@ -73,13 +73,15 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 				String token = jsonResponce.getString("key");
 				if (!jsonResponce.has("default_password") || !jsonResponce.getBoolean("default_password")) {
 					Log.e("cookie", token);
-					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
-					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
+					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).commit();
+					sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
+							UserIdentificationContract.SUCCESS_AUTHORIZATION).commit();
+					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "default"));
 					interactionWithUI.showToast("Успешный вход");
 					return UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS;
 				}
 				else {
-					sharedPreferences.edit().putString(UserIdentificationContract.TEMPORATY_TOKEN_AUTORIZATION, token).commit();
+					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).commit();
 					return UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD;
 				}
 			}

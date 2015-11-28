@@ -68,8 +68,10 @@ public class Registration implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCa
 			if (200 <= responceCode && responceCode < 300) {
 				String token = jsonResponce.getString("key");
 				Log.e("cookie", token);
-				sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
-				Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
+				sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).commit();
+				sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
+						UserIdentificationContract.SUCCESS_AUTHORIZATION).commit();
+				Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "default"));
 				interactionWithUI.showToast("Регистрация прошла успешно !");
 				return UserIdentificationContract.REGISTRATION_STATUS_SUCCESS;
 			}

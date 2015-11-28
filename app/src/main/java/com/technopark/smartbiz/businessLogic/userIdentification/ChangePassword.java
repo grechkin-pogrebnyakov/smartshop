@@ -34,13 +34,11 @@ public class ChangePassword implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTask
 			changePasswordJsonObject.accumulate(UserIdentificationContract.CHANGE_PASSWORD_OLD_PASSWORD_KEY, oldPassword);
 			changePasswordJsonObject.accumulate(UserIdentificationContract.CHANGE_PASSWORD_PASSWORD1_KEY, newPassword1);
 			changePasswordJsonObject.accumulate(UserIdentificationContract.CHANGE_PASSWORD_PASSWORD2_KEY, newPassword2);
-			if (sharedPreferences.contains(UserIdentificationContract.TEMPORATY_TOKEN_AUTORIZATION)) {
-				HttpsHelper.setToken(sharedPreferences.getString(UserIdentificationContract.TEMPORATY_TOKEN_AUTORIZATION, ""));
+			if (sharedPreferences.contains(UserIdentificationContract.TOKEN_AUTHORIZATION)) {
 				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Auth.URL_CHANGE_PASSWORD, changePasswordJsonObject, this, context)
 						.execute(HttpsHelper.Method.POST);
 			}
 			else {
-				interactionWithUI.showToast("Ошибка смены пароля ! Попробуйте повторить попытку позже");
 				onPostExecute(new JSONObject().put(HttpsHelper.RESPONSE_CODE, 300));
 			}
 
@@ -74,11 +72,11 @@ public class ChangePassword implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTask
 			int responceCode = jsonResponse.getInt(HttpsHelper.RESPONSE_CODE);
 
 			if (200 <= responceCode && responceCode < 300) {
-
-				String token = sharedPreferences.getString(UserIdentificationContract.TEMPORATY_TOKEN_AUTORIZATION, "");
+				String token = sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "");
 				Log.e("cookie", token);
-				sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
-				Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
+				sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
+						UserIdentificationContract.SUCCESS_AUTHORIZATION).commit();
+				Log.e("changePassword", "success");
 				interactionWithUI.showToast("Новый пароль успешно установлен !");
 
 				return UserIdentificationContract.CHANGE_PASSWORD_STATUS_SUCCESS;

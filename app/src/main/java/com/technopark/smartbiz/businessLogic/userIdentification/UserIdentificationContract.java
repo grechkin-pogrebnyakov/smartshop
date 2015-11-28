@@ -5,8 +5,10 @@ package com.technopark.smartbiz.businessLogic.userIdentification;
  */
 public final class UserIdentificationContract {
 
-	public static final String TOKEN_AUTORIZATION = "token";
-	public static final String TEMPORATY_TOKEN_AUTORIZATION = "temporaryToken";
+	public static final String STATUS_AUTHORIZATION_KEY = "statusAuth";
+	public static final String SUCCESS_AUTHORIZATION = "success";
+
+	public static final String TOKEN_AUTHORIZATION = "token";
 	public static final int REQUEST_CODE_REGISTRATION_ACTION = 1;
 	public static final int REQUEST_CODE_AUTHORIZATION_ACTION = 2;
 	public static final int REQUEST_CODE_CHANGE_PASSWORD_ACTION = 3;

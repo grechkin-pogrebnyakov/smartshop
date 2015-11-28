@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.api.HttpsHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,7 +103,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements Interac
 		}
 
 		// Проверка правильности повторного ввода пароля.
-		if (isRepeatPasswordValid(newPassword1, newPassword2)) {
+		if (!isRepeatPasswordValid(newPassword1, newPassword2)) {
 			newPassword2EditText.setError(getString(R.string.error_invalid_repeat_password));
 			focusView = newPassword2EditText;
 			cancel = true;

@@ -28,6 +28,7 @@ import com.technopark.smartbiz.businessLogic.shopProfile.ShopProfileActivity;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
 import com.technopark.smartbiz.businessLogic.supply.SupplyActivity;
 import com.technopark.smartbiz.businessLogic.userIdentification.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 
@@ -37,7 +38,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
 	public static final String APP_PREFERENCES = "mysettings";
-	public static final String TOKEN_AUTHORIZATION = "token";
 
 	private SharedPreferences sharedPreferences;
 	private CheckContentObserver checkContentObserver = new CheckContentObserver();
@@ -67,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
 		logOut.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				sharedPreferences.edit().remove(TOKEN_AUTHORIZATION).apply();
+				sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+				sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
 				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 			}
 		});

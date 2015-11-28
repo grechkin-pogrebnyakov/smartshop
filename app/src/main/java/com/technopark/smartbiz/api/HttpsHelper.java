@@ -269,7 +269,7 @@ public final class HttpsHelper {
 
 			if (context != null) {
 				SharedPreferences sharedPreferences = context.getSharedPreferences(LoginActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
-				String token = sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "");
+				String token = sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "");
 				setToken(token);
 			}
 		}

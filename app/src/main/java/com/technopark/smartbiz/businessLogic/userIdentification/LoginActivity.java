@@ -77,10 +77,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		// Инициализируем компоненты формы логина
 		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
-		if (sharedPreferences.contains(UserIdentificationContract.TOKEN_AUTORIZATION)) {
-			String session = sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "");
-			Log.e("session", session);
-			if (!session.isEmpty()) {
+		if (sharedPreferences.contains(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)) {
+			String statusAuthorization = sharedPreferences.getString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY, "");
+			Log.e("statusAuthorization", statusAuthorization);
+			if (statusAuthorization.equals(UserIdentificationContract.SUCCESS_AUTHORIZATION)) {
 				startActivity(new Intent(getApplicationContext(), MainActivity.class));
 				finish();
 			}
@@ -173,7 +173,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		if (requestCode == 1 && data != null && data.hasExtra("access_token")) {
 			String accessToken = data.getStringExtra("access_token");
 			int userId = data.getIntExtra("user_id", 0);
-			sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, accessToken).commit();
+			sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, accessToken).commit();
 			startActivity(new Intent(getApplicationContext(), MainActivity.class));
 			Log.i("VK_LOGIN", "accessToken: " + accessToken + ", userId: " + userId);
 		}
@@ -400,7 +400,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					case UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD:
 						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
 						startActivity(goChangePasswordActivity);
-						//finish();
+						finish();
 						break;
 					default: showProgress(false);
 				}
