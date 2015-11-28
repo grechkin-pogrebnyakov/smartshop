@@ -52,12 +52,12 @@ public class Registration implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCa
 	public void onPostExecute(JSONObject jsonObject) {
 		int registrationResult = registration(jsonObject);
 		try {
-			jsonObject.put(UserIdentificationContract.REGISTRATION_RESPONCE_STATUS_KEY, registrationResult);
+			jsonObject.put(UserIdentificationContract.REGISTRATION_RESPONSE_STATUS_KEY, registrationResult);
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		interactionWithUI.asynctaskActionResponce(requestActionCode, jsonObject);
+		interactionWithUI.asynctaskActionResponse(requestActionCode, jsonObject);
 	}
 
 	private int registration (JSONObject jsonResponce) {

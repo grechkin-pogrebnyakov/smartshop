@@ -12,13 +12,11 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -38,33 +36,12 @@ import android.widget.Toast;
 
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
-import com.technopark.smartbiz.api.HttpsHelper;
-import com.technopark.smartbiz.api.SmartShopUrl;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 
 /**
@@ -79,10 +56,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private final String ACTION_AUTHORIZATION = "authorization";
 	private final String ACTION_REGISTRATION = "registration";
-	private final String ACTION_ACTIVATION = "activation";
+	private final String ACTION_PASSWORD_CHANGE = "passwordChange";
 	private final String ACTION_VALIDATION = "validation";
 	private String temporaryToken = null;
-	private UserLoginTask mAuthTask = null;
 	private SharedPreferences sharedPreferences;
 	// Ссылки на графические компоненты
 	private AutoCompleteTextView mEmailView;
@@ -117,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			@Override
 			public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
 				if (id == R.id.login || id == EditorInfo.IME_NULL) {
-					attemptLoginOrRegistration(ACTION_VALIDATION);
+					startActionInitiatedByUser(ACTION_VALIDATION);
 					return true;
 				}
 				return false;
@@ -136,7 +112,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		registrtionButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				attemptLoginOrRegistration(ACTION_REGISTRATION);
+				startActionInitiatedByUser(ACTION_REGISTRATION);
 			}
 		});
 
@@ -149,9 +125,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						mPasswordRepeatView.setVisibility(View.VISIBLE);
 						newAccountButton.setVisibility(View.GONE);
 						registrtionButton.setVisibility(View.VISIBLE);
-						break;
-					case "Установить новый пароль":
-						changePassword();
 						break;
 				}
 			}
@@ -166,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					registrtionButton.setVisibility(View.GONE);
 					newAccountButton.setVisibility(View.VISIBLE);
 				}
-				attemptLoginOrRegistration(ACTION_AUTHORIZATION);
+				startActionInitiatedByUser(ACTION_AUTHORIZATION);
 
 			}
 		});
@@ -195,48 +168,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 	}
 
-	private void changePassword() {
-		boolean cancel = false;
-		View focusView = null;
-		String password = mPasswordView.getText().toString();
-		String repeatPassword = mPasswordRepeatView.getVisibility() == View.VISIBLE ?
-				mPasswordRepeatView.getText().toString() : null;
-
-		// Проверка правильности пароля.
-		if (!isPasswordValid(password)) {
-			mPasswordView.setError(getString(R.string.error_invalid_password));
-			focusView = mPasswordView;
-			cancel = true;
-		}
-
-		// Проверка правильности повторного ввода пароля.
-		if (repeatPassword != null && !isRepeatPasswordValid(password, repeatPassword)) {
-			mPasswordRepeatView.setError(getString(R.string.error_invalid_repeat_password));
-			focusView = mPasswordRepeatView;
-			cancel = true;
-		}
-		if (cancel) {
-			// Была допущена ошибка; не производиться попытка авторизации и фокус устанавливаеться
-			// на поле ввода с ошибкой.
-			focusView.requestFocus();
-		}
-		else {
-			// Показываем прогресс выполнения задачи аутентификации в background
-			// выполняем попытку входа.
-			showProgress(true);
-
-			if (isNetworkConnected()) {
-				mAuthTask = new UserLoginTask("", password);
-				mAuthTask.execute("setNewPassword");
-			}
-			else {
-				showProgress(false);
-				(Toast.makeText(getApplicationContext(), "Отсутствует соединение с интернетом !", Toast.LENGTH_SHORT)).show();
-			}
-		}
-	}
-
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1 && data != null && data.hasExtra("access_token")) {
@@ -262,10 +193,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	 * Если есть ошибки (некорректный email, недостающие поля, и т. д.),
 	 * Представляются ошибки и не производиться попытка авторизации.
 	 */
-	private void attemptLoginOrRegistration(String action) {
-		if (mAuthTask != null) {
-			return;
-		}
+	private void startActionInitiatedByUser(String action) {
+//		if (mAuthTask != null) {
+//			return;
+//		}
 
 		// Сброс ошибок.
 		mEmailView.setError(null);
@@ -316,15 +247,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			showProgress(true);
 
 			if (isNetworkConnected()) {
-				mAuthTask = new UserLoginTask(email, password);
 				switch (action) {
-					case "authorization":
-						mAuthTask.execute("authorization");
+					case ACTION_AUTHORIZATION:
+						new Authorization(UserIdentificationContract.REQUEST_CODE_AUTHORIZATION_ACTION,
+								getApplicationContext(), this).startAuthorization(email, password);
 						break;
-					case "registration":
-//						mAuthTask.execute("registration");
+					case ACTION_REGISTRATION:
 						new Registration(UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION,
 								getApplicationContext(), this).startRegistration(email, password, password);
+						break;
+					case ACTION_PASSWORD_CHANGE:
+//						new ChangePassword(UserIdentificationContract.REQUEST_CODE_CHANGE_PASSWORD_ACTION,
+//								getApplicationContext(), this).startChangePassword();
 						break;
 				}
 			}
@@ -433,9 +367,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	}
 
 	@Override
-	public void asynctaskActionResponce(int requestActionCode, JSONObject jsonResponce) {
+	public void asynctaskActionResponse(int requestActionCode, JSONObject jsonResponce) {
 		showProgress(false);
 		switch (requestActionCode) {
+			case UserIdentificationContract.REQUEST_CODE_AUTHORIZATION_ACTION:
+				authorizationResultAction(jsonResponce);
+				break;
 			case UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION:
 				registrationResultAction(jsonResponce);
 				break;
@@ -447,18 +384,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 	}
 
-	private void registrationResultAction(JSONObject resultActionCode) {
+	private void authorizationResultAction(JSONObject resultActionCode) {
 		try {
-			if (resultActionCode.has(UserIdentificationContract.REGISTRATION_RESPONCE_STATUS_KEY)) {
+			if (resultActionCode.has(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 
-				switch (resultActionCode.getInt(UserIdentificationContract.REGISTRATION_RESPONCE_STATUS_KEY)) {
-					case UserIdentificationContract.REGISTRATION_STATUS_SUCCESS:
+				switch (resultActionCode.getInt(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
+					case UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS:
 						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
 						startActivity(goMainActivity);
 						finish();
 						break;
-					case UserIdentificationContract.REGISTRATION_STATUS_FAIL:
+					case UserIdentificationContract.AUTHORIZATION_STATUS_FAIL:
+						showProgress(false);
 						break;
+					case UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD:
+						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
+						startActivity(goChangePasswordActivity);
+						//finish();
+						break;
+					default: showProgress(false);
 				}
 			}
 		}
@@ -466,6 +410,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			e.printStackTrace();
 		}
 	}
+
+	private void registrationResultAction(JSONObject resultActionCode) {
+		try {
+			if (resultActionCode.has(UserIdentificationContract.REGISTRATION_RESPONSE_STATUS_KEY)) {
+
+				switch (resultActionCode.getInt(UserIdentificationContract.REGISTRATION_RESPONSE_STATUS_KEY)) {
+					case UserIdentificationContract.REGISTRATION_STATUS_SUCCESS:
+						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+						startActivity(goMainActivity);
+						finish();
+						break;
+					case UserIdentificationContract.REGISTRATION_STATUS_FAIL:
+						showProgress(false);
+						break;
+					default: showProgress(false);
+				}
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 
 	private interface ProfileQuery {
 		String[] PROJECTION = {
@@ -487,327 +455,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		mEmailView.setAdapter(adapter);
 	}
 
-	/**
-	 * Представляет асинхронную задачу аутентификации пользователя.
-	 */
-	public class UserLoginTask extends AsyncTask<String, Void, String> {
-		Resources res = getResources();
-		private static final String DEBUG_TAG = "HttpExample";
-		private final String mEmail;
-		private final String mPassword;
+//
+//		@Override
+//		protected void onCancelled() {
+//			mAuthTask = null;
+//			showProgress(false);
+//		}
 
-		UserLoginTask(String email, String password) {
-			mEmail = email;
-			mPassword = password;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-			// TODO: реализовать попытку авторизации с помощью сервиса сетевых коммуникаций.
-			switch (params[0]) {
-				case "authorization":
-					return authorization();
-				case "registration":
-					return registration();
-				case "setNewPassword":
-					return setNewPassword();
-				case "refreshAuthorization":
-					return refreshAutorization(params[1]);
-				default:
-					return "fail";
-			}
-
-		}
-
-		@Override
-		protected void onPostExecute(final String result) {
-			mAuthTask = null;
-			showProgress(false);
-
-			switch (result) {
-				case "success":
-					Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
-					startActivity(goMainActivity);
-					finish();
-					break;
-				case "changePassword":
-					mEmailView.setVisibility(View.GONE);
-					mPasswordRepeatView.setVisibility(View.VISIBLE);
-					registrtionButton.setVisibility(View.GONE);
-					((Button) findViewById(R.id.login_button_new_account)).setText("Установить новый пароль");
-					((Button) findViewById(R.id.login_button_sing_in)).setVisibility(View.GONE);
-					((Button) findViewById(R.id.login_button_vkAuth)).setVisibility(View.GONE);
-					mPasswordView.setText("");
-					break;
-				case "fail":
-					showProgress(false);
-					break;
-			}
-		}
-
-		@Override
-		protected void onCancelled() {
-			mAuthTask = null;
-			showProgress(false);
-		}
-
-
-		private String authorization() {
-			JSONObject jsonRequest = new JSONObject();
-			try {
-				jsonRequest.accumulate("username", mEmail);
-				jsonRequest.accumulate("password", mPassword);
-				JSONObject jsonResponce = requestPostMethod(SmartShopUrl.Auth.URL_LOGIN, jsonRequest);
-				int responceCode = jsonResponce.getInt("responceCode");
-
-				if (200 <= responceCode && responceCode < 300) {
-					if (false/*!jsonResponce.has("default_password") || jsonResponce.getInt("default_password") == 0*/) {
-						String token = jsonResponce.getString("key");
-						Log.e("cookie", token);
-						sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
-						Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
-						showToast("Успешный вход");
-						return "success";
-					}
-					else {
-						temporaryToken = jsonResponce.getString("key");
-						return "changePassword";
-					}
-				}
-				else if (300 <= responceCode && responceCode < 400) {
-					showToast("Ошибка авторизации !");
-					return "fail";
-				}
-				else if (400 <= responceCode && responceCode < 500) {
-					showToast("Неправильный логин или пароль !");
-					return "fail";
-				}
-				else if (responceCode >= 500) {
-					showToast("Ошибка сервера !");
-					return "fail";
-				}
-
-			}
-			catch (JSONException e) {
-				e.printStackTrace();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				showToast("Ошибка сервера !");
-			}
-			showToast("Неизвестная ошибка !");
-			return "fail";
-		}
-
-		private String registration() {
-			JSONObject jsonRequest = new JSONObject();
-			try {
-				jsonRequest.accumulate("username", mEmail);
-				jsonRequest.accumulate("password1", mPassword);
-				jsonRequest.accumulate("password2", mPassword);
-				JSONObject jsonResponce = requestPostMethod(SmartShopUrl.Auth.URL_REGISTRATION, jsonRequest);
-
-				int responceCode = jsonResponce.getInt("responceCode");
-
-				if (200 <= responceCode && responceCode < 300) {
-					String token = jsonResponce.getString("key");
-					Log.e("cookie", token);
-					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
-					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
-					showToast("Регистрация прошла успешно !");
-					return "success";
-				}
-				else if (300 <= responceCode && responceCode < 400) {
-					showToast("Ошибка регистрации !");
-					return "fail";
-				}
-				else if (400 <= responceCode && responceCode < 500) {
-					showToast("Пользователь уже существует !");
-					return "fail";
-				}
-				else if (responceCode >= 500) {
-					showToast("Ошибка сервера !");
-					return "fail";
-				}
-
-			}
-			catch (JSONException e) {
-				e.printStackTrace();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-			showToast("Неизвестная ошибка !");
-			return "fail";
-		}
-
-		private String setNewPassword() {
-			JSONObject jsonRequest = new JSONObject();
-			try {
-				jsonRequest.accumulate("new_password1", mPassword);
-				jsonRequest.accumulate("new_password2", mPassword);
-				if (temporaryToken != null) {
-					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, temporaryToken).commit();
-				}
-				else {
-					return "fail";
-				}
-				JSONObject jsonResponce = HttpsHelper.post(SmartShopUrl.Auth.URL_CHANGE_PASSWORD, jsonRequest);
-				int responceCode = jsonResponce.getInt("responceCode");
-
-				if (200 <= responceCode && responceCode < 300) {
-
-					String token = jsonResponce.getString("key");
-					Log.e("cookie", token);
-					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
-					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
-					showToast("Новый пароль успешно установлен !");
-
-					return "success";
-				}
-				else if (300 <= responceCode && responceCode < 400) {
-					showToast("Ошибка изменения пароля !");
-					return "fail";
-				}
-				else if (400 <= responceCode && responceCode < 500) {
-					showToast("Недопустимый пароль !");
-					return "fail";
-				}
-				else if (responceCode >= 500) {
-					showToast("Ошибка сервера !");
-					return "fail";
-				}
-
-			}
-			catch (JSONException e) {
-				e.printStackTrace();
-			}
-			showToast("Неизвестная ошибка !");
-			return "fail";
-		}
-
-		private String refreshAutorization(String sessionId) {
-			return "fail";
-		}
-
-		private void showToast(final String message) {
-			runOnUiThread(new Runnable() {
-				public void run() {
-					Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-				}
-			});
-		}
-
-		private JSONObject requestPostMethod(String requesrUrl, JSONObject jsonRequest) throws IOException {
-			InputStream is = null;
-			OutputStream os = null;
-			int responce = 0;
-			int len = 500;
-			try {
-				disableSSLCertificateChecking();
-				CookieManager cookieManager = new CookieManager();
-				CookieHandler.setDefault(cookieManager);
-				URL url = new URL(requesrUrl);
-				HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-				conn.setReadTimeout(10000 /* milliseconds */);
-				conn.setConnectTimeout(15000 /* milliseconds */);
-				conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-				conn.setRequestProperty("Accept", "application/json");
-				conn.setRequestMethod("POST");
-				conn.setDoOutput(true);
-				conn.setDoInput(true);
-
-
-				os = conn.getOutputStream();
-				os.write(jsonRequest.toString().getBytes("UTF-8"));
-
-				// Starts the query
-				conn.connect();
-
-				responce = conn.getResponseCode();
-				Log.d(DEBUG_TAG, "The responce is: " + responce);
-				is = conn.getInputStream();
-
-				// Convert the InputStream into a string
-				JSONObject jsonResponseObject = new JSONObject(readIt(is, len));
-				jsonResponseObject.put("responceCode", responce);
-
-				return jsonResponseObject;
-
-				// Makes sure that the InputStream is closed after the app is
-				// finished using it.
-			}
-			catch (JSONException e) {
-				e.printStackTrace();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			finally {
-				if (is != null) {
-					os.close();
-					is.close();
-				}
-			}
-			try {
-				return new JSONObject().put("responceCode", responce);
-			}
-			catch (JSONException e) {
-				e.printStackTrace();
-				return new JSONObject();
-			}
-		}
-
-		private void disableSSLCertificateChecking() {
-			HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
-			TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-				public X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-
-				@Override
-				public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-					// Not implemented
-				}
-
-				@Override
-				public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-					// Not implemented
-				}
-			}};
-
-			try {
-				SSLContext sc = SSLContext.getInstance("TLS");
-
-				sc.init(null, trustAllCerts, new java.security.SecureRandom());
-
-				HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-			}
-			catch (KeyManagementException e) {
-				e.printStackTrace();
-			}
-			catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			}
-		}
-
-		private String readIt(InputStream stream, int len) throws IOException {
-			Reader reader = null;
-			reader = new InputStreamReader(stream, "UTF-8");
-			char[] buffer = new char[len];
-			reader.read(buffer);
-			return new String(buffer);
-		}
-
-
-	}
-
-
-	private class NullHostNameVerifier implements HostnameVerifier {
-		@Override
-		public boolean verify(String s, SSLSession sslSession) {
-			return true;
-		}
-	}
 }
 

@@ -10,8 +10,6 @@ import com.technopark.smartbiz.api.SmartShopUrl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 /**
  * Created by Abovyan on 26.11.15.
  */
@@ -30,13 +28,12 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 		sharedPreferences = context.getSharedPreferences(LoginActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
 	}
 
-	public void startAuthorization(String username, String password1, String password2) {
+	public void startAuthorization(String username, String password) {
 		JSONObject authorizationJsonObject = new JSONObject();
 		try {
-			authorizationJsonObject.accumulate(UserIdentificationContract.REGISTRATION_LOGIN_KEY, username);
-			authorizationJsonObject.accumulate(UserIdentificationContract.REGISTRATION_PASSWORD1_KEY, password1);
-			authorizationJsonObject.accumulate(UserIdentificationContract.REGISTRATION_PASSWORD2_KEY, password2);
-			new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Auth.URL_REGISTRATION, authorizationJsonObject, this, context)
+			authorizationJsonObject.accumulate(UserIdentificationContract.AUTHORIZATION_LOGIN_KEY, username);
+			authorizationJsonObject.accumulate(UserIdentificationContract.AUTHORIZATION_PASSWORD_KEY, password);
+			new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Auth.URL_LOGIN, authorizationJsonObject, this, context)
 					.execute(HttpsHelper.Method.POST);
 		}
 		catch (JSONException e) {
@@ -51,24 +48,30 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
-		/*int authorizationResult = authorization(jsonObject);
+		int authorizationResult = authorization(jsonObject);
 		try {
-			jsonObject.put(UserIdentificationContract.REGISTRATION_RESPONCE_STATUS_KEY, authorizationResult);
+			if (jsonObject != null) {
+				jsonObject.put(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY, authorizationResult);
+			} else {
+				interactionWithUI.showToast("Время ожидания истекло !");
+				jsonObject = new JSONObject().put(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY,
+						UserIdentificationContract.AUTHORIZATION_STATUS_FAIL);
+			}
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		interactionWithUI.asynctaskActionResponce(requestActionCode, jsonObject);*/
+		interactionWithUI.asynctaskActionResponse(requestActionCode, jsonObject);
 	}
 
-	/*private int authorization(JSONObject jsonResponce) {
+	private int authorization(JSONObject jsonResponce) {
 
 		try {
 			int responceCode = jsonResponce.getInt(HttpsHelper.RESPONSE_CODE);
 
 			if (200 <= responceCode && responceCode < 300) {
-				if (!jsonResponce.has("default_password") || jsonResponce.getInt("default_password") == 0) {
-					String token = jsonResponce.getString("key");
+				String token = jsonResponce.getString("key");
+				if (!jsonResponce.has("default_password") || !jsonResponce.getBoolean("default_password")) {
 					Log.e("cookie", token);
 					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
 					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
@@ -76,21 +79,21 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 					return UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS;
 				}
 				else {
-					//temporaryToken = jsonResponce.getString("key");
+					sharedPreferences.edit().putString(UserIdentificationContract.TEMPORATY_TOKEN_AUTORIZATION, token).commit();
 					return UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD;
 				}
 			}
 			else if (300 <= responceCode && responceCode < 400) {
 				interactionWithUI.showToast("Ошибка авторизации !");
-				return "fail";
+				return UserIdentificationContract.AUTHORIZATION_STATUS_FAIL;
 			}
 			else if (400 <= responceCode && responceCode < 500) {
 				interactionWithUI.showToast("Неправильный логин или пароль !");
-				return "fail";
+				return UserIdentificationContract.AUTHORIZATION_STATUS_FAIL;
 			}
 			else if (responceCode >= 500) {
 				interactionWithUI.showToast("Ошибка сервера !");
-				return "fail";
+				return UserIdentificationContract.AUTHORIZATION_STATUS_FAIL;
 			}
 
 		}
@@ -98,6 +101,6 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 			e.printStackTrace();
 		}
 		interactionWithUI.showToast("Неизвестная ошибка !");
-		return "fail";
-	}*/
+		return UserIdentificationContract.AUTHORIZATION_STATUS_FAIL;
+	}
 }

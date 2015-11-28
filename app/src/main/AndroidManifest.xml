@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.technopark.smartbiz"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest package="com.technopark.smartbiz"
+          xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
@@ -113,6 +112,8 @@
             android:name=".businessLogic.employees.EmployeeRegistrationActivity"
             android:label="Регистрация сотрудника"
             >
+        </activity>
+        <activity android:name=".businessLogic.userIdentification.ChangePasswordActivity">
         </activity>
     </application>
 

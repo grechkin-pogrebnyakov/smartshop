@@ -61,4 +61,7 @@
     <string name="authorization_uri">/api/auth/login/</string>
     <string name="registration_uri">/api/auth/registration/</string>
     <string name="change_password_uri">/api/auth/changepassword/</string>
+    <string name="old_password">Старый пароль</string>
+    <string name="new_password">Новый пароль</string>
+    <string name="repeat_new_password">Повторите пароль</string>
 </resources>

@@ -217,7 +217,8 @@ public final class HttpsHelper {
 
 	private static void setupConnection(HttpsURLConnection urlConnection, String method) throws ProtocolException {
 		urlConnection.setRequestMethod(method);
-
+		urlConnection.setReadTimeout(10000 /* milliseconds */);
+		urlConnection.setConnectTimeout(15000 /* milliseconds */);
 		urlConnection.setRequestProperty("Content-Type", "application/json");
 		urlConnection.setRequestProperty("Accept", "application/json");
 
