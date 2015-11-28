@@ -52,10 +52,19 @@ class Store(ListCreateAPIView):
 
 
 class Item(ListCreateAPIView):
-    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated)
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ShopItemSerializer
+    queryset = models.Item.objects.all()
     def get(self, request, *args, **kwargs):
-        items = Item.objects.all()
-        serializer = self.get_serializer(items,many=True)
+        curShop = request.user.profile.oShop
+        items = models.Item.objects.filter(shop=curShop)
+        serializer = self.get_serializer(items, many=True)
         return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(owner=self.request.user)
+        return Response({'id': serializer.data.get('id')},status=status.HTTP_201_CREATED)
