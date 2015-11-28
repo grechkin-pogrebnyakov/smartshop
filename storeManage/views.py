@@ -57,8 +57,9 @@ class Item(ListCreateAPIView):
     serializer_class = ShopItemSerializer
     queryset = models.Item.objects.all()
     def get(self, request, *args, **kwargs):
-        items = models.Item.objects.all()
-        serializer = self.get_serializer(items,many=True)
+        curShop = request.user.profile.oShop
+        items = models.Item.objects.filter(shop=curShop)
+        serializer = self.get_serializer(items, many=True)
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
