@@ -1,7 +1,7 @@
 from django.contrib.auth import login, logout
 from django.conf import settings
 
-from rest_framework import status
+from rest_framework import status, authentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
@@ -85,6 +85,35 @@ class LogoutView(APIView):
         return Response({"success": "Successfully logged out."},
                         status=status.HTTP_200_OK)
 
+class EmpoyeesListView(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication)
+    allowed_methods = ('GET', 'OPTIONS', 'HEAD')
+
+    def post(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def put(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(RegisterView, self).get_form_kwargs(*args, **kwargs)
+        kwargs['data'] = self.request.data
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        if( not user.profile.accountType == 'owner' ):
+            log.warn('worker list request from worker. client_ip {0}, username {1}'.format(get_client_ip(self.request), user.username))
+            return self.get_response_with_errors({'details':'request is not from owner'})
+        workers = [{'first_name':worker.user.first_name,'last_name':worker.user.last_name,'login':worker.user.username,'father_name':worker.father_name,'default_password':worker.defaultPassword} for worker in user.profile.oShop.workers.all()]
+        return Response({'employees': workers}, status=status.HTTP_200_OK)
+
+
+    def get_response_with_errors(self, errors):
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetailsView(RetrieveUpdateAPIView):
 

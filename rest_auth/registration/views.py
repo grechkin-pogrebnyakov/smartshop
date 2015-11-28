@@ -115,7 +115,9 @@ class RegisterEmployeeView(GenericAPIView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        #TODO проверить что автор хозяин
+        if( not self.request.user.profile.accountType == 'owner' ):
+            log.warn('worker register request from worker. client_ip {0}, username {1}'.format(get_client_ip(self.request), self.request.user.username))
+            return self.get_response_with_errors({'details':'request is not from owner'})
         self.serializer = self.get_serializer(data=request.data)
         if not self.serializer.is_valid():
             log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
@@ -124,8 +126,10 @@ class RegisterEmployeeView(GenericAPIView):
         return Response({'login': self.serializer.login, 'temporary_password': self.serializer.password}, status=status.HTTP_201_CREATED)
 
 
-    def get_response_with_errors(self):
-        return Response(self.serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_response_with_errors(self, error = None):
+        if( error is None ):
+            error = self.serializer.errors
+        return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyEmailView(APIView, ConfirmEmailView):
 
