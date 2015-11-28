@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.technopark.smartbiz.businessLogic.userIdentification.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -162,7 +163,7 @@ public final class HttpsHelper {
 
 		try {
 			InputStream tempStream;
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+			if (isSuccesResponce(connection)) {
 				tempStream = connection.getInputStream();
 			}
 			else {
@@ -205,6 +206,13 @@ public final class HttpsHelper {
 			e.printStackTrace();
 		}
 		return jsonObject;
+	}
+
+	private static boolean isSuccesResponce(HttpsURLConnection connection) throws IOException {
+		if (connection.getResponseCode() >= 200 && connection.getResponseCode() < 300) {
+			return true;
+		}
+		return false;
 	}
 
 	private static void setupConnection(HttpsURLConnection urlConnection, String method) throws ProtocolException {
@@ -267,7 +275,7 @@ public final class HttpsHelper {
 
 			if (context != null) {
 				SharedPreferences sharedPreferences = context.getSharedPreferences(LoginActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
-				String token = sharedPreferences.getString(LoginActivity.TOKEN_AUTORIZATION, "");
+				String token = sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "");
 				setToken(token);
 			}
 		}

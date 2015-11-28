@@ -364,7 +364,6 @@ public class SmartShopContentProvider extends ContentProvider {
 				throw new IllegalArgumentException("Wrong URI: " + uri);
 		}
 
-
 		getContext().getContentResolver().notifyChange(uri, null);
 		return count;
 	}

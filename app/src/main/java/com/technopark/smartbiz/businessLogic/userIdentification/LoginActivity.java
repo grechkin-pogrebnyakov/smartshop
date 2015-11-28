@@ -38,6 +38,8 @@ import android.widget.Toast;
 
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,20 +70,13 @@ import javax.net.ssl.X509TrustManager;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, InteractionWithUI {
 
-	/**
-	 * A dummy authentication store containing known user names and passwords.
-	 * TODO: remove after connecting to a real authentication system.
-	 */
-	private static final String[] DUMMY_CREDENTIALS = new String[]{
-			"foo@example.com:hello", "bar@example.com:world"
-	};
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
 	public static final String APP_PREFERENCES = "mysettings";
-	public static final String TOKEN_AUTORIZATION = "token";
+
 	private final String ACTION_AUTHORIZATION = "authorization";
 	private final String ACTION_REGISTRATION = "registration";
 	private final String ACTION_ACTIVATION = "activation";
@@ -106,8 +101,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		// Инициализируем компоненты формы логина
 		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
-		if (sharedPreferences.contains(TOKEN_AUTORIZATION)) {
-			String session = sharedPreferences.getString(TOKEN_AUTORIZATION, "");
+		if (sharedPreferences.contains(UserIdentificationContract.TOKEN_AUTORIZATION)) {
+			String session = sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "");
 			Log.e("session", session);
 			if (!session.isEmpty()) {
 				startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -247,7 +242,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		if (requestCode == 1 && data != null && data.hasExtra("access_token")) {
 			String accessToken = data.getStringExtra("access_token");
 			int userId = data.getIntExtra("user_id", 0);
-			sharedPreferences.edit().putString(TOKEN_AUTORIZATION, accessToken).commit();
+			sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, accessToken).commit();
 			startActivity(new Intent(getApplicationContext(), MainActivity.class));
 			Log.i("VK_LOGIN", "accessToken: " + accessToken + ", userId: " + userId);
 		}
@@ -327,7 +322,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						mAuthTask.execute("authorization");
 						break;
 					case "registration":
-						mAuthTask.execute("registration");
+//						mAuthTask.execute("registration");
+						new Registration(UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION,
+								getApplicationContext(), this).startRegistration(email, password, password);
 						break;
 				}
 			}
@@ -435,6 +432,41 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	}
 
+	@Override
+	public void asynctaskActionResponce(int requestActionCode, JSONObject jsonResponce) {
+		showProgress(false);
+		switch (requestActionCode) {
+			case UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION:
+				registrationResultAction(jsonResponce);
+				break;
+		}
+	}
+
+	@Override
+	public void showToast(String message) {
+		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+	}
+
+	private void registrationResultAction(JSONObject resultActionCode) {
+		try {
+			if (resultActionCode.has(UserIdentificationContract.REGISTRATION_RESPONCE_STATUS_KEY)) {
+
+				switch (resultActionCode.getInt(UserIdentificationContract.REGISTRATION_RESPONCE_STATUS_KEY)) {
+					case UserIdentificationContract.REGISTRATION_STATUS_SUCCESS:
+						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+						startActivity(goMainActivity);
+						finish();
+						break;
+					case UserIdentificationContract.REGISTRATION_STATUS_FAIL:
+						break;
+				}
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private interface ProfileQuery {
 		String[] PROJECTION = {
 				ContactsContract.CommonDataKinds.Email.ADDRESS,
@@ -461,9 +493,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	public class UserLoginTask extends AsyncTask<String, Void, String> {
 		Resources res = getResources();
 		private static final String DEBUG_TAG = "HttpExample";
-		private final String urlAuthorization = res.getString(R.string.host) + res.getString(R.string.authorization_uri); // 192.168.43.241:80/api/auth/login/";//"https://smartshop1.ddns.net:8000/api/login";
-		private final String urlRegistration = res.getString(R.string.host) + res.getString(R.string.registration_uri); //"https://192.168.43.241:80/api/auth/registration/"; //"https://smartshop1.ddns.net:8000/api/registration";
-		private final String urlChangePassword = res.getString(R.string.host) + res.getString(R.string.change_password_uri); //"https://192.168.43.241:80/api/auth/registration/"; //"https://smartshop1.ddns.net:8000/api/registration";
 		private final String mEmail;
 		private final String mPassword;
 
@@ -488,8 +517,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					return "fail";
 			}
 
-			// TODO: регистрировать новый акаунт для пользователя.
-			//return true;
 		}
 
 		@Override
@@ -530,15 +557,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			try {
 				jsonRequest.accumulate("username", mEmail);
 				jsonRequest.accumulate("password", mPassword);
-				JSONObject jsonResponce = requestPostMethod(urlAuthorization, jsonRequest);
+				JSONObject jsonResponce = requestPostMethod(SmartShopUrl.Auth.URL_LOGIN, jsonRequest);
 				int responceCode = jsonResponce.getInt("responceCode");
 
 				if (200 <= responceCode && responceCode < 300) {
-					if (!jsonResponce.has("default_password") || jsonResponce.getInt("default_password") == 0) {
+					if (false/*!jsonResponce.has("default_password") || jsonResponce.getInt("default_password") == 0*/) {
 						String token = jsonResponce.getString("key");
 						Log.e("cookie", token);
-						sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
-						Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+						sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
+						Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
 						showToast("Успешный вход");
 						return "success";
 					}
@@ -578,15 +605,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				jsonRequest.accumulate("username", mEmail);
 				jsonRequest.accumulate("password1", mPassword);
 				jsonRequest.accumulate("password2", mPassword);
-				JSONObject jsonResponce = requestPostMethod(urlRegistration, jsonRequest);
+				JSONObject jsonResponce = requestPostMethod(SmartShopUrl.Auth.URL_REGISTRATION, jsonRequest);
 
 				int responceCode = jsonResponce.getInt("responceCode");
 
 				if (200 <= responceCode && responceCode < 300) {
 					String token = jsonResponce.getString("key");
 					Log.e("cookie", token);
-					sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
-					Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
+					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
 					showToast("Регистрация прошла успешно !");
 					return "success";
 				}
@@ -617,19 +644,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		private String setNewPassword() {
 			JSONObject jsonRequest = new JSONObject();
 			try {
-				jsonRequest.accumulate("password", mPassword);
+				jsonRequest.accumulate("new_password1", mPassword);
+				jsonRequest.accumulate("new_password2", mPassword);
 				if (temporaryToken != null) {
-					jsonRequest.accumulate("key", temporaryToken);
-				} else return "fail";
-				JSONObject jsonResponce = requestPostMethod(urlChangePassword, jsonRequest);
+					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, temporaryToken).commit();
+				}
+				else {
+					return "fail";
+				}
+				JSONObject jsonResponce = HttpsHelper.post(SmartShopUrl.Auth.URL_CHANGE_PASSWORD, jsonRequest);
 				int responceCode = jsonResponce.getInt("responceCode");
 
 				if (200 <= responceCode && responceCode < 300) {
 
 					String token = jsonResponce.getString("key");
 					Log.e("cookie", token);
-					sharedPreferences.edit().putString(TOKEN_AUTORIZATION, token).commit();
-					Log.e("session", sharedPreferences.getString(TOKEN_AUTORIZATION, "default"));
+					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTORIZATION, token).commit();
+					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTORIZATION, "default"));
 					showToast("Новый пароль успешно установлен !");
 
 					return "success";
@@ -650,10 +681,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			}
 			catch (JSONException e) {
 				e.printStackTrace();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				showToast("Ошибка сервера !");
 			}
 			showToast("Неизвестная ошибка !");
 			return "fail";
@@ -704,14 +731,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				// Convert the InputStream into a string
 				JSONObject jsonResponseObject = new JSONObject(readIt(is, len));
 				jsonResponseObject.put("responceCode", responce);
-
-				//                if (!requesrUrl.equals("https://smartshop1.ddns.net/api/auth/registration/")) {
-				//                    String token = jsonResponseObject.getString("key");//conn.getHeaderFields().get("Key").get(0);
-				//                    Log.e("cookie", token);
-				//                    sharedPreferences.edit().putString(TOKEN_AUTHORIZATION, token).commit();
-				//                    Log.e("session", sharedPreferences.getString(TOKEN_AUTHORIZATION, "default"));
-				//                }
-
 
 				return jsonResponseObject;
 

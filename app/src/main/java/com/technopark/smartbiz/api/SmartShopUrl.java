@@ -21,12 +21,14 @@ public final class SmartShopUrl {
 		private static final String LOGIN = "/login/";
 		private static final String LOGOUT = "/logout/";
 		private static final String REGISTRATION = "/registration/";
+		private static final String CHANGE_PASSWORD = "/change/";
 
 		private static final String URL_AUTH = URL_API + AUTH;
 
 		public static final String URL_LOGIN = URL_AUTH + LOGIN;
 		public static final String URL_LOGOUT = URL_AUTH + LOGOUT;
 		public static final String URL_REGISTRATION = URL_AUTH + REGISTRATION;
+		public static final String URL_CHANGE_PASSWORD = URL_AUTH+ CHANGE_PASSWORD;
 
 		private Auth() {}
 	}
