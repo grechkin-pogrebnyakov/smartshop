@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 public class EmployeeRegistrationActivity extends AppCompatActivity implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
@@ -39,23 +42,28 @@ public class EmployeeRegistrationActivity extends AppCompatActivity implements H
 		submitButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Validate input
-				sendRegisterEmployee();
+				final String firstName = ((EditText) findViewById(R.id.activity_employee_registration_first_name)).getText().toString();
+				final String lastName = ((EditText) findViewById(R.id.activity_employee_registration_last_name)).getText().toString();
+				final String fatherName = ((EditText) findViewById(R.id.activity_employee_registration_father_name)).getText().toString();
+
+				if (!TextUtils.isEmpty(firstName) && !TextUtils.isEmpty(lastName)) {
+					sendRegisterEmployee(firstName, lastName, fatherName);
+				}
+				// TODO Show error message
 			}
 		});
 	}
 
-	private void sendRegisterEmployee() {
+	private void sendRegisterEmployee(String firstName, String lastName, String fatherName) {
 		Log.d(LOG, "sendRegisterEmployee");
-
-		String firstName = ((EditText) findViewById(R.id.activity_employee_registration_first_name)).getText().toString();
-		String lastName = ((EditText) findViewById(R.id.activity_employee_registration_last_name)).getText().toString();
-		String fatherName = ((EditText) findViewById(R.id.activity_employee_registration_father_name)).getText().toString();
 
 		Map<String, String> map = new HashMap<>();
 		map.put(ContractClass.Employees.COLUMN_NAME_FIRST_NAME, firstName);
 		map.put(ContractClass.Employees.COLUMN_NAME_LAST_NAME, lastName);
-		map.put(ContractClass.Employees.COLUMN_NAME_FATHER_NAME, fatherName);
+
+		if (!TextUtils.isEmpty(fatherName)) {
+			map.put(ContractClass.Employees.COLUMN_NAME_FATHER_NAME, fatherName);
+		}
 
 		employeeJsonObject = new JSONObject(map);
 
@@ -73,9 +81,16 @@ public class EmployeeRegistrationActivity extends AppCompatActivity implements H
 		JSONObject dbJsonObject = Utils.mergeJsonObject(employeeJsonObject, responseJsonObject);
 		Log.d(LOG, dbJsonObject.toString());
 
-		// TODO Validate response
-		keepTempPassword(dbJsonObject);
-		saveEmployee(dbJsonObject);
+		try {
+			if (isResponseSuccess(dbJsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
+				keepTempPassword(dbJsonObject);
+				saveEmployee(dbJsonObject);
+			}
+			// TODO Show error message
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
 
 		Intent intent = new Intent(getApplicationContext(), EmployeeListActivity.class);
 		startActivity(intent);

@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -30,6 +29,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 /**
  * Created by titaevskiy.s on 25.11.15.
@@ -163,7 +164,7 @@ public final class HttpsHelper {
 
 		try {
 			InputStream tempStream;
-			if (isSuccesResponce(connection)) {
+			if (isResponseSuccess(connection.getResponseCode())) {
 				tempStream = connection.getInputStream();
 			}
 			else {
@@ -208,18 +209,10 @@ public final class HttpsHelper {
 		return jsonObject;
 	}
 
-	private static boolean isSuccesResponce(HttpsURLConnection connection) throws IOException {
-		if (connection.getResponseCode() >= 200 && connection.getResponseCode() < 300) {
-			return true;
-		}
-		return false;
-	}
-
 	private static void setupConnection(HttpsURLConnection urlConnection, String method) throws ProtocolException {
 		urlConnection.setRequestMethod(method);
-		urlConnection.setReadTimeout(10000 /* milliseconds */);
-		urlConnection.setConnectTimeout(15000 /* milliseconds */);
-		urlConnection.setRequestProperty("Content-Type", "application/json");
+
+		urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 		urlConnection.setRequestProperty("Accept", "application/json");
 
 		setAuthorizationToken(urlConnection);

@@ -48,4 +48,9 @@ public final class Utils {
 
 		return contentValues;
 	}
+
+	public static boolean isResponseSuccess(int responseCode) {
+		return (responseCode >= 200 && responseCode < 300);
+	}
+
 }
