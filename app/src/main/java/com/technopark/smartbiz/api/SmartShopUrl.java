@@ -28,7 +28,7 @@ public final class SmartShopUrl {
 		public static final String URL_LOGIN = URL_AUTH + LOGIN;
 		public static final String URL_LOGOUT = URL_AUTH + LOGOUT;
 		public static final String URL_REGISTRATION = URL_AUTH + REGISTRATION;
-		public static final String URL_CHANGE_PASSWORD = URL_AUTH+ CHANGE_PASSWORD;
+		public static final String URL_CHANGE_PASSWORD = URL_AUTH + CHANGE_PASSWORD;
 
 		private Auth() {}
 	}

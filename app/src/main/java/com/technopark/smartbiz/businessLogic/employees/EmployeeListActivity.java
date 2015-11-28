@@ -6,6 +6,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -39,6 +41,16 @@ public class EmployeeListActivity extends AppCompatActivity implements LoaderMan
 
 		ListView employeeListView = (ListView) findViewById(R.id.activity_employee_list_listview);
 		employeeListView.setAdapter(adapter);
+		employeeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Cursor cursor = (Cursor) adapter.getItem(position);
+				final String login = cursor.getString(cursor.getColumnIndex(ContractClass.Employees.COLUMN_NAME_LOGIN));
+
+				EmployeeInfoDialog dialog = EmployeeInfoDialog.newInstance(login);
+				dialog.show(getFragmentManager(), "EmployeeInfoDialog");
+			}
+		});
 
 		getLoaderManager().initLoader(LOADER_ID, null, this);
 	}
