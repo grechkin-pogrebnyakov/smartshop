@@ -123,7 +123,7 @@ class RegisterEmployeeSerializer(serializers.Serializer):
     """
     first_name = serializers.CharField(max_length=128)
     last_name = serializers.CharField(max_length=128)
-    father_name = serializers.CharField(max_length=128, required=False)
+    father_name = serializers.CharField(max_length=128, required=False, allow_blank=True)
     login = ''
     password = ''
 
