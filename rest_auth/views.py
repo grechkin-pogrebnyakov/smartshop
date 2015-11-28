@@ -205,4 +205,7 @@ class PasswordChangeView(GenericAPIView):
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
         serializer.save()
+        userProfile = request.user.profile
+        userProfile.defaultPassword=False
+        userProfile.save()
         return Response({"success": "New password has been saved."})
