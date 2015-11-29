@@ -18,10 +18,11 @@ class Item(models.Model):
 
 class Check(models.Model):
     author = models.ForeignKey(User)
-    time = models.DateTimeField
+    creation_time = models.DateTimeField(auto_now_add=True)
 
 class CheckPosition(models.Model):
     relatedCheck = models.ForeignKey(Check, related_name='check_positions')
     item = models.ForeignKey(Item)
     count = models.IntegerField()
-
+    priceSellingProduct = models.FloatField()
+    pricePurchaseProduct = models.FloatField()

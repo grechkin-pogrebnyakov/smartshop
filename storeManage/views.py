@@ -14,16 +14,16 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView,ListCreateAPIView
 from storeManage.serializers import ShopSerializer
-from storeManage.models import Shop
+from storeManage.models import Shop,Check
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
 from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer
 import logging
 from my_utils import get_client_ip
+import datetime
 
 log = logging.getLogger('smartshop.log')
-
 
 class JSONResponse(HttpResponse):
     """
@@ -57,6 +57,8 @@ class Item(ListCreateAPIView):
     serializer_class = ShopItemSerializer
     def get(self, request, *args, **kwargs):
         curShop = request.user.profile.oShop
+        if curShop==None:
+            curShop=request.user.profile.shop
         items = models.Item.objects.filter(shop=curShop)
         serializer = self.get_serializer(items, many=True)
         return Response({'response':serializer.data})
@@ -71,17 +73,31 @@ class Item(ListCreateAPIView):
         pass
 
 
-class Check(ListCreateAPIView):
+class CheckView(ListCreateAPIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = CheckSerializer
     def get(self, request, *args, **kwargs):
-        self.serializer = self.get_serializer(data=request.data.get('request'),many=True)
-        return Response('')
+        try:
+            time1 = datetime.datetime.fromtimestamp(int(request.GET.get('time1')))
+            time2 = datetime.datetime.fromtimestamp(int(request.GET.get('time2')))
+        except Exception:
+            return Response('no time specified')
+        if request.user.profile.oShop!=None:
+            shop_id = request.user.profile.oShop.id
+        else:
+            shop_id = request.user.profile.shop.id
+        checks = Check.objects.filter(creation_time__range=[time1,time2])#magic range
+        serializer = self.get_serializer(checks, many=True)
+        serializer.data
+        return Response(serializer.data)
+
     def post(self, request, *args, **kwargs):
-        self.serializer = self.get_serializer(data=request.data)
-        if not self.serializer.is_valid():
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
             log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
             return Response('')
-        self.serializer.save(user=self.request.user)
-        return Response({'id': self.serializer.data.get('id')},status=status.HTTP_201_CREATED)
+        serializer.save(user=self.request.user)
+        return Response({'id': serializer.data.get('id')},status=status.HTTP_201_CREATED)
+    def get_queryset(self):
+        return None

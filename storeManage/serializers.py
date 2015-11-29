@@ -25,6 +25,8 @@ class ShopItemSerializer(serializers.Serializer):
     def create(self, validated_data):
         owner = validated_data.get('owner')
         oShop = owner.profile.oShop
+        if oShop==None:
+            oShop = owner.profile.shop
         item = Item()
         item.count=validated_data.get("count")
         item.productName=validated_data.get("productName")
@@ -40,21 +42,28 @@ class ShopItemSerializer(serializers.Serializer):
 class CheckPositionSerizlizer(serializers.Serializer):
     item_id = serializers.IntegerField()
     count = serializers.IntegerField()
+    priceSellingProduct = serializers.FloatField(read_only=True)
+    pricePurchaseProduct = serializers.FloatField(read_only=True)
 
 class CheckSerializer(serializers.Serializer):
     check_positions = CheckPositionSerizlizer(many=True)
     id = serializers.IntegerField(required=False)
+    author = serializers.CharField(max_length=255,read_only=True)
+    shop_id = serializers.IntegerField(read_only=True)
+
     def create(self, validated_data):
+        #TODO validate item_id
         user = validated_data.get('user')
         check = Check.objects.create(author=user)
         check.time = datetime.datetime.now()
         check.save()
         for item in validated_data.get('check_positions'):
-            position = CheckPosition.objects.create(item_id=item.get('item_id'),count=item.get('count'),relatedCheck=check)
+            position = CheckPosition.objects.create(item_id=item.get('item_id'),count=item.get('count'),relatedCheck=check,
+                                                    priceSellingProduct=Item.objects.filter(id=item.get('item_id'))[0].priceSellingProduct,
+                                                    pricePurchaseProduct=Item.objects.filter(id=item.get('item_id'))[0].pricePurchaseProduct,
+                                                    )
             position.save();
         return check
-    def get(self,time1,time2):
-        return None
 
 
 
