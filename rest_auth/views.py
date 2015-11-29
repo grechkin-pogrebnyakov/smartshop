@@ -99,7 +99,7 @@ class EmpoyeesListView(APIView):
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def get_form_kwargs(self, *args, **kwargs):
-        kwargs = super(RegisterView, self).get_form_kwargs(*args, **kwargs)
+        kwargs = super(EmpoyeesListView, self).get_form_kwargs(*args, **kwargs)
         kwargs['data'] = self.request.data
         return kwargs
 

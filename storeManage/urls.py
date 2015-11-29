@@ -8,6 +8,9 @@ urlpatterns = patterns('',
     url(r'^/',views.Store.as_view()),
     url(r'^item/add/',views.Item.as_view()),
     url(r'^item/list/',views.Item.as_view()),
+    url(r'^check/add/',views.Check.as_view()),
+    url(r'^check/list/',views.Check.as_view()),
+
     url(r'^api-token-auth', t_v.obtain_auth_token),
     #url(r'^items/',include())
 )

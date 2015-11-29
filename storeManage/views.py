@@ -18,7 +18,7 @@ from storeManage.models import Shop
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
-from storeManage.serializers import ShopSerializer,ShopItemSerializer
+from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer
 import logging
 from my_utils import get_client_ip
 
@@ -55,7 +55,6 @@ class Item(ListCreateAPIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ShopItemSerializer
-    queryset = models.Item.objects.all()
     def get(self, request, *args, **kwargs):
         curShop = request.user.profile.oShop
         items = models.Item.objects.filter(shop=curShop)
@@ -68,3 +67,21 @@ class Item(ListCreateAPIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer.save(owner=self.request.user)
         return Response({'id': serializer.data.get('id')},status=status.HTTP_201_CREATED)
+    def get_queryset(self):
+        pass
+
+
+class Check(ListCreateAPIView):
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = CheckSerializer
+    def get(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer(data=request.data.get('request'),many=True)
+        return Response('')
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer(data=request.data)
+        if not self.serializer.is_valid():
+            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
+            return Response('')
+        self.serializer.save(user=self.request.user)
+        return Response({'id': self.serializer.data.get('id')},status=status.HTTP_201_CREATED)
