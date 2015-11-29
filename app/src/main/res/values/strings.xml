@@ -64,5 +64,6 @@
     <string name="old_password">Старый пароль</string>
     <string name="new_password">Новый пароль</string>
     <string name="repeat_new_password">Повторите пароль</string>
+    <string name="content_main_button_sync">Синхронизировать с сервером</string>
     <string name="scan_product">Сканировать продукт</string>
 </resources>

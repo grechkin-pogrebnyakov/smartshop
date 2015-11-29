@@ -73,4 +73,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 	}
 
+	public void dropTable(String table) {
+		Log.d(LOG_DB, "Drop table " + table);
+
+		SQLiteDatabase db = getWritableDatabase();
+
+		switch (table) {
+			case PRODUCTS_TABLE_NAME:
+				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
+				db.execSQL(PRODUCT_TABLE_CREATE);
+				break;
+		}
+
+		db.close();
+	}
 }
