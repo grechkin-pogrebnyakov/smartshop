@@ -52,6 +52,7 @@
             android:name=".businessLogic.addProduct.AddProductActivity"
             android:label="@string/title_activity_add_product"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity

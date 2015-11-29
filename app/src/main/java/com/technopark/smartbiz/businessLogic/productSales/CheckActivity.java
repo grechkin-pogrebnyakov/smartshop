@@ -53,6 +53,7 @@ public class CheckActivity extends AppCompatActivity {
 			check.setPriceSellingProduct((int) (purchaseDialogFragment.getProductPrice()));
 			adapter.addItem(check);
 			adapter.notifyDataSetChanged();
+			setTotalPrice(calculateSumCheck());
 		}
 	};
 
