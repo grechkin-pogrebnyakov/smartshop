@@ -19,15 +19,24 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
-import com.technopark.smartbiz.database.SmartShopContentProvider;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
+import com.technopark.smartbiz.database.SmartShopContentProvider;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-public class AddProductActivity extends AppCompatActivity {
+import static com.technopark.smartbiz.Utils.isResponseSuccess;
+
+public class AddProductActivity extends AppCompatActivity implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -40,6 +49,7 @@ public class AddProductActivity extends AppCompatActivity {
 	EditText nameEditText, priceCostProductEditText, priceSellingProductEditText,
 			barcodeEditText, countEditText, descriptionEditText;
 
+	private String productId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,16 +114,27 @@ public class AddProductActivity extends AppCompatActivity {
 		barcode = barcodeEditText.getText().toString();
 		description = descriptionEditText.getText().toString();
 
-		if (!addRecord(name, priceCostProduct, priceSellingProduct, count, barcode, description,
-				photoPath).toString().contains("-1")) {
-			Toast.makeText(getApplicationContext(), "Продукт добавлен", Toast.LENGTH_LONG).show();
-			Intent goToListAddedProduct = new Intent(getApplicationContext(), ListAddedProducts.class);
-			startActivity(goToListAddedProduct);
-			finish();
+		final Uri productUri = addRecord(name, priceCostProduct, priceSellingProduct, count, barcode, description, photoPath);
+		productId = productUri.getLastPathSegment();
+
+		if (!productId.equals("-1")) {
+			Map<String, String> map = new HashMap<>();
+
+			// TODO Move product column name to Contract
+			map.put("productName", name);
+			map.put("descriptionProduct", description);
+			map.put("priceSellingProduct", priceSellingProduct);
+			map.put("pricePurchaseProduct", priceCostProduct);
+			map.put("productBarcode", barcode);
+			map.put("count", count);
+
+			final JSONObject productJsonObject = new JSONObject(map);
+
+			new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_ADD, productJsonObject, this, this)
+					.execute(HttpsHelper.Method.POST);
 		}
 		else {
-			Toast.makeText(getApplicationContext(), "Ошибка добавления продукта",
-					Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "Ошибка добавления продукта", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -233,4 +254,35 @@ public class AddProductActivity extends AppCompatActivity {
 		}
 	}
 
+	@Override
+	public void onPreExecute() {}
+
+	@Override
+	public void onPostExecute(JSONObject jsonObject) {
+		try {
+			if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
+				int id = jsonObject.getInt("id");
+
+				ContentValues contentValues = new ContentValues();
+				contentValues.put("_id", id);
+
+				getContentResolver().update(
+						SmartShopContentProvider.PRODUCTS_CONTENT_URI,
+						contentValues, "_id=" + productId,
+						null
+				);
+
+				Toast.makeText(getApplicationContext(), "Продукт добавлен", Toast.LENGTH_LONG).show();
+				Intent goToListAddedProduct = new Intent(getApplicationContext(), ListAddedProducts.class);
+				startActivity(goToListAddedProduct);
+				finish();
+			}
+			else {
+				Toast.makeText(getApplicationContext(), "Ошибка добавления продукта", Toast.LENGTH_LONG).show();
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
 }

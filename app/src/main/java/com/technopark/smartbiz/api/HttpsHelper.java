@@ -39,7 +39,8 @@ public final class HttpsHelper {
 
 	private static final String LOG = "HttpsHelper";
 
-	public static final String RESPONSE_CODE = "response";
+	public static final String RESPONSE_CODE = "response_code";
+	public static final String RESPONSE = "response";
 
 	private static String token = "";
 
