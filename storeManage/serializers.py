@@ -42,15 +42,16 @@ class CheckPositionSerizlizer(serializers.Serializer):
     count = serializers.IntegerField()
 
 class CheckSerializer(serializers.Serializer):
-    request = CheckPositionSerizlizer(many=True)
+    check_positions = CheckPositionSerizlizer(many=True)
+    id = serializers.IntegerField(required=False)
     def create(self, validated_data):
         user = validated_data.get('user')
         check = Check.objects.create(author=user)
         check.time = datetime.datetime.now()
-        for item in validated_data.get('request'):
+        check.save()
+        for item in validated_data.get('check_positions'):
             position = CheckPosition.objects.create(item_id=item.get('item_id'),count=item.get('count'),relatedCheck=check)
             position.save();
-        check.save()
         return check
     def get(self,time1,time2):
         return None
