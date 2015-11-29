@@ -1,8 +1,10 @@
 __author__ = 'mid'
 
 from rest_framework import serializers
-from storeManage.models import Shop,Item
+from storeManage.models import Shop,Item, Check,CheckPosition
 from userManage.models import UserProfile
+import json
+import time,datetime
 
 class ShopSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(many=False, read_only=False,queryset=UserProfile.objects.all())
@@ -35,11 +37,23 @@ class ShopItemSerializer(serializers.Serializer):
         return item
 
 
+class CheckPositionSerizlizer(serializers.Serializer):
+    item_id = serializers.IntegerField()
+    count = serializers.IntegerField()
 
-
-
-
-
+class CheckSerializer(serializers.Serializer):
+    request = CheckPositionSerizlizer(many=True)
+    def create(self, validated_data):
+        user = validated_data.get('user')
+        check = Check.objects.create(author=user)
+        check.time = datetime.datetime.now()
+        for item in validated_data.get('request'):
+            position = CheckPosition.objects.create(item_id=item.get('item_id'),count=item.get('count'),relatedCheck=check)
+            position.save();
+        check.save()
+        return check
+    def get(self,time1,time2):
+        return None
 
 
 
