@@ -66,7 +66,7 @@ class Item(ListCreateAPIView):
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer.save(owner=self.request.user)
-        return Response({'id': serializer.data.get('id')},status=status.HTTP_201_CREATED)
+        return Response({'id': serializer.data.get("id")},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         pass
 

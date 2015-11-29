@@ -21,7 +21,7 @@ class Check(models.Model):
     time = models.DateTimeField
 
 class CheckPosition(models.Model):
-    relatedCheck = models.ForeignKey(Check)
+    relatedCheck = models.ForeignKey(Check, related_name='check_positions')
     item = models.ForeignKey(Item)
     count = models.IntegerField()
 
