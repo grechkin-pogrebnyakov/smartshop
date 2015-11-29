@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
+from django.db.models import Q
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,6 +16,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView,ListCreateAPIView
 from storeManage.serializers import ShopSerializer
 from storeManage.models import Shop,Check
+from userManage.models import UserProfile
+from  django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
@@ -84,13 +87,12 @@ class CheckView(ListCreateAPIView):
         except Exception:
             return Response('no time specified')
         if request.user.profile.oShop!=None:
-            shop_id = request.user.profile.oShop.id
+            cshop = request.user.profile.oShop
         else:
-            shop_id = request.user.profile.shop.id
-        a = None
-        checks = Check.objects.filter(creation_time__range=[time1,time2])
+            cshop = request.user.profile.shop
+        userProfs = User.objects.filter(profile__shop=cshop,profile__oShop=cshop)
+        checks = Check.objects.filter(Q(creation_time__range=[time1,time2]) | Q(author__in=userProfs))
         serializer = self.get_serializer(checks, many=True)
-        serializer.data
         return Response({'response':serializer.data})
 
     def post(self, request, *args, **kwargs):
