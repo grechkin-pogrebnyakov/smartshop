@@ -1,5 +1,6 @@
 package com.technopark.smartbiz;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,12 +14,15 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
 import com.technopark.smartbiz.businessLogic.discard.DiscardActivity;
 import com.technopark.smartbiz.businessLogic.employees.EmployeeListActivity;
@@ -32,7 +36,13 @@ import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificati
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+
+import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -147,6 +157,15 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+
+		Button syncButton = (Button) findViewById(R.id.content_main_button_sync);
+		syncButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_LIST, null, productCallback, getApplicationContext())
+						.execute(HttpsHelper.Method.GET);
+			}
+		});
 	}
 
 	private void setupChart() {
@@ -224,4 +243,51 @@ public class MainActivity extends AppCompatActivity {
 			Log.d(CHECK_CONTENT_OBSERVER_LOG, "onChangeUri");
 		}
 	}
+
+	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback productCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
+		@Override
+		public void onPreExecute() {}
+
+		@Override
+		public void onPostExecute(JSONObject jsonObject) {
+			try {
+				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
+					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+
+					databaseHelper.dropTable(DatabaseHelper.PRODUCTS_TABLE_NAME);
+
+					JSONArray products = jsonObject.getJSONArray(HttpsHelper.RESPONSE);
+					for (int i = 0; i < products.length(); ++i) {
+						JSONObject product = products.getJSONObject(i);
+
+						String productName = product.getString("productName");
+						String descriptionProduct = product.getString("descriptionProduct");
+						String priceSellingProduct = product.getString("priceSellingProduct");
+						String pricePurchaseProduct = product.getString("pricePurchaseProduct");
+						String productBarcode = product.getString("productBarcode");
+						String count = product.getString("count");
+						String id = product.getString("id");
+
+						ContentValues contentValues = new ContentValues();
+
+						contentValues.put("name", productName);
+						contentValues.put("description", descriptionProduct);
+						contentValues.put("price_selling_product", priceSellingProduct);
+						contentValues.put("price_cost_product", pricePurchaseProduct);
+						contentValues.put("barcode", productBarcode);
+						contentValues.put("count", count);
+						contentValues.put("_id", id);
+
+						getContentResolver().insert(SmartShopContentProvider.PRODUCTS_CONTENT_URI, contentValues);
+					}
+
+					Toast.makeText(getApplicationContext(), "Данные успешно синхронизированы!", Toast.LENGTH_LONG)
+							.show();
+				}
+			}
+			catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+	};
 }
