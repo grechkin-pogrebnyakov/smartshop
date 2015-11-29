@@ -1,6 +1,7 @@
 package com.technopark.smartbiz.businessLogic.discard;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +11,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.businessLogic.productSales.DialogFragmentCallback;
 import com.technopark.smartbiz.businessLogic.productSales.PurchaseActivity;
+import com.technopark.smartbiz.businessLogic.productSales.PurchaseDialogFragment;
 import com.technopark.smartbiz.database.DatabaseHelper;
+import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
@@ -26,6 +33,20 @@ public class DiscardActivity extends AppCompatActivity {
 
 	private ProductAdapter adapter;
 	private DatabaseHelper dbHelper;
+	private String DIALOG = "purchaseDialogFragment";
+
+	private PurchaseDialogFragment purchaseDialogFragment = new PurchaseDialogFragment();
+
+	private DialogFragmentCallback dialogListener = new DialogFragmentCallback() {
+		@Override
+		public void callback() {
+			Check check = purchaseDialogFragment.getCheck();
+			check.setCount(purchaseDialogFragment.getProductCount());
+			check.setPriceSellingProduct((int) (purchaseDialogFragment.getProductPrice()));
+			adapter.addItem(check);
+			adapter.notifyDataSetChanged();
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +76,7 @@ public class DiscardActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+		purchaseDialogFragment.setAddButtonCallback(dialogListener);
 	}
 
 	@Override
@@ -65,10 +87,17 @@ public class DiscardActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent addProduct = new Intent(getApplicationContext(), PurchaseActivity.class);
-		addProduct.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-		startActivityForResult(addProduct, SELECT_PRODUCT);
-		return false;
+		switch (item.getItemId()) {
+			case R.id.add_product:
+				Intent addProduct = new Intent(getApplicationContext(), PurchaseActivity.class);
+				addProduct.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivityForResult(addProduct, SELECT_PRODUCT);
+				return false;
+			case R.id.scan_product:
+				scanBarcode();
+				return false;
+			default: return false;
+		}
 	}
 
 	@Override
@@ -77,6 +106,19 @@ public class DiscardActivity extends AppCompatActivity {
 			Check check = data.getParcelableExtra(PurchaseActivity.KEY_RESPONCE_OBJECT);
 			adapter.addItem(check);
 			adapter.notifyDataSetChanged();
+		}
+
+		IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+		if (result != null) {
+			String contents = result.getContents();
+			if (contents != null) {
+				String barcode = result.getContents();
+				findProductByBarcode(barcode);
+			}
+			else {
+				Toast.makeText(getApplicationContext(), "Не отсканировано !",
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -101,5 +143,38 @@ public class DiscardActivity extends AppCompatActivity {
 		}
 
 		db.close();
+	}
+
+	private void scanBarcode() {
+		IntentIntegrator integrator = new IntentIntegrator(DiscardActivity.this);
+		integrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES);
+	}
+
+	private void findProductByBarcode(String barcode) {
+		Cursor cursor = getContentResolver().query(SmartShopContentProvider.PRODUCTS_CONTENT_URI, new String[]{},
+				"barcode = ?", new String[]{barcode}, "");
+		if (cursor != null && cursor.moveToNext()) {
+			String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
+			String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
+			int priceSellingProduct = cursor.getInt(cursor
+					.getColumnIndex("price_selling_product"));
+			int pricePurchaseProduct = cursor.getInt(cursor
+					.getColumnIndex("price_cost_product"));
+			int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
+			long id = cursor.getLong(cursor.getColumnIndex("_id"));
+			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, countProduct);
+			showDialog(check);
+		} else {
+			Toast.makeText(getApplicationContext(), "Продукт не найден !",
+					Toast.LENGTH_LONG).show();
+		}
+	}
+
+	private void showDialog(Check check) {
+		purchaseDialogFragment.setCheck(check);
+		purchaseDialogFragment.setProductName(check.getProductName());
+		purchaseDialogFragment.setProductPrice(check.getPriceSellingProduct());
+		purchaseDialogFragment.setProductCount(1);
+		purchaseDialogFragment.show(getFragmentManager(), DIALOG);
 	}
 }

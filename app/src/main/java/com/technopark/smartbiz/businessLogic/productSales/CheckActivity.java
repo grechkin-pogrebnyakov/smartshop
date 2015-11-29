@@ -163,8 +163,6 @@ public class CheckActivity extends AppCompatActivity {
 				"barcode = ?", new String[]{barcode}, "");
 		if (cursor != null && cursor.moveToNext()) {
 			String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
-			String descriptionProduct = cursor.getString(cursor
-					.getColumnIndex("description"));
 			String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
 			int priceSellingProduct = cursor.getInt(cursor
 					.getColumnIndex("price_selling_product"));

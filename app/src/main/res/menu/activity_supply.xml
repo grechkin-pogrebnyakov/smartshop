@@ -8,4 +8,11 @@
         android:title="@string/add_product"
         app:showAsAction="always"
         />
+
+    <item
+        android:id="@+id/scan_product"
+        android:icon="@drawable/barcode_scan"
+        android:title="@string/scan_product"
+        app:showAsAction="always"
+        />
 </menu>

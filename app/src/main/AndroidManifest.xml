@@ -97,11 +97,13 @@
         <activity
             android:name=".businessLogic.supply.SupplyActivity"
             android:label="Поставка"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".businessLogic.discard.DiscardActivity"
             android:label="Списание"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
