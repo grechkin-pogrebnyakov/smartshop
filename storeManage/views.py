@@ -87,10 +87,11 @@ class CheckView(ListCreateAPIView):
             shop_id = request.user.profile.oShop.id
         else:
             shop_id = request.user.profile.shop.id
-        checks = Check.objects.filter(creation_time__range=[time1,time2])#magic range
+        a = None
+        checks = Check.objects.filter(creation_time__range=[time1,time2])
         serializer = self.get_serializer(checks, many=True)
         serializer.data
-        return Response(serializer.data)
+        return Response({'response':serializer.data})
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
