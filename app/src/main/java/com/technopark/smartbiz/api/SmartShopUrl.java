@@ -47,4 +47,28 @@ public final class SmartShopUrl {
 
 		private Employee() {}
 	}
+
+	public static final class Shop {
+
+		private static final String SHOP = "/shop";
+
+		private static final String URL_SHOP = URL_API + SHOP;
+
+		private Shop() {}
+
+		public static final class Item {
+
+			private static final String ITEM = "/item";
+
+			private static final String ADD = "/add/";
+			private static final String LIST = "/list/";
+
+			private static final String URL_ITEM = URL_SHOP + ITEM;
+
+			public static final String URL_ITEM_ADD = URL_ITEM + ADD;
+			public static final String URL_ITEM_LIST = URL_ITEM + LIST;
+
+			private Item() {}
+		}
+	}
 }
