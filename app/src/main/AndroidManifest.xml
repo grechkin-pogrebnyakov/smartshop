@@ -81,6 +81,7 @@
         <activity
             android:name=".businessLogic.productSales.CheckActivity"
             android:label="@string/title_activity_check"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
