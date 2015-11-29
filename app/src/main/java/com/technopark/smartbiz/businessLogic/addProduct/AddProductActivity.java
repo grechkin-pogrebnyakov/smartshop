@@ -285,4 +285,9 @@ public class AddProductActivity extends AppCompatActivity implements HttpsHelper
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void onCancelled() {
+
+	}
 }

@@ -28,7 +28,7 @@
         android:theme="@style/AppTheme"
         >
         <activity
-            android:name=".businessLogic.userIdentification.LoginActivity"
+            android:name=".businessLogic.userIdentification.activities.LoginActivity"
             android:label="@string/app_name"
             >
             <intent-filter>
@@ -113,7 +113,7 @@
             android:label="Регистрация сотрудника"
             >
         </activity>
-        <activity android:name=".businessLogic.userIdentification.ChangePasswordActivity">
+        <activity android:name=".businessLogic.userIdentification.activities.ChangePasswordActivity">
         </activity>
     </application>
 

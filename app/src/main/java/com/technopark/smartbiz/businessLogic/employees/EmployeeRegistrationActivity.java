@@ -96,6 +96,11 @@ public class EmployeeRegistrationActivity extends AppCompatActivity implements H
 		startActivity(intent);
 	}
 
+	@Override
+	public void onCancelled() {
+
+	}
+
 	private void saveEmployee(JSONObject jsonObject) {
 		String[] names = new String[]{
 				ContractClass.Employees.COLUMN_NAME_FIRST_NAME,

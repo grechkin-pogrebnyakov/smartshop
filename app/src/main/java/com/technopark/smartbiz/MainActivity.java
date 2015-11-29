@@ -31,8 +31,10 @@ import com.technopark.smartbiz.businessLogic.productSales.CheckActivity;
 import com.technopark.smartbiz.businessLogic.shopProfile.ShopProfileActivity;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
 import com.technopark.smartbiz.businessLogic.supply.SupplyActivity;
-import com.technopark.smartbiz.businessLogic.userIdentification.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
+import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
+import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 
@@ -45,7 +47,7 @@ import java.util.ArrayList;
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements InteractionWithUI {
 
 	public static final String APP_PREFERENCES = "mysettings";
 
@@ -53,13 +55,15 @@ public class MainActivity extends AppCompatActivity {
 	private CheckContentObserver checkContentObserver = new CheckContentObserver();
 	private DatabaseHelper dbHelper;
 
+	private AccessControl accessControl;
 	private LineChart mainChart;
+	private Button logOut, purchaseButton, showProductsButton, discardButton,
+			goToAddProduct, editShopProfileButton, supplyButton, employeesButton, employeeRegistrationButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
 		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 
 		getContentResolver()
@@ -69,103 +73,8 @@ public class MainActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		mainChart = (LineChart) findViewById(R.id.content_main_chart);
-		setupChart();
-		fillChart();
-
-		Button logOut = (Button) findViewById(R.id.button_logout);
-		logOut.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
-				sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
-				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-			}
-		});
-
-		Button goToAddProduct = (Button) findViewById(R.id.go_to_add_product);
-		goToAddProduct.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
-				startActivity(goAddProduct);
-			}
-		});
-
-		Button purchaseButton = (Button) findViewById(R.id.content_main_button_purchase);
-		purchaseButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, CheckActivity.class);
-				startActivity(intent);
-			}
-		});
-
-		Button showProductsButton = (Button) findViewById(R.id.content_main_button_show_products);
-		showProductsButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent show = new Intent(getApplicationContext(), ListAddedProducts.class);
-				startActivity(show);
-			}
-		});
-
-		Button editShopProfileButton = (Button) findViewById(R.id.content_main_button_edit_shop_profile);
-		editShopProfileButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent show = new Intent(getApplicationContext(), ShopProfileActivity.class);
-				show.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(show);
-			}
-		});
-
-		Button supplyButton = (Button) findViewById(R.id.content_main_button_supply);
-		supplyButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), SupplyActivity.class);
-				startActivity(intent);
-			}
-		});
-
-		Button discardButton = (Button) findViewById(R.id.content_main_button_discarding);
-		discardButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), DiscardActivity.class);
-				startActivity(intent);
-			}
-		});
-
-		Button employeesButton = (Button) findViewById(R.id.content_main_button_employees);
-		employeesButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), EmployeeListActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(intent);
-			}
-		});
-
-		Button employeeRegistrationButton = (Button) findViewById(R.id.content_main_button_employee_registration);
-		employeeRegistrationButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), EmployeeRegistrationActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(intent);
-			}
-		});
-
-		Button syncButton = (Button) findViewById(R.id.content_main_button_sync);
-		syncButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_LIST, null, productCallback, getApplicationContext())
-						.execute(HttpsHelper.Method.GET);
-			}
-		});
+		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
+		accessControl.displayActivityOfAccessRights();
 	}
 
 	private void setupChart() {
@@ -218,6 +127,146 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public void onBackPressed() {
 		moveTaskToBack(true);
+	}
+
+	@Override
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {
+
+	}
+
+	@Override
+	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
+		switch (requestActionCode) {
+			case UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN:
+				initializationActivitiByStatus(accessRightIdentificator);
+				break;
+		}
+	}
+
+	@Override
+	public void showToast(String message) {
+		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+	}
+
+	private void initializationActivitiByStatus(String accessRightIdentificator) {
+		initializationActivitiElementsForOwner();
+		switch (accessRightIdentificator) {
+			case UserIdentificationContract.SUCCESS_AUTHORIZATION_EMPLOYEE:
+				retainElementsForEmployee();
+				break;
+		}
+	}
+
+	private void initializationActivitiElementsForOwner() {
+		// общие элементы
+		logOut = (Button) findViewById(R.id.button_logout);
+		logOut.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+				sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
+				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+			}
+		});
+
+		purchaseButton = (Button) findViewById(R.id.content_main_button_purchase);
+		purchaseButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, CheckActivity.class);
+				startActivity(intent);
+			}
+		});
+
+		showProductsButton = (Button) findViewById(R.id.content_main_button_show_products);
+		showProductsButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent show = new Intent(getApplicationContext(), ListAddedProducts.class);
+				startActivity(show);
+			}
+		});
+
+		discardButton = (Button) findViewById(R.id.content_main_button_discarding);
+		discardButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), DiscardActivity.class);
+				startActivity(intent);
+			}
+		});
+
+		//элементы для владельца
+		mainChart = (LineChart) findViewById(R.id.content_main_chart);
+		setupChart();
+		fillChart();
+
+		goToAddProduct = (Button) findViewById(R.id.go_to_add_product);
+		goToAddProduct.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
+				startActivity(goAddProduct);
+			}
+		});
+
+
+		editShopProfileButton = (Button) findViewById(R.id.content_main_button_edit_shop_profile);
+		editShopProfileButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent show = new Intent(getApplicationContext(), ShopProfileActivity.class);
+				show.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivity(show);
+			}
+		});
+
+		supplyButton = (Button) findViewById(R.id.content_main_button_supply);
+		supplyButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), SupplyActivity.class);
+				startActivity(intent);
+			}
+		});
+
+		employeesButton = (Button) findViewById(R.id.content_main_button_employees);
+		employeesButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), EmployeeListActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivity(intent);
+			}
+		});
+
+		employeeRegistrationButton = (Button) findViewById(R.id.content_main_button_employee_registration);
+		employeeRegistrationButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), EmployeeRegistrationActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivity(intent);
+			}
+		});
+
+		Button syncButton = (Button) findViewById(R.id.content_main_button_sync);
+		syncButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_LIST, null, productCallback, getApplicationContext())
+						.execute(HttpsHelper.Method.GET);
+			}
+		});
+	}
+
+	private void retainElementsForEmployee() {
+		mainChart.setVisibility(View.GONE);
+		goToAddProduct.setVisibility(View.GONE);
+		editShopProfileButton.setVisibility(View.GONE);
+		supplyButton.setVisibility(View.GONE);
+		employeesButton.setVisibility(View.GONE);
+		employeeRegistrationButton.setVisibility(View.GONE);
 	}
 
 	private class CheckContentObserver extends ContentObserver {
@@ -288,6 +337,11 @@ public class MainActivity extends AppCompatActivity {
 			catch (JSONException e) {
 				e.printStackTrace();
 			}
+		}
+
+		@Override
+		public void onCancelled() {
+
 		}
 	};
 }

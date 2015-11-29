@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.businessLogic.userIdentification;
+package com.technopark.smartbiz.businessLogic.userIdentification.identificationServices;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
+import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
+import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,14 +59,27 @@ public class ChangePassword implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTask
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
-		int authorizationResult = setNewPassword(jsonObject);
+		int changePasswordResult = setNewPassword(jsonObject);
 		try {
-			jsonObject.put(UserIdentificationContract.CHANGE_PASSWORD_RESPONSE_STATUS_KEY, authorizationResult);
+			jsonObject.put(UserIdentificationContract.CHANGE_PASSWORD_RESPONSE_STATUS_KEY, changePasswordResult);
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		interactionWithUI.asynctaskActionResponse(requestActionCode, jsonObject);
+		interactionWithUI.netActionResponse(requestActionCode, jsonObject);
+	}
+
+	@Override
+	public void onCancelled() {
+		int changePasswordResult = UserIdentificationContract.CHANGE_PASSWORD_STATUS_FAIL;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(UserIdentificationContract.CHANGE_PASSWORD_RESPONSE_STATUS_KEY, changePasswordResult);
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		interactionWithUI.netActionResponse(requestActionCode, jsonObject);
 	}
 
 	private int setNewPassword(JSONObject jsonResponse) {
@@ -75,7 +91,7 @@ public class ChangePassword implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTask
 				String token = sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "");
 				Log.e("cookie", token);
 				sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
-						UserIdentificationContract.SUCCESS_AUTHORIZATION).commit();
+						UserIdentificationContract.SUCCESS_AUTHORIZATION_EMPLOYEE).apply();
 				Log.e("changePassword", "success");
 				interactionWithUI.showToast("Новый пароль успешно установлен !");
 
@@ -93,7 +109,6 @@ public class ChangePassword implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTask
 				interactionWithUI.showToast("Ошибка сервера !");
 				return UserIdentificationContract.CHANGE_PASSWORD_STATUS_FAIL;
 			}
-
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
