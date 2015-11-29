@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.businessLogic.userIdentification;
+package com.technopark.smartbiz.businessLogic.userIdentification.identificationServices;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
+import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
+import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +60,20 @@ public class Registration implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCa
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		interactionWithUI.asynctaskActionResponse(requestActionCode, jsonObject);
+		interactionWithUI.netActionResponse(requestActionCode, jsonObject);
+	}
+
+	@Override
+	public void onCancelled() {
+		int registrationResult = UserIdentificationContract.REGISTRATION_STATUS_FAIL;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(UserIdentificationContract.REGISTRATION_RESPONSE_STATUS_KEY, registrationResult);
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		interactionWithUI.netActionResponse(requestActionCode, jsonObject);
 	}
 
 	private int registration (JSONObject jsonResponce) {
@@ -68,9 +84,9 @@ public class Registration implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCa
 			if (200 <= responceCode && responceCode < 300) {
 				String token = jsonResponce.getString("key");
 				Log.e("cookie", token);
-				sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).commit();
+				sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).apply();
 				sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
-						UserIdentificationContract.SUCCESS_AUTHORIZATION).commit();
+						UserIdentificationContract.SUCCESS_AUTHORIZATION_OWNER).apply();
 				Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "default"));
 				interactionWithUI.showToast("Регистрация прошла успешно !");
 				return UserIdentificationContract.REGISTRATION_STATUS_SUCCESS;

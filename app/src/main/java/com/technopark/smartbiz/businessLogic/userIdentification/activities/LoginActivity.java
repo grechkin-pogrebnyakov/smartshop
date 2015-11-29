@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.businessLogic.userIdentification;
+package com.technopark.smartbiz.businessLogic.userIdentification.activities;
 
 
 import android.accounts.Account;
@@ -36,6 +36,11 @@ import android.widget.Toast;
 
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
+import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
+import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.Authorization;
+import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.Registration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,8 +63,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	private final String ACTION_REGISTRATION = "registration";
 	private final String ACTION_PASSWORD_CHANGE = "passwordChange";
 	private final String ACTION_VALIDATION = "validation";
-	private String temporaryToken = null;
 	private SharedPreferences sharedPreferences;
+	private AccessControl accessControl;
 	// Ссылки на графические компоненты
 	private AutoCompleteTextView mEmailView;
 	private EditText mPasswordView;
@@ -73,18 +78,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
+		accessControl.displayActivityOfAccessRights();
 		// Инициализация приложения...
 		// Инициализируем компоненты формы логина
 		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
-		if (sharedPreferences.contains(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)) {
-			String statusAuthorization = sharedPreferences.getString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY, "");
-			Log.e("statusAuthorization", statusAuthorization);
-			if (statusAuthorization.equals(UserIdentificationContract.SUCCESS_AUTHORIZATION)) {
-				startActivity(new Intent(getApplicationContext(), MainActivity.class));
-				finish();
-			}
-		}
+
+
 		mPasswordRepeatView = (EditText) findViewById(R.id.login_password_repeat);
 		mPasswordRepeatView.setVisibility(View.GONE);
 		mPasswordView = (EditText) findViewById(R.id.login_password);
@@ -173,7 +174,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		if (requestCode == 1 && data != null && data.hasExtra("access_token")) {
 			String accessToken = data.getStringExtra("access_token");
 			int userId = data.getIntExtra("user_id", 0);
-			sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, accessToken).commit();
+			sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, accessToken).apply();
+			sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
+					UserIdentificationContract.SUCCESS_AUTHORIZATION_OWNER).apply();
 			startActivity(new Intent(getApplicationContext(), MainActivity.class));
 			Log.i("VK_LOGIN", "accessToken: " + accessToken + ", userId: " + userId);
 		}
@@ -194,9 +197,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	 * Представляются ошибки и не производиться попытка авторизации.
 	 */
 	private void startActionInitiatedByUser(String action) {
-//		if (mAuthTask != null) {
-//			return;
-//		}
+		//		if (mAuthTask != null) {
+		//			return;
+		//		}
 
 		// Сброс ошибок.
 		mEmailView.setError(null);
@@ -255,10 +258,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					case ACTION_REGISTRATION:
 						new Registration(UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION,
 								getApplicationContext(), this).startRegistration(email, password, password);
-						break;
-					case ACTION_PASSWORD_CHANGE:
-//						new ChangePassword(UserIdentificationContract.REQUEST_CODE_CHANGE_PASSWORD_ACTION,
-//								getApplicationContext(), this).startChangePassword();
 						break;
 				}
 			}
@@ -367,7 +366,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	}
 
 	@Override
-	public void asynctaskActionResponse(int requestActionCode, JSONObject jsonResponce) {
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {
 		showProgress(false);
 		switch (requestActionCode) {
 			case UserIdentificationContract.REQUEST_CODE_AUTHORIZATION_ACTION:
@@ -375,6 +374,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				break;
 			case UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION:
 				registrationResultAction(jsonResponce);
+				break;
+		}
+	}
+
+	@Override
+	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
+		switch (requestActionCode) {
+			case UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN:
+				showActivityForAccessStatus(accessRightIdentificator);
 				break;
 		}
 	}
@@ -402,7 +410,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						startActivity(goChangePasswordActivity);
 						finish();
 						break;
-					default: showProgress(false);
+					default:
+						showProgress(false);
 				}
 			}
 		}
@@ -424,7 +433,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					case UserIdentificationContract.REGISTRATION_STATUS_FAIL:
 						showProgress(false);
 						break;
-					default: showProgress(false);
+					default:
+						showProgress(false);
 				}
 			}
 		}
@@ -433,7 +443,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 	}
 
-
+	private void showActivityForAccessStatus(String accessRightIdentificator) {
+		if (accessRightIdentificator.contains(UserIdentificationContract.SUCCESS_AUTHORIZATION)) {
+			startActivity(new Intent(getApplicationContext(), MainActivity.class));
+			finish();
+		}
+	}
 
 	private interface ProfileQuery {
 		String[] PROJECTION = {
@@ -454,13 +469,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 		mEmailView.setAdapter(adapter);
 	}
-
-//
-//		@Override
-//		protected void onCancelled() {
-//			mAuthTask = null;
-//			showProgress(false);
-//		}
 
 }
 

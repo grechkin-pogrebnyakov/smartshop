@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.businessLogic.userIdentification;
+package com.technopark.smartbiz.businessLogic.userIdentification.identificationServices;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
+import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
+import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +16,7 @@ import org.json.JSONObject;
 /**
  * Created by Abovyan on 26.11.15.
  */
-public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback{
+public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	private int requestActionCode;
 	private Context context;
@@ -52,7 +55,8 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 		try {
 			if (jsonObject != null) {
 				jsonObject.put(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY, authorizationResult);
-			} else {
+			}
+			else {
 				interactionWithUI.showToast("Время ожидания истекло !");
 				jsonObject = new JSONObject().put(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY,
 						UserIdentificationContract.AUTHORIZATION_STATUS_FAIL);
@@ -61,7 +65,20 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		interactionWithUI.asynctaskActionResponse(requestActionCode, jsonObject);
+		interactionWithUI.netActionResponse(requestActionCode, jsonObject);
+	}
+
+	@Override
+	public void onCancelled() {
+		int authorizationResult = UserIdentificationContract.AUTHORIZATION_STATUS_FAIL;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY, authorizationResult);
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		interactionWithUI.netActionResponse(requestActionCode, jsonObject);
 	}
 
 	private int authorization(JSONObject jsonResponce) {
@@ -73,15 +90,20 @@ public class Authorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskC
 				String token = jsonResponce.getString("key");
 				if (!jsonResponce.has("default_password") || !jsonResponce.getBoolean("default_password")) {
 					Log.e("cookie", token);
-					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).commit();
-					sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
-							UserIdentificationContract.SUCCESS_AUTHORIZATION).commit();
-					Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "default"));
-					interactionWithUI.showToast("Успешный вход");
-					return UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS;
+					if (jsonResponce.has("is_worker")) {
+						boolean is_worker = jsonResponce.getBoolean("is_worker");
+						String authorizationStatus = is_worker ? UserIdentificationContract.SUCCESS_AUTHORIZATION_EMPLOYEE :
+								UserIdentificationContract.SUCCESS_AUTHORIZATION_OWNER;
+						sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).apply();
+						sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
+								authorizationStatus).apply();
+						Log.e("session", sharedPreferences.getString(UserIdentificationContract.TOKEN_AUTHORIZATION, "default"));
+						interactionWithUI.showToast("Успешный вход");
+						return UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS;
+					}
 				}
 				else {
-					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).commit();
+					sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, token).apply();
 					return UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD;
 				}
 			}

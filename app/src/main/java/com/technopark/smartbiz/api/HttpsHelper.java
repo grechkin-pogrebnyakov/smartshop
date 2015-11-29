@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.technopark.smartbiz.businessLogic.userIdentification.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 
 import org.json.JSONException;
@@ -211,6 +211,8 @@ public final class HttpsHelper {
 
 	private static void setupConnection(HttpsURLConnection urlConnection, String method) throws ProtocolException {
 		urlConnection.setRequestMethod(method);
+		urlConnection.setReadTimeout(10000 /* milliseconds */);
+		urlConnection.setConnectTimeout(15000 /* milliseconds */);
 
 		urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 		urlConnection.setRequestProperty("Accept", "application/json");
@@ -281,10 +283,20 @@ public final class HttpsHelper {
 			}
 		}
 
+		@Override
+		protected void onCancelled() {
+			super.onCancelled();
+			if (callback != null) {
+				callback.onCancelled();
+			}
+		}
+
 		public interface HttpsAsyncTaskCallback {
 			void onPreExecute();
 
 			void onPostExecute(JSONObject jsonObject);
+
+			void onCancelled();
 		}
 	}
 }

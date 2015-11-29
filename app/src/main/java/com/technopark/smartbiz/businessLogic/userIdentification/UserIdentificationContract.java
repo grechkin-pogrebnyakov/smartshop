@@ -7,11 +7,15 @@ public final class UserIdentificationContract {
 
 	public static final String STATUS_AUTHORIZATION_KEY = "statusAuth";
 	public static final String SUCCESS_AUTHORIZATION = "success";
+	public static final String SUCCESS_AUTHORIZATION_OWNER = "success_owner";
+	public static final String SUCCESS_AUTHORIZATION_EMPLOYEE = "success_employee";
 
 	public static final String TOKEN_AUTHORIZATION = "token";
 	public static final int REQUEST_CODE_REGISTRATION_ACTION = 1;
 	public static final int REQUEST_CODE_AUTHORIZATION_ACTION = 2;
 	public static final int REQUEST_CODE_CHANGE_PASSWORD_ACTION = 3;
+
+	public static final int REQUEST_CODE_ACCESS_LOGIN = 3;
 
 	public final static String REGISTRATION_LOGIN_KEY = "username";
 	public final static String REGISTRATION_PASSWORD1_KEY = "password1";

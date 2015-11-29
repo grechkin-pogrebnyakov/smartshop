@@ -1,4 +1,4 @@
-package com.technopark.smartbiz.businessLogic.userIdentification;
+package com.technopark.smartbiz.businessLogic.userIdentification.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -17,12 +17,15 @@ import android.widget.Toast;
 
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
-import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
+import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.ChangePassword;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ChangePasswordActivity extends AppCompatActivity implements InteractionWithUI{
+public class ChangePasswordActivity extends AppCompatActivity implements InteractionWithUI {
 
 	private View mProgressView;
 	private View mChangePasswordFormView;
@@ -53,13 +56,18 @@ public class ChangePasswordActivity extends AppCompatActivity implements Interac
 	}
 
 	@Override
-	public void asynctaskActionResponse(int requestActionCode, JSONObject jsonResponce) {
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {
 		showProgress(false);
 		switch (requestActionCode) {
 			case UserIdentificationContract.REQUEST_CODE_CHANGE_PASSWORD_ACTION:
 				changePasswordResultAction(jsonResponce);
 				break;
 		}
+	}
+
+	@Override
+	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
+
 	}
 
 	@Override
