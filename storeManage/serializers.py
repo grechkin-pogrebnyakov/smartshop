@@ -43,13 +43,14 @@ class CheckPositionSerizlizer(serializers.Serializer):
     item_id = serializers.IntegerField()
     count = serializers.IntegerField()
     priceSellingProduct = serializers.FloatField(read_only=True)
-    pricePurchaseProduct = serializers.FloatField(read_only=True)
+    pricePurchaseProduct = serializers.FloatField(read_only=True)	
 
 class CheckSerializer(serializers.Serializer):
     check_positions = CheckPositionSerizlizer(many=True)
     id = serializers.IntegerField(required=False)
     author = serializers.CharField(max_length=255,read_only=True)
     shop_id = serializers.IntegerField(read_only=True)
+    creation_time=serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
         #TODO validate item_id
@@ -57,12 +58,16 @@ class CheckSerializer(serializers.Serializer):
         check = Check.objects.create(author=user)
         check.time = datetime.datetime.now()
         check.save()
-        for item in validated_data.get('check_positions'):
-            position = CheckPosition.objects.create(item_id=item.get('item_id'),count=item.get('count'),relatedCheck=check,
-                                                    priceSellingProduct=Item.objects.filter(id=item.get('item_id'))[0].priceSellingProduct,
-                                                    pricePurchaseProduct=Item.objects.filter(id=item.get('item_id'))[0].pricePurchaseProduct,
+        for pos in validated_data.get('check_positions'):
+            position = CheckPosition.objects.create(item_id=pos.get('item_id'),count=pos.get('count'),relatedCheck=check,
+                                                    priceSellingProduct=Item.objects.filter(id=pos.get('item_id'))[0].priceSellingProduct,
+                                                    pricePurchaseProduct=Item.objects.filter(id=pos.get('item_id'))[0].pricePurchaseProduct,
                                                     )
             position.save();
+            item = Item.objects.filter(id=pos.get('item_id'))[0]
+            item.count = item.count-pos.get('count')
+            item.save()
+            
         return check
 
 
