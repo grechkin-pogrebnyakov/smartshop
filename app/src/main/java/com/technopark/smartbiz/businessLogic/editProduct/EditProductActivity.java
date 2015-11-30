@@ -22,19 +22,25 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Abovyan on 15.11.15.
  */
-public class EditProductActivity extends AppCompatActivity {
+public class EditProductActivity extends AppCompatActivity implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 	static final int REQUEST_TAKE_PHOTO = 1;
 
 	private String name, priceCostProduct, priceSellingProduct, count, barcode, description, photoPath;
@@ -160,9 +166,7 @@ public class EditProductActivity extends AppCompatActivity {
 		if (updateRecord(product.getId(), name, priceCostProduct, priceSellingProduct, count, barcode, description,
 				photoPath) != 0) {
 			Toast.makeText(getApplicationContext(), "Изменения сохранены !", Toast.LENGTH_LONG).show();
-			Intent goToListAddedProduct = new Intent(getApplicationContext(), ListAddedProducts.class);
-			startActivity(goToListAddedProduct);
-			finish();
+
 		}
 		else {
 			Toast.makeText(getApplicationContext(), "Ошибка сохранения !",
@@ -219,6 +223,27 @@ public class EditProductActivity extends AppCompatActivity {
 
 		mNewUri = getContentResolver().update(SmartShopContentProvider.PRODUCTS_CONTENT_URI, mNewValues,
 				mSelectionClause, mSelectionArgs);
+
+
+		// TODO POOOOOOOOOR
+		Map<String, String> map = new HashMap<>();
+
+		// TODO Move product column name to Contract
+		map.put("productName", name);
+		map.put("descriptionProduct", description);
+		map.put("priceSellingProduct", priceSellingProduct);
+		map.put("pricePurchaseProduct", priceCostProduct);
+		map.put("productBarcode", barcode);
+		map.put("count", count);
+		map.put("id", String.valueOf(id));
+
+		final JSONObject productJsonObject = new JSONObject(map);
+
+		new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_EDIT, productJsonObject, this, this)
+				.execute(HttpsHelper.Method.POST);
+
+
+
 		return mNewUri;
 	}
 
@@ -287,4 +312,17 @@ public class EditProductActivity extends AppCompatActivity {
 			addProductPhotoButton.setImageBitmap(bitmap);
 		}
 	}
+
+	@Override
+	public void onPreExecute() { }
+
+	@Override
+	public void onPostExecute(JSONObject jsonObject) {
+		Intent goToListAddedProduct = new Intent(getApplicationContext(), ListAddedProducts.class);
+		startActivity(goToListAddedProduct);
+		finish();
+	}
+
+	@Override
+	public void onCancelled() { }
 }

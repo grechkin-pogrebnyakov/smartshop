@@ -64,11 +64,13 @@ public final class SmartShopUrl {
 
 			private static final String ADD = "/add/";
 			private static final String LIST = "/list/";
+			private static final String EDIT = "/update/";
 
 			private static final String URL_ITEM = URL_SHOP + ITEM;
 
 			public static final String URL_ITEM_ADD = URL_ITEM + ADD;
 			public static final String URL_ITEM_LIST = URL_ITEM + LIST;
+			public static final String URL_ITEM_EDIT = URL_ITEM + EDIT;
 
 			private Item() {}
 		}
