@@ -14,6 +14,7 @@ public final class UserIdentificationContract {
 	public static final int REQUEST_CODE_REGISTRATION_ACTION = 1;
 	public static final int REQUEST_CODE_AUTHORIZATION_ACTION = 2;
 	public static final int REQUEST_CODE_CHANGE_PASSWORD_ACTION = 3;
+	public static final int REQUEST_CODE_VK_AUTHORIZATION_ACTION = 4;
 
 	public static final int REQUEST_CODE_ACCESS_LOGIN = 3;
 
@@ -39,5 +40,12 @@ public final class UserIdentificationContract {
 	public final static String CHANGE_PASSWORD_OLD_PASSWORD_KEY = "old_password";
 	public final static String CHANGE_PASSWORD_PASSWORD1_KEY = "new_password1";
 	public final static String CHANGE_PASSWORD_PASSWORD2_KEY = "new_password2";
+
+	public static final String VK_AUTHORIZATION_EMAIL = "email";
+	public static final String VK_AUTHORIZATION_ACCESS_TOKEN = "access_token";
+	public static final String VK_AUTHORIZATION_USER_ID = "user_id";
+	public static final String VK_AUTHORIZATION_RESPONSE_STATUS_KEY = "vkAuthResponceStatus";
+	public static final int VK_AUTHORIZATION_STATUS_SUCCESS = 8;
+	public static final int VK_AUTHORIZATION_STATUS_FAIL = 9;
 
 }

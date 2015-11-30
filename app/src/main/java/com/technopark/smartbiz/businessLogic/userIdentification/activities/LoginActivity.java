@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,6 +40,12 @@ import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithU
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.Authorization;
 import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.Registration;
+import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.VkAuthorization;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKCallback;
+import com.vk.sdk.VKScope;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKError;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,6 +70,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	private final String ACTION_VALIDATION = "validation";
 	private SharedPreferences sharedPreferences;
 	private AccessControl accessControl;
+
 	// Ссылки на графические компоненты
 	private AutoCompleteTextView mEmailView;
 	private EditText mPasswordView;
@@ -73,10 +79,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	private View mLoginFormView;
 	private Button registrtionButton;
 
+	private static final String[] sMyScope = new String[]{
+			VKScope.FRIENDS,
+			VKScope.WALL,
+			VKScope.PHOTOS,
+			VKScope.EMAIL
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+
 		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
 		accessControl.displayActivityOfAccessRights();
@@ -84,7 +98,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		// Инициализируем компоненты формы логина
 		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
-
+		//		VKSdk.initialize(this);
+		//		VKSdk.login(this, sMyScope);
 
 		mPasswordRepeatView = (EditText) findViewById(R.id.login_password_repeat);
 		mPasswordRepeatView.setVisibility(View.GONE);
@@ -147,38 +162,42 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 		Button vkAuthButton = (Button) findViewById(R.id.login_button_vkAuth);
 		Account[] accounts = AccountManager.get(this).getAccountsByType("com.vkontakte.account");
+		String buttonText;
 		if (accounts.length > 0) {
-			String buttonText = getString(R.string.action_registration_vk, accounts[0].name);
-			vkAuthButton.setText(buttonText);
-			vkAuthButton.setBackgroundColor(Color.BLUE);
-			vkAuthButton.setTextColor(Color.WHITE);
-			vkAuthButton.setVisibility(View.VISIBLE);
-			vkAuthButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent("com.vkontakte.android.action.SDK_AUTH", null)
-							.putExtra("version", "5")
-							.putExtra("client_id", 5093720)
-							.putExtra("scope", "friends,photos");
-					startActivityForResult(intent, 1);
-				}
-			});
+			buttonText = getString(R.string.action_registration_vk, accounts[0].name);
 		}
 		else {
-			vkAuthButton.setVisibility(View.GONE);
+			buttonText = "Войти через | VK";
 		}
+		vkAuthButton.setText(buttonText);
+		vkAuthButton.setBackgroundColor(Color.BLUE);
+		vkAuthButton.setTextColor(Color.WHITE);
+		vkAuthButton.setVisibility(View.VISIBLE);
+		vkAuthButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				VKSdk.login(LoginActivity.this, sMyScope);
+			}
+		});
 	}
+
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1 && data != null && data.hasExtra("access_token")) {
-			String accessToken = data.getStringExtra("access_token");
-			int userId = data.getIntExtra("user_id", 0);
-			sharedPreferences.edit().putString(UserIdentificationContract.TOKEN_AUTHORIZATION, accessToken).apply();
-			sharedPreferences.edit().putString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY,
-					UserIdentificationContract.SUCCESS_AUTHORIZATION_OWNER).apply();
-			startActivity(new Intent(getApplicationContext(), MainActivity.class));
-			Log.i("VK_LOGIN", "accessToken: " + accessToken + ", userId: " + userId);
+		if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
+			@Override
+			public void onResult(VKAccessToken res) {
+				// Пользователь успешно авторизовался
+				startVkAuthorization(res.accessToken, res.email, res.userId);
+			}
+
+			@Override
+			public void onError(VKError error) {
+				// Произошла ошибка авторизации (например, пользователь запретил авторизацию)
+				showToast("Ошибка авторизации !");
+			}
+		})) {
+			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 
@@ -375,6 +394,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			case UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION:
 				registrationResultAction(jsonResponce);
 				break;
+			case UserIdentificationContract.REQUEST_CODE_VK_AUTHORIZATION_ACTION:
+				authorizationResultAction(jsonResponce);
+				break;
 		}
 	}
 
@@ -443,6 +465,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 	}
 
+	private void startVkAuthorization(String token, String email, String userId) {
+		VkAuthorization vkAuthorization = new VkAuthorization(
+				UserIdentificationContract.REQUEST_CODE_VK_AUTHORIZATION_ACTION,
+				getApplicationContext(), LoginActivity.this);
+		vkAuthorization.startAuthorization(token, email, userId);
+	}
+
 	private void showActivityForAccessStatus(String accessRightIdentificator) {
 		if (accessRightIdentificator.contains(UserIdentificationContract.SUCCESS_AUTHORIZATION)) {
 			startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -469,6 +498,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 		mEmailView.setAdapter(adapter);
 	}
+
 
 }
 
