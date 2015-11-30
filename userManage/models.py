@@ -12,3 +12,4 @@ class UserProfile(models.Model):
     shop = models.ForeignKey(Shop,related_name='workers', null=True)
     oShop = models.OneToOneField(Shop,related_name='owner', null=True)
     defaultPassword = models.BooleanField(default=False)
+    accessToken = models.CharField(max_length=255,null=True)

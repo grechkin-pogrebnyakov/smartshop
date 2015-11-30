@@ -10,13 +10,16 @@ from rest_framework.authtoken.models import Token
 from allauth.account.views import SignupView, ConfirmEmailView
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings
+from django.conf import settings
+from django.contrib.auth import login
 
-from rest_auth.app_settings import TokenSerializer
-from rest_auth.registration.serializers import SocialLoginSerializer,RegisterEmployeeSerializer, UserSerializer
+from rest_auth.app_settings import TokenSerializer, LoginSerializer
+from rest_auth.registration.serializers import RegisterEmployeeSerializer, UserSerializer, VkRegisterSerializer
 from rest_auth.views import LoginView
 import logging
 from my_utils import get_client_ip
-from userManage.models import Shop, UserProfile
+from userManage.models import Shop, UserProfile, User
+
 
 log = logging.getLogger('smartshop.log')
 
@@ -125,6 +128,71 @@ class RegisterEmployeeView(GenericAPIView):
         self.serializer.save(owner=self.request.user)
         return Response({'login': self.serializer.login, 'temporary_password': self.serializer.password}, status=status.HTTP_201_CREATED)
 
+class VkRegisterView(GenericAPIView):
+    """
+    Accepts the credentials and creates a new user
+    if user does not exist already
+    Return the REST Token if the credentials are valid and authenticated.
+    Calls allauth complete_signup method
+
+    Accept the following POST parameters: username, email, password
+    Return the REST Framework Token Object's key.
+    """
+
+    permission_classes = (AllowAny,)
+#    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication)
+    allowed_methods = ('POST', 'OPTIONS', 'HEAD')
+    token_model = Token
+    response_serializer = TokenSerializer
+    serializer_class = VkRegisterSerializer
+
+    def login(self):
+        self.user = self.login_serializer.validated_data['user']
+        self.token, created = self.token_model.objects.get_or_create(
+            user=self.user)
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            login(self.request, self.user)
+
+    def get(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def put(self, *args, **kwargs):
+        log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def get_response(self):
+        resp = self.response_serializer(self.token).data
+        resp.update({'is_worker': (self.user.profile.accountType == 'worker'), 'default_password': self.user.profile.defaultPassword})
+        return Response(
+            resp, status=status.HTTP_200_OK
+        )
+
+    def get_error_response(self):
+        return Response(
+            {'response':self.login_serializer.errors}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer(data=request.data)
+        if not self.serializer.is_valid():
+            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
+            return self.get_response_with_errors()
+        username = 'vk_user_'+self.serializer.validated_data.get('user_id')
+        users = User.objects.filter(username = username)
+        if( len(users) == 0 ) :
+            self.serializer.save()
+        self.login_serializer = LoginSerializer(data={'username':username, 'password':'123456'})
+        if ( not self.login_serializer.is_valid() ):
+            return self.get_error_response()
+        self.login()
+        accessToken = self.serializer.validated_data.get('access_token')
+        if (self.user.profile.accessToken != accessToken) :
+            self.user.profile.accessToken = accessToken
+            self.user.save()
+        return self.get_response()
+
+
 
     def get_response_with_errors(self, error = None):
         if( error is None ):
@@ -147,28 +215,28 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
 
 
-class SocialLoginView(LoginView):
-    """
-    class used for social authentications
-    example usage for facebook with access_token
-    -------------
-    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-
-    class FacebookLogin(SocialLoginView):
-        adapter_class = FacebookOAuth2Adapter
-    -------------
-
-    example usage for facebook with code
-
-    -------------
-    from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-    from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-
-    class FacebookLogin(SocialLoginView):
-        adapter_class = FacebookOAuth2Adapter
-         client_class = OAuth2Client
-         callback_url = 'localhost:8000'
-    -------------
-    """
-
-    serializer_class = SocialLoginSerializer
+# class SocialLoginView(LoginView):
+#     """
+#     class used for social authentications
+#     example usage for facebook with access_token
+#     -------------
+#     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+#
+#     class FacebookLogin(SocialLoginView):
+#         adapter_class = FacebookOAuth2Adapter
+#     -------------
+#
+#     example usage for facebook with code
+#
+#     -------------
+#     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+#     from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+#
+#     class FacebookLogin(SocialLoginView):
+#         adapter_class = FacebookOAuth2Adapter
+#          client_class = OAuth2Client
+#          callback_url = 'localhost:8000'
+#     -------------
+#     """
+#
+#     serializer_class = SocialLoginSerializer

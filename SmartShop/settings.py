@@ -91,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'SmartShop',
         'USER': 'root',
-        'PASSWORD': '1234QWer',
+#'PASSWORD': '1234QWer',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
@@ -102,7 +102,6 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    'social_auth.backends.contrib.vk.VKOAuth2Backend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -210,7 +209,8 @@ REST_FRAMEWORK = {
 
 VKAPP_APP_ID = "5093720"
 VKAPP_API_SECRET = "bFCtfRc6NhGBhuFy7CYw"
-SITE_ID = 2
+SITE_ID = 3
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 TEMPLATE_CONTEXT_PROCESSORS = {
     'allauth.socialaccount.context_processors.socialaccount'
