@@ -90,8 +90,8 @@ class CheckView(ListCreateAPIView):
             cshop = request.user.profile.oShop
         else:
             cshop = request.user.profile.shop
-        userProfs = User.objects.filter(profile__shop=cshop,profile__oShop=cshop)
-        checks = Check.objects.filter(Q(creation_time__range=[time1,time2]) | Q(author__in=userProfs))
+        userProfs = User.objects.filter(Q(profile__shop=cshop) | Q(profile__oShop=cshop))
+        checks = Check.objects.filter(creation_time__range=[time1,time2], author__in=userProfs)
         serializer = self.get_serializer(checks, many=True)
         return Response({'response':serializer.data})
 
