@@ -19,6 +19,8 @@ class Item(models.Model):
 class Check(models.Model):
     author = models.ForeignKey(User)
     creation_time = models.DateTimeField(auto_now_add=True)
+    #type = 0 -- sell, 1 -- sypply, 2 -- discard
+    type = models.IntegerField()
 
 class CheckPosition(models.Model):
     relatedCheck = models.ForeignKey(Check, related_name='check_positions')
