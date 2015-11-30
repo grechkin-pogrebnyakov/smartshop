@@ -21,7 +21,7 @@ from  django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
-from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer
+from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer,ShopItem_updateSerializer
 import logging
 from my_utils import get_client_ip
 import datetime
@@ -54,7 +54,7 @@ class Store(ListCreateAPIView):
         return Response(serializer.data)
 
 
-class Item(ListCreateAPIView):
+class Item(APIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ShopItemSerializer
@@ -66,6 +66,19 @@ class Item(ListCreateAPIView):
         serializer = self.get_serializer(items, many=True)
         return Response({'response':serializer.data})
 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(owner=self.request.user)
+        return Response({'id': serializer.data.get("id")},status=status.HTTP_201_CREATED)
+    def get_queryset(self):
+        pass
+
+class Item_update(APIView):
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ShopItem_updateSerializer
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
