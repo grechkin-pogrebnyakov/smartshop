@@ -6,7 +6,7 @@ package com.technopark.smartbiz.api;
 public final class SmartShopUrl {
 
 	private static final String SCHEME = "https://";
-	private static final String HOST = "smartshop1.ddns.net";
+	private static final String HOST = "192.168.43.62:8000";
 	private static final String URL_HOST = SCHEME + HOST;
 
 	private static final String API = "/api";
@@ -69,6 +69,28 @@ public final class SmartShopUrl {
 			public static final String URL_ITEM_LIST = URL_ITEM + LIST;
 
 			private Item() {}
+		}
+
+		public static final class Check {
+
+			public static final int TYPE_SELL = 0;
+			public static final int TYPE_SUPPLY = 1;
+			public static final int TYPE_DISCARD = 2;
+
+			public static final String REQUEST_ARRAY_NAME = "check_positions";
+			public static final String RESPONSE_ARRAY_NAME = "check_positions";
+
+			private static final String CHECK = "/check";
+
+			private static final String ADD = "/add/";
+			private static final String LIST = "/list/";
+
+			private static final String URL_CHECK = URL_SHOP + CHECK;
+
+			public static final String URL_CHECK_ADD = URL_CHECK + ADD;
+			public static final String URL_CHECK_LIST = URL_CHECK + LIST;
+
+			private Check() {}
 		}
 	}
 }

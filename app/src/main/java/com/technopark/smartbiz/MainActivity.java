@@ -256,6 +256,10 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 			public void onClick(View v) {
 				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_LIST, null, productCallback, getApplicationContext())
 						.execute(HttpsHelper.Method.GET);
+
+				// TODO Calculate time
+				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Check.URL_CHECK_LIST + "?time1=12099242&time2=12209039393&type=0", null, checkCallback, getApplicationContext())
+						.execute(HttpsHelper.Method.GET);
 			}
 		});
 	}
@@ -330,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 						getContentResolver().insert(SmartShopContentProvider.PRODUCTS_CONTENT_URI, contentValues);
 					}
 
-					Toast.makeText(getApplicationContext(), "Данные успешно синхронизированы!", Toast.LENGTH_LONG)
+					Toast.makeText(getApplicationContext(), "Товары успешно синхронизированы!", Toast.LENGTH_LONG)
 							.show();
 				}
 			}
@@ -340,8 +344,62 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		}
 
 		@Override
-		public void onCancelled() {
+		public void onCancelled() {}
+	};
+
+	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback checkCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
+		@Override
+		public void onPreExecute() {}
+
+		@Override
+		public void onPostExecute(JSONObject jsonObject) {
+			try {
+				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
+					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+
+					databaseHelper.dropTable(DatabaseHelper.CHECKS_TABLE_NAME);
+
+					JSONArray response = jsonObject.getJSONArray(HttpsHelper.RESPONSE);
+					for (int i = 0; i < response.length(); ++i) {
+						JSONObject checkGroup = response.getJSONObject(i);
+
+						String time = checkGroup.getString("creation_time");
+
+						JSONArray checks = checkGroup.getJSONArray(SmartShopUrl.Shop.Check.RESPONSE_ARRAY_NAME);
+
+						for (int j = 0; j < checks.length(); ++j) {
+							JSONObject check = checks.getJSONObject(j);
+
+							String itemId = check.getString("item_id");
+							String count = check.getString("count");
+							String priceSellingProduct = check.getString("priceSellingProduct");
+							String pricePurchaseProduct = check.getString("pricePurchaseProduct");
+
+							ContentValues contentValues = new ContentValues();
+
+							contentValues.put("id_from_products_table", itemId);
+							contentValues.put("count", count);
+							contentValues.put("price_selling_product", priceSellingProduct);
+							contentValues.put("price_cost_product", pricePurchaseProduct);
+							contentValues.put("date_time", time);
+
+							getContentResolver().insert(SmartShopContentProvider.CHECKS_CONTENT_URI, contentValues);
+						}
+					}
+
+					fillChart();
+
+					Toast.makeText(getApplicationContext(), "Чеки успешно синхронизированы!", Toast.LENGTH_LONG)
+							.show();
+				}
+			}
+			catch (JSONException e) {
+				e.printStackTrace();
+			}
 
 		}
+
+		@Override
+		public void onCancelled() {}
 	};
 }

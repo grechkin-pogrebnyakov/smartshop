@@ -16,14 +16,20 @@ import android.widget.TextView;
 
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class PaymentActivity extends AppCompatActivity implements TextWatcher {
+public class PaymentActivity extends AppCompatActivity implements TextWatcher, HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	private float totalPrice = 0.0f;
 	private float oddMoney = 0.0f;
@@ -62,14 +68,37 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 					addRecord(checkArrayList);
 					updateProductsDatabase(checkArrayList);
 
-					Intent submit = new Intent(getApplicationContext(), MainActivity.class);
-					submit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(submit);
+					sendToServer(checkArrayList);
 				}
 			}
 		});
 
 		dbHelper = new DatabaseHelper(this);
+	}
+
+	private void sendToServer(ArrayList<Check> checkArrayList) {
+		JSONObject requestJsonObject = new JSONObject();
+		JSONObject tempCheck = new JSONObject();
+
+		JSONArray tempArray = new JSONArray();
+		try {
+			for (Check check : checkArrayList) {
+
+				tempCheck.put("item_id", check.getIdFromProductsTable());
+				tempCheck.put("count", check.getCount());
+
+				tempArray.put(tempCheck);
+			}
+
+			requestJsonObject.put(SmartShopUrl.Shop.Check.REQUEST_ARRAY_NAME, tempArray);
+			requestJsonObject.put("type", SmartShopUrl.Shop.Check.TYPE_SELL);
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Check.URL_CHECK_ADD, requestJsonObject, this, this)
+				.execute(HttpsHelper.Method.POST);
 	}
 
 	private void updateProductsDatabase(ArrayList<Check> checkArrayList) {
@@ -147,5 +176,20 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher {
 		}
 		getContentResolver().notifyChange(SmartShopContentProvider.CHECKS_CONTENT_URI, null);
 		return mNewUri;
+	}
+
+	@Override
+	public void onPreExecute() {}
+
+	@Override
+	public void onPostExecute(JSONObject jsonObject) {
+		Intent submit = new Intent(getApplicationContext(), MainActivity.class);
+		submit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(submit);
+	}
+
+	@Override
+	public void onCancelled() {
+
 	}
 }

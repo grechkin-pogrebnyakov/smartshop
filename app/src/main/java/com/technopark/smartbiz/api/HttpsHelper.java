@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
+import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -97,7 +97,7 @@ public final class HttpsHelper {
 		}
 
 		if (requestJsonObject != null) {
-			Log.d(LOG, requestJsonObject.toString());
+			Log.d(LOG, "Request: " + requestJsonObject.toString());
 		}
 		Log.d(LOG, "Response: " + outJsonObject.toString());
 

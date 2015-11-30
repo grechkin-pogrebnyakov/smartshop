@@ -18,16 +18,22 @@ import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.productSales.DialogFragmentCallback;
 import com.technopark.smartbiz.businessLogic.productSales.PurchaseActivity;
 import com.technopark.smartbiz.businessLogic.productSales.PurchaseDialogFragment;
+import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
-import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
 
-public class SupplyActivity extends AppCompatActivity {
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class SupplyActivity extends AppCompatActivity implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	private int SELECT_PRODUCT = 1;
 	private String DIALOG = "purchaseDialogFragment";
@@ -70,10 +76,6 @@ public class SupplyActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				doSupply();
-
-				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
 			}
 		});
 		purchaseDialogFragment.setAddButtonCallback(dialogListener);
@@ -96,12 +98,13 @@ public class SupplyActivity extends AppCompatActivity {
 			case R.id.scan_product:
 				scanBarcode();
 				return false;
-			default: return false;
+			default:
+				return false;
 		}
-//		Intent addProduct = new Intent(getApplicationContext(), PurchaseActivity.class);
-//		addProduct.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//		startActivityForResult(addProduct, SELECT_PRODUCT);
-//		return false;
+		//		Intent addProduct = new Intent(getApplicationContext(), PurchaseActivity.class);
+		//		addProduct.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		//		startActivityForResult(addProduct, SELECT_PRODUCT);
+		//		return false;
 	}
 
 	@Override
@@ -147,6 +150,33 @@ public class SupplyActivity extends AppCompatActivity {
 		}
 
 		db.close();
+
+		sendToServer();
+	}
+
+	private void sendToServer() {
+		JSONObject requestJsonObject = new JSONObject();
+		JSONObject tempCheck = new JSONObject();
+
+		JSONArray tempArray = new JSONArray();
+		try {
+			for (ItemForProductAdapter check : adapter.getListItems()) {
+
+				tempCheck.put("item_id", ((Check) check).getIdFromProductsTable());
+				tempCheck.put("count", check.getCount());
+
+				tempArray.put(tempCheck);
+			}
+
+			requestJsonObject.put(SmartShopUrl.Shop.Check.REQUEST_ARRAY_NAME, tempArray);
+			requestJsonObject.put("type", SmartShopUrl.Shop.Check.TYPE_SUPPLY);
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Check.URL_CHECK_ADD, requestJsonObject, this, this)
+				.execute(HttpsHelper.Method.POST);
 	}
 
 	private void scanBarcode() {
@@ -168,7 +198,8 @@ public class SupplyActivity extends AppCompatActivity {
 			long id = cursor.getLong(cursor.getColumnIndex("_id"));
 			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, countProduct);
 			showDialog(check);
-		} else {
+		}
+		else {
 			Toast.makeText(getApplicationContext(), "Продукт не найден !",
 					Toast.LENGTH_LONG).show();
 		}
@@ -181,4 +212,17 @@ public class SupplyActivity extends AppCompatActivity {
 		purchaseDialogFragment.setProductCount(1);
 		purchaseDialogFragment.show(getFragmentManager(), DIALOG);
 	}
+
+	@Override
+	public void onPreExecute() {}
+
+	@Override
+	public void onPostExecute(JSONObject jsonObject) {
+		Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
+	}
+
+	@Override
+	public void onCancelled() {}
 }

@@ -83,6 +83,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
 				db.execSQL(PRODUCT_TABLE_CREATE);
 				break;
+			case CHECKS_TABLE_NAME:
+				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
+				db.execSQL(CHECKS_TABLE_CREATE);
 		}
 
 		db.close();
