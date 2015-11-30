@@ -43,11 +43,12 @@ class CheckPositionSerizlizer(serializers.Serializer):
     item_id = serializers.IntegerField()
     count = serializers.IntegerField()
     priceSellingProduct = serializers.FloatField(read_only=True)
-    pricePurchaseProduct = serializers.FloatField(read_only=True)	
+    pricePurchaseProduct = serializers.FloatField(read_only=True)
 
 class CheckSerializer(serializers.Serializer):
     check_positions = CheckPositionSerizlizer(many=True)
     id = serializers.IntegerField(required=False)
+    type = serializers.IntegerField()
     author = serializers.CharField(max_length=255,read_only=True)
     shop_id = serializers.IntegerField(read_only=True)
     creation_time=serializers.DateTimeField(read_only=True)
@@ -55,7 +56,8 @@ class CheckSerializer(serializers.Serializer):
     def create(self, validated_data):
         #TODO validate item_id
         user = validated_data.get('user')
-        check = Check.objects.create(author=user)
+        type = validated_data.get('type')
+        check = Check.objects.create(author=user, type=type)
         check.time = datetime.datetime.now()
         check.save()
         for pos in validated_data.get('check_positions'):
@@ -63,12 +65,14 @@ class CheckSerializer(serializers.Serializer):
                                                     priceSellingProduct=Item.objects.filter(id=pos.get('item_id'))[0].priceSellingProduct,
                                                     pricePurchaseProduct=Item.objects.filter(id=pos.get('item_id'))[0].pricePurchaseProduct,
                                                     )
-            position.save();
+            position.save()
             item = Item.objects.filter(id=pos.get('item_id'))[0]
-            item.count = item.count-pos.get('count')
+            db_count = pos.get('count')
+            if( type == 1 ):
+                db_count = -db_count
+            item.count = item.count-db_count
             item.save()
             
         return check
-
 
 

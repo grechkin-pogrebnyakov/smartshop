@@ -86,12 +86,16 @@ class CheckView(ListCreateAPIView):
             time2 = datetime.datetime.fromtimestamp(int(request.GET.get('time2')))
         except Exception:
             return Response('no time specified')
+        try:
+            type = int(request.GET.get('type'))
+        except Exception:
+            type = 0
         if request.user.profile.oShop!=None:
             cshop = request.user.profile.oShop
         else:
             cshop = request.user.profile.shop
         userProfs = User.objects.filter(Q(profile__shop=cshop) | Q(profile__oShop=cshop))
-        checks = Check.objects.filter(creation_time__range=[time1,time2], author__in=userProfs)
+        checks = Check.objects.filter(creation_time__range=[time1,time2], author__in=userProfs, type=type)
         serializer = self.get_serializer(checks, many=True)
         return Response({'response':serializer.data})
 
