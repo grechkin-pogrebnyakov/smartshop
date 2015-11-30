@@ -64,7 +64,7 @@ class Item(ListCreateAPIView):
             curShop=request.user.profile.shop
         items = models.Item.objects.filter(shop=curShop)
         serializer = self.get_serializer(items, many=True)
-        return Response(serializer.data)
+        return Response({'response':serializer.data})
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
