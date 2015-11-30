@@ -45,7 +45,10 @@ import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,9 +101,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		// Инициализируем компоненты формы логина
 		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
-		//		VKSdk.initialize(this);
-		//		VKSdk.login(this, sMyScope);
-
 		mPasswordRepeatView = (EditText) findViewById(R.id.login_password_repeat);
 		mPasswordRepeatView.setVisibility(View.GONE);
 		mPasswordView = (EditText) findViewById(R.id.login_password);
@@ -416,18 +416,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void authorizationResultAction(JSONObject resultActionCode) {
 		try {
-			if (resultActionCode.has(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
+			if (resultActionCode.has(UserIdentificationContract.VK_AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 
-				switch (resultActionCode.getInt(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
-					case UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS:
+				switch (resultActionCode.getInt(UserIdentificationContract.VK_AUTHORIZATION_RESPONSE_STATUS_KEY)) {
+					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_SUCCESS:
 						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
 						startActivity(goMainActivity);
 						finish();
 						break;
-					case UserIdentificationContract.AUTHORIZATION_STATUS_FAIL:
+					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_FAIL:
 						showProgress(false);
 						break;
-					case UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD:
+					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_CHANGE_PASSWORD:
 						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
 						startActivity(goChangePasswordActivity);
 						finish();
@@ -465,11 +465,34 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 	}
 
-	private void startVkAuthorization(String token, String email, String userId) {
-		VkAuthorization vkAuthorization = new VkAuthorization(
+	private void startVkAuthorization(final String token, final String email, final String userId) {
+		VKRequest request = VKApi.users().get();
+		final List<String> tempMass = new ArrayList<>();
+		final VkAuthorization vkAuthorization = new VkAuthorization(
 				UserIdentificationContract.REQUEST_CODE_VK_AUTHORIZATION_ACTION,
 				getApplicationContext(), LoginActivity.this);
-		vkAuthorization.startAuthorization(token, email, userId);
+		request.executeWithListener(new VKRequest.VKRequestListener() {
+			@Override
+			public void onComplete(VKResponse response) {
+				//Do complete stuff
+				try {
+					JSONObject jsonObject = new JSONObject(response.json.getJSONArray("response").getString(0));
+					vkAuthorization.startAuthorization(token, email, userId, jsonObject.getString("first_name"),
+							jsonObject.getString("last_name"));
+				}
+				catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			@Override
+			public void onError(VKError error) {
+				//Do error stuff
+			}
+			@Override
+			public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
+				//I don't really believe in progress
+			}
+		});
 	}
 
 	private void showActivityForAccessStatus(String accessRightIdentificator) {

@@ -31,12 +31,14 @@ public class VkAuthorization implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTas
 		sharedPreferences = context.getSharedPreferences(LoginActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
 	}
 
-	public void startAuthorization(String token, String email, String userID) {
+	public void startAuthorization(String token, String email, String userID, String firstName, String lastName) {
 		JSONObject authorizationJsonObject = new JSONObject();
 		try {
-			authorizationJsonObject.accumulate(UserIdentificationContract.VK_AUTHORIZATION_EMAIL, token);
-			authorizationJsonObject.accumulate(UserIdentificationContract.VK_AUTHORIZATION_ACCESS_TOKEN, email);
+			authorizationJsonObject.accumulate(UserIdentificationContract.VK_AUTHORIZATION_EMAIL, email);
+			authorizationJsonObject.accumulate(UserIdentificationContract.VK_AUTHORIZATION_ACCESS_TOKEN, token);
 			authorizationJsonObject.accumulate(UserIdentificationContract.VK_AUTHORIZATION_USER_ID, userID);
+			authorizationJsonObject.accumulate(UserIdentificationContract.VK_AUTHORIZATION_FIRST_NAME, firstName);
+			authorizationJsonObject.accumulate(UserIdentificationContract.VK_AUTHORIZATION_LAST_NAME, lastName);
 			new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Auth.URL_VK_LOGIN, authorizationJsonObject, this, context)
 					.execute(HttpsHelper.Method.POST);
 		}

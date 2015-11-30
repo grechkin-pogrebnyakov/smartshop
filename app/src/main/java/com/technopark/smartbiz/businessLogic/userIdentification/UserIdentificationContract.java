@@ -47,5 +47,7 @@ public final class UserIdentificationContract {
 	public static final String VK_AUTHORIZATION_RESPONSE_STATUS_KEY = "vkAuthResponceStatus";
 	public static final int VK_AUTHORIZATION_STATUS_SUCCESS = 8;
 	public static final int VK_AUTHORIZATION_STATUS_FAIL = 9;
-
+	public static final String VK_AUTHORIZATION_FIRST_NAME = "first_name";
+	public static final String VK_AUTHORIZATION_LAST_NAME = "last_name";
+	public static final int VK_AUTHORIZATION_STATUS_CHANGE_PASSWORD = 10;
 }
