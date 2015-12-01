@@ -395,7 +395,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				registrationResultAction(jsonResponce);
 				break;
 			case UserIdentificationContract.REQUEST_CODE_VK_AUTHORIZATION_ACTION:
-				authorizationResultAction(jsonResponce);
+				vkAuthorizationResultAction(jsonResponce);
 				break;
 		}
 	}
@@ -415,6 +415,34 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	}
 
 	private void authorizationResultAction(JSONObject resultActionCode) {
+		try {
+			if (resultActionCode.has(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
+
+				switch (resultActionCode.getInt(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
+					case UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS:
+						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+						startActivity(goMainActivity);
+						finish();
+						break;
+					case UserIdentificationContract.AUTHORIZATION_STATUS_FAIL:
+						showProgress(false);
+						break;
+					case UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD:
+						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
+						startActivity(goChangePasswordActivity);
+						finish();
+						break;
+					default:
+						showProgress(false);
+				}
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void vkAuthorizationResultAction(JSONObject resultActionCode) {
 		try {
 			if (resultActionCode.has(UserIdentificationContract.VK_AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 
