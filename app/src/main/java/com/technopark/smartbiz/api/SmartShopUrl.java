@@ -6,7 +6,7 @@ package com.technopark.smartbiz.api;
 public final class SmartShopUrl {
 
 	private static final String SCHEME = "https://";
-	private static final String HOST = "192.168.43.62:8000";
+	private static final String HOST = "smartshop1.ddns.net";
 	private static final String URL_HOST = SCHEME + HOST;
 
 	private static final String API = "/api";
