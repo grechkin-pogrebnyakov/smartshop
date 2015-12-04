@@ -22,11 +22,9 @@ class ShopItem_updateSerializer(serializers.Serializer):
     count = serializers.IntegerField()
     id = serializers.IntegerField()
     def create(self,validated_data):
-        owner = validated_data.get('owner')
-        oShop = owner.profile.oShop
-        if oShop==None:
-            oShop = owner.profile.shop
-        item = Item.objects.filter(id=id)
+        item = Item.objects.filter(id=validated_data.get('id'))[0]
+        if( item is None):
+            raise serializers.ValidationError
         item.count=validated_data.get("count")
         item.productName=validated_data.get("productName")
         item.pricePurchaseProduct=validated_data.get("pricePurchaseProduct")
