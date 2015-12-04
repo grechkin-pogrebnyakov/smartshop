@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url, include
-from rest_auth.registration.views import RegisterView
+from rest_auth.registration.views import RegisterView, VkRegisterView
 from rest_auth.views import (
     LoginView, LogoutView, UserDetailsView, PasswordChangeView,
     PasswordResetView, PasswordResetConfirmView,
@@ -14,6 +14,7 @@ urlpatterns = patterns(
     url(r'^password/reset/confirm/$', PasswordResetConfirmView.as_view(),
         name='rest_password_reset_confirm'),
     url(r'^login/$', LoginView.as_view(), name='rest_login'),
+    url(r'^login/vk/$', VkRegisterView.as_view()),
     # URLs that require a user to be logged in with a valid session / token.
     url(r'^logout/$', LogoutView.as_view(), name='rest_logout'),
     url(r'^user/$', UserDetailsView.as_view(), name='rest_user_details'),
