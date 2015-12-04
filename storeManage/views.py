@@ -54,7 +54,7 @@ class Store(ListCreateAPIView):
         return Response(serializer.data)
 
 
-class Item(APIView):
+class Item(GenericAPIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ShopItemSerializer
@@ -75,7 +75,7 @@ class Item(APIView):
     def get_queryset(self):
         pass
 
-class Item_update(APIView):
+class Item_update(GenericAPIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ShopItem_updateSerializer
@@ -83,7 +83,7 @@ class Item_update(APIView):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer.save(owner=self.request.user)
+        serializer.save()
         return Response({'id': serializer.data.get("id")},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         pass
