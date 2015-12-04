@@ -15,6 +15,8 @@ class Item(models.Model):
     productBarcode = models.CharField(max_length=255)
     count = models.IntegerField()
     shop = models.ForeignKey(Shop)
+    is_deleted = models.IntegerField(default=0)
+    new_item = models.OneToOneField('Item', related_name='old_item', null=True)
 
 class Check(models.Model):
     author = models.ForeignKey(User)

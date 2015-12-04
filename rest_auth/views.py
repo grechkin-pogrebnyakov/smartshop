@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView
 import logging
 from my_utils import get_client_ip
+from push_notifications.models import GCMDevice
 
 log = logging.getLogger('smartshop.log')
 
@@ -72,13 +73,21 @@ class LogoutView(APIView):
 
     Accepts/Returns nothing.
     """
-    permission_classes = (AllowAny,)
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication)
+    permission_classes = (IsAuthenticated,)
+    allowed_methods = ('POST', 'OPTIONS')
 
     def post(self, request):
         try:
             request.user.auth_token.delete()
         except:
             log.warn('logout whithout auth_token. client_ip {0}, login "{1}"'.format(get_client_ip(self.request), request.user.username))
+
+        devices = GCMDevice.objects.filter(user=request.user)
+        if(len(devices) > 0):
+            device = devices[0]
+            device.active = False
+            device.save()
 
         logout(request)
 
