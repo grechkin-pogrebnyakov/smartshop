@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'push_notifications',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -214,4 +215,8 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 TEMPLATE_CONTEXT_PROCESSORS = {
     'allauth.socialaccount.context_processors.socialaccount'
+}
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+        'GCM_API_KEY': 'AIzaSyAbnX99ai1LJSPWmqPECK_uAhuTFZEYXCI',
 }
