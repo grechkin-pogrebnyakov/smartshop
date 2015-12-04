@@ -13,6 +13,27 @@ class ShopSerializer(serializers.ModelSerializer):
         fields = ('name', 'owner',)
         read_only_fields = ('accountType',)
 
+class ShopItem_updateSerializer(serializers.Serializer):
+    productName = serializers.CharField(max_length=255)
+    descriptionProduct = serializers.CharField(max_length=255)
+    priceSellingProduct = serializers.FloatField()
+    pricePurchaseProduct = serializers.FloatField()
+    productBarcode = serializers.CharField(max_length=255)
+    count = serializers.IntegerField()
+    id = serializers.IntegerField()
+    def create(self,validated_data):
+        item = Item.objects.filter(id=validated_data.get('id'))[0]
+        if( item is None):
+            raise serializers.ValidationError
+        item.count=validated_data.get("count")
+        item.productName=validated_data.get("productName")
+        item.pricePurchaseProduct=validated_data.get("pricePurchaseProduct")
+        item.priceSellingProduct=validated_data.get("priceSellingProduct")
+        item.descriptionProduct=validated_data.get("descriptionProduct")
+        item.productBarcode=validated_data.get("productBarcode")
+        item.save()
+        return item
+
 
 class ShopItemSerializer(serializers.Serializer):
     productName = serializers.CharField(max_length=255)
