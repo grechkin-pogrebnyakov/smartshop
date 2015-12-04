@@ -92,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'SmartShop',
         'USER': 'root',
-        #'PASSWORD': '1234QWer',
+        'PASSWORD': '1234QWer',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
