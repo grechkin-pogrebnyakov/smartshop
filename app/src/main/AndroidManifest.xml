@@ -123,7 +123,10 @@
             >
         </activity>
         <activity android:name=".businessLogic.userIdentification.activities.ChangePasswordActivity"/>
-        <activity android:name=".businessLogic.ListChangesPriceActivity"/>
+        <activity
+            android:name=".businessLogic.changesPriceList.ListChangesPriceActivity"
+            android:label="Список изменений"
+            />
 
         <service
             android:name=".gcm.RegistrationIntentService"

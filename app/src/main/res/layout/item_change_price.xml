@@ -1,40 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    >
 
     <TextView
+        android:id="@+id/item_change_price_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Название продукта"
-        android:id="@+id/item_change_price_name_product"
-        android:layout_gravity="center_horizontal"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Старая цена"
-        android:id="@+id/item_change_price_old_price"
-        android:layout_below="@+id/item_change_price_name_product"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="5dp"
+        android:text="Название продукта"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         />
 
     <TextView
+        android:id="@+id/text1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/item_change_price_name"
+        android:paddingBottom="4dp"
+        android:paddingEnd="5dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="5dp"
+        android:paddingStart="0dp"
+        android:text="Старая цена, руб."
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Новая цена"
+        />
+
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/text1"
+        android:text="Новая цена, руб."
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        />
+
+    <TextView
+        android:id="@+id/item_change_price_old_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/item_change_price_name"
+        android:layout_toEndOf="@+id/text1"
+        android:layout_toRightOf="@+id/text1"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        />
+
+    <TextView
         android:id="@+id/item_change_price_new_price"
-        android:layout_below="@+id/item_change_price_name_product"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/text2"
+        android:layout_toEndOf="@+id/text1"
+        android:layout_toRightOf="@+id/text1"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         />
 
 </RelativeLayout>

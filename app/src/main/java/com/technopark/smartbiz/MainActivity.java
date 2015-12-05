@@ -24,6 +24,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
+import com.technopark.smartbiz.businessLogic.changesPriceList.ListChangesPriceActivity;
 import com.technopark.smartbiz.businessLogic.discard.DiscardActivity;
 import com.technopark.smartbiz.businessLogic.employees.EmployeeListActivity;
 import com.technopark.smartbiz.businessLogic.employees.EmployeeRegistrationActivity;
@@ -266,6 +267,16 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 				// TODO Calculate time
 				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Check.URL_CHECK_LIST + "?time1=12099242&time2=12209039393&type=0", null, checkCallback, getApplicationContext())
 						.execute(HttpsHelper.Method.GET);
+			}
+		});
+
+		Button priceUpdate = (Button) findViewById(R.id.content_main_button_price_update);
+		priceUpdate.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), ListChangesPriceActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivity(intent);
 			}
 		});
 	}
