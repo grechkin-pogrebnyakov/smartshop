@@ -123,14 +123,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	}
 
 	private void registrationButtons() {
-		registrtionButton = (Button) findViewById(R.id.login_button_registration);
-		registrtionButton.setVisibility(View.GONE);
-		registrtionButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				startActionInitiatedByUser(ACTION_REGISTRATION);
-			}
-		});
+		final Button mEmailSignInButton = (Button) findViewById(R.id.login_button_sing_in);
 
 		final Button newAccountButton = (Button) findViewById(R.id.login_button_new_account);
 		newAccountButton.setOnClickListener(new OnClickListener() {
@@ -141,22 +134,40 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						mPasswordRepeatView.setVisibility(View.VISIBLE);
 						newAccountButton.setVisibility(View.GONE);
 						registrtionButton.setVisibility(View.VISIBLE);
+						mEmailSignInButton.setText("Зарегистрироваться");
 						break;
 				}
 			}
 		});
 
-		Button mEmailSignInButton = (Button) findViewById(R.id.login_button_sing_in);
-		mEmailSignInButton.setOnClickListener(new OnClickListener() {
+		registrtionButton = (Button) findViewById(R.id.login_button_registration);
+		registrtionButton.setVisibility(View.GONE);
+		registrtionButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
 					mPasswordRepeatView.setVisibility(View.GONE);
 					registrtionButton.setVisibility(View.GONE);
 					newAccountButton.setVisibility(View.VISIBLE);
+					mEmailSignInButton.setText("Войти");
 				}
 				startActionInitiatedByUser(ACTION_AUTHORIZATION);
+				//startActionInitiatedByUser(ACTION_REGISTRATION);
+			}
+		});
 
+
+		mEmailSignInButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
+//					mPasswordRepeatView.setVisibility(View.GONE);
+//					registrtionButton.setVisibility(View.GONE);
+//					newAccountButton.setVisibility(View.VISIBLE);
+					startActionInitiatedByUser(ACTION_REGISTRATION);
+				} else {
+					startActionInitiatedByUser(ACTION_AUTHORIZATION);
+				}
 			}
 		});
 
@@ -225,7 +236,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		mPasswordView.setError(null);
 
 		// Получаем значения введенные пользователем для попытки авторизации.
-		String email = mEmailView.getText().toString();
+		String email = mEmailView.getText().toString().replace(" ", "");
 		String password = mPasswordView.getText().toString();
 		String repeatPassword = mPasswordRepeatView.getVisibility() == View.VISIBLE ? mPasswordRepeatView.getText().toString() : null;
 
