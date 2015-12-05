@@ -24,6 +24,7 @@ import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
@@ -210,13 +211,13 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
         * Sets the values of each column and inserts the word. The arguments to the "put"
         * method are "column name" and "value"
         */
-		mNewValues.put("barcode", barcode);
-		mNewValues.put("photo_path", photoPath);
-		mNewValues.put("name", name);
-		mNewValues.put("price_selling_product", priceSellingProduct);
-		mNewValues.put("price_cost_product", priceCostProduct);
-		mNewValues.put("description", description);
-		mNewValues.put("count", count);
+		mNewValues.put(ContractClass.Products.BARCODE, barcode);
+		mNewValues.put(ContractClass.Products.PHOTO_PATH, photoPath);
+		mNewValues.put(ContractClass.Products.NAME, name);
+		mNewValues.put(ContractClass.Products.PRICE_SELLING, priceSellingProduct);
+		mNewValues.put(ContractClass.Products.PRICE_COST, priceCostProduct);
+		mNewValues.put(ContractClass.Products.DESCRIPTION, description);
+		mNewValues.put(ContractClass.Products._COUNT, count);
 
 		String mSelectionClause = "_id = ?";
 		String[] mSelectionArgs = {String.valueOf(product.getId())};

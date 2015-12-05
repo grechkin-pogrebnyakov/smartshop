@@ -21,10 +21,10 @@
         />
 
     <application
+        android:name=".businessLogic.userIdentification.VkApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".businessLogic.userIdentification.VkApplication"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         >
@@ -52,8 +52,8 @@
         <activity
             android:name=".businessLogic.addProduct.AddProductActivity"
             android:label="@string/title_activity_add_product"
-            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
@@ -66,6 +66,7 @@
             android:name=".businessLogic.editProduct.EditProductActivity"
             android:label="@string/title_activity_edit_product"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
 
@@ -119,6 +120,8 @@
             >
         </activity>
         <activity android:name=".businessLogic.userIdentification.activities.ChangePasswordActivity">
+        </activity>
+        <activity android:name=".businessLogic.ListChangesPriceActivity">
         </activity>
     </application>
 

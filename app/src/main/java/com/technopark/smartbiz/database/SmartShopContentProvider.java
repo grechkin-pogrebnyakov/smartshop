@@ -23,8 +23,8 @@ public class SmartShopContentProvider extends ContentProvider {
 	private final String LOG_TAG = "ContentProvider";
 
 	// Таблица
-	private static final String PRODUCTS_TABLE = DatabaseHelper.PRODUCTS_TABLE_NAME;
-	private static final String CHECKS_TABLE = DatabaseHelper.CHECKS_TABLE_NAME;
+	private static final String PRODUCTS_TABLE = ContractClass.Products.TABLE_NAME;
+	private static final String CHECKS_TABLE = ContractClass.Сhecks.TABLE_NAME;
 
 	// Поля
 	static final String ITEMS_ID = "_id";
@@ -34,8 +34,8 @@ public class SmartShopContentProvider extends ContentProvider {
 	static final String AUTHORITY = "ru.tech_mail.smart_biz.data";
 
 	// path
-	static final String PRODUCTS_PATH = DatabaseHelper.PRODUCTS_TABLE_NAME;
-	static final String CHECKS_PATH = DatabaseHelper.CHECKS_TABLE_NAME;
+	static final String PRODUCTS_PATH = ContractClass.Products.TABLE_NAME;
+	static final String CHECKS_PATH = ContractClass.Сhecks.TABLE_NAME;
 
 	// Общий Uri
 	public static final Uri PRODUCTS_CONTENT_URI = Uri.parse("content://"
@@ -118,7 +118,7 @@ public class SmartShopContentProvider extends ContentProvider {
 				if (TextUtils.isEmpty(sortOrder)) {
 					sortOrder = "name" + " ASC";
 				}
-				cursor = db.query(DatabaseHelper.PRODUCTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor = db.query(ContractClass.Products.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 				cursor.setNotificationUri(getContext().getContentResolver(), PRODUCTS_CONTENT_URI);
 				break;
 
@@ -132,7 +132,7 @@ public class SmartShopContentProvider extends ContentProvider {
 				else {
 					selection = selection + " AND " + ITEMS_ID + " = " + id;
 				}
-				cursor = db.query(DatabaseHelper.PRODUCTS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor = db.query(ContractClass.Products.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 				cursor.setNotificationUri(getContext().getContentResolver(), PRODUCTS_CONTENT_URI);
 				break;
 
@@ -142,7 +142,7 @@ public class SmartShopContentProvider extends ContentProvider {
 				if (TextUtils.isEmpty(sortOrder)) {
 					sortOrder = "name" + " ASC";
 				}
-				cursor = db.query(DatabaseHelper.CHECKS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor = db.query(ContractClass.Сhecks.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 				cursor.setNotificationUri(getContext().getContentResolver(), CHECKS_CONTENT_URI);
 				break;
 
@@ -156,7 +156,7 @@ public class SmartShopContentProvider extends ContentProvider {
 				else {
 					selection = selection + " AND " + ITEMS_ID + " = " + id;
 				}
-				cursor = db.query(DatabaseHelper.CHECKS_TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor = db.query(ContractClass.Сhecks.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 				cursor.setNotificationUri(getContext().getContentResolver(),
 						CHECKS_CONTENT_URI);
 				break;
@@ -220,12 +220,12 @@ public class SmartShopContentProvider extends ContentProvider {
 
 		switch (uriMatcher.match(uri)) {
 			case URI_PRODUCTS:
-				rowID = db.insert(DatabaseHelper.PRODUCTS_TABLE_NAME, null, values);
+				rowID = db.insert(ContractClass.Products.TABLE_NAME, null, values);
 				resultUri = ContentUris.withAppendedId(PRODUCTS_CONTENT_URI, rowID);
 				break;
 
 			case URI_CHECKS:
-				rowID = db.insert(DatabaseHelper.CHECKS_TABLE_NAME, null, values);
+				rowID = db.insert(ContractClass.Сhecks.TABLE_NAME, null, values);
 				resultUri = ContentUris.withAppendedId(CHECKS_CONTENT_URI, rowID);
 				break;
 

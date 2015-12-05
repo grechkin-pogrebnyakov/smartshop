@@ -80,6 +80,10 @@ public class ProductAdapter extends BaseAdapter {
     }
 
     private void setPic(ImageView imageProductView, String photoPath) {
+        if (photoPath == null || photoPath.isEmpty()) {
+            imageProductView.setImageBitmap(null);
+            return;
+        }
         // Get the dimensions of the View
         int targetW = 50;
         int targetH = 50;

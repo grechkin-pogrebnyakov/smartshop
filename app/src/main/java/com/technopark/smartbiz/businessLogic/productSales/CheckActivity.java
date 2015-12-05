@@ -18,6 +18,7 @@ import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
@@ -50,7 +51,7 @@ public class CheckActivity extends AppCompatActivity {
 		public void callback() {
 			Check check = purchaseDialogFragment.getCheck();
 			check.setCount(purchaseDialogFragment.getProductCount());
-			check.setPriceSellingProduct((int) (purchaseDialogFragment.getProductPrice()));
+			check.setPriceSellingProduct(purchaseDialogFragment.getProductPrice());
 			adapter.addItem(check);
 			adapter.notifyDataSetChanged();
 			setTotalPrice(calculateSumCheck());
@@ -98,8 +99,8 @@ public class CheckActivity extends AppCompatActivity {
 		return checkList;
 	}
 
-	private int calculateSumCheck() {
-		int sum = 0;
+	private double calculateSumCheck() {
+		double sum = 0;
 		for (ItemForProductAdapter temp : adapter.getListItems()) {
 			sum += temp.getPriceSellingProduct() * temp.getCount();
 		}
@@ -149,7 +150,7 @@ public class CheckActivity extends AppCompatActivity {
 		}
 	}
 
-	private void setTotalPrice(float totalPrice) {
+	private void setTotalPrice(double totalPrice) {
 		TextView totalTextView = (TextView) findViewById(R.id.activity_check_total);
 		totalTextView.setText(String.format(Locale.US, "%.2f", totalPrice));
 	}
@@ -163,14 +164,14 @@ public class CheckActivity extends AppCompatActivity {
 		Cursor cursor = getContentResolver().query(SmartShopContentProvider.PRODUCTS_CONTENT_URI, new String[]{},
 				"barcode = ?", new String[]{barcode}, "");
 		if (cursor != null && cursor.moveToNext()) {
-			String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
-			String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
-			int priceSellingProduct = cursor.getInt(cursor
-					.getColumnIndex("price_selling_product"));
-			int pricePurchaseProduct = cursor.getInt(cursor
-					.getColumnIndex("price_cost_product"));
-			int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
-			long id = cursor.getLong(cursor.getColumnIndex("_id"));
+			String nameProduct = cursor.getString(cursor.getColumnIndex(ContractClass.Products.NAME));
+			String photoPath = cursor.getString(cursor.getColumnIndex(ContractClass.Products.PHOTO_PATH));
+			double priceSellingProduct = cursor.getDouble(cursor
+					.getColumnIndex(ContractClass.Products.PRICE_SELLING));
+			double pricePurchaseProduct = cursor.getDouble(cursor
+					.getColumnIndex(ContractClass.Products.PRICE_COST));
+			int countProduct = cursor.getInt(cursor.getColumnIndex(ContractClass.Products._COUNT));
+			long id = cursor.getLong(cursor.getColumnIndex(ContractClass.Products._ID));
 			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, countProduct);
 			showDialog(check);
 		} else {

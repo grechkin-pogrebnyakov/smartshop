@@ -24,6 +24,7 @@ import com.technopark.smartbiz.businessLogic.productSales.DialogFragmentCallback
 import com.technopark.smartbiz.businessLogic.productSales.PurchaseActivity;
 import com.technopark.smartbiz.businessLogic.productSales.PurchaseDialogFragment;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
@@ -48,7 +49,7 @@ public class SupplyActivity extends AppCompatActivity implements HttpsHelper.Htt
 		public void callback() {
 			Check check = purchaseDialogFragment.getCheck();
 			check.setCount(purchaseDialogFragment.getProductCount());
-			check.setPriceSellingProduct((int) (purchaseDialogFragment.getProductPrice()));
+			check.setPriceSellingProduct(purchaseDialogFragment.getProductPrice());
 			adapter.addItem(check);
 			adapter.notifyDataSetChanged();
 		}
@@ -133,8 +134,8 @@ public class SupplyActivity extends AppCompatActivity implements HttpsHelper.Htt
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 
 		String queryString;
-		String formatString = "UPDATE " + DatabaseHelper.PRODUCTS_TABLE_NAME + " " +
-				"SET count = count + %d " +
+		String formatString = "UPDATE " + ContractClass.Products.TABLE_NAME + " " +
+				"SET _count = _count + %d " +
 				"WHERE _id = %d" +
 				";";
 
@@ -188,14 +189,14 @@ public class SupplyActivity extends AppCompatActivity implements HttpsHelper.Htt
 		Cursor cursor = getContentResolver().query(SmartShopContentProvider.PRODUCTS_CONTENT_URI, new String[]{},
 				"barcode = ?", new String[]{barcode}, "");
 		if (cursor != null && cursor.moveToNext()) {
-			String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
-			String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
-			int priceSellingProduct = cursor.getInt(cursor
-					.getColumnIndex("price_selling_product"));
-			int pricePurchaseProduct = cursor.getInt(cursor
-					.getColumnIndex("price_cost_product"));
-			int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
-			long id = cursor.getLong(cursor.getColumnIndex("_id"));
+			String nameProduct = cursor.getString(cursor.getColumnIndex(ContractClass.Products.NAME));
+			String photoPath = cursor.getString(cursor.getColumnIndex(ContractClass.Products.PHOTO_PATH));
+			double priceSellingProduct = cursor.getDouble(cursor
+					.getColumnIndex(ContractClass.Products.PRICE_SELLING));
+			double pricePurchaseProduct = cursor.getDouble(cursor
+					.getColumnIndex(ContractClass.Products.PRICE_COST));
+			int countProduct = cursor.getInt(cursor.getColumnIndex(ContractClass.Products._COUNT));
+			long id = cursor.getLong(cursor.getColumnIndex(ContractClass.Products._ID));
 			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, countProduct);
 			showDialog(check);
 		}

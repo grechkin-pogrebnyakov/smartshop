@@ -18,6 +18,7 @@ import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteProductFromList
 import com.technopark.smartbiz.businessLogic.editProduct.EditProductActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Product;
 
@@ -99,14 +100,14 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
 				//simpleCursorAdapter.swapCursor( cursor );
 				if (cursor.moveToFirst()) {
 					do {
-						String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
-						String descriptionProduct = cursor.getString(cursor.getColumnIndex("description"));
-						String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
-						int priceSellingProduct = cursor.getInt(cursor.getColumnIndex("price_selling_product"));
-						int pricePurchaseProduct = cursor.getInt(cursor.getColumnIndex("price_cost_product"));
-						int productBarcode = cursor.getInt(cursor.getColumnIndex("barcode"));
-						int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
-						long id = cursor.getInt(cursor.getColumnIndex("_id"));
+						String nameProduct = cursor.getString(cursor.getColumnIndex(ContractClass.Products.NAME));
+						String descriptionProduct = cursor.getString(cursor.getColumnIndex(ContractClass.Products.DESCRIPTION));
+						String photoPath = cursor.getString(cursor.getColumnIndex(ContractClass.Products.PHOTO_PATH));
+						double priceSellingProduct = cursor.getDouble(cursor.getColumnIndex(ContractClass.Products.PRICE_SELLING));
+						double pricePurchaseProduct = cursor.getDouble(cursor.getColumnIndex(ContractClass.Products.PRICE_COST));
+						String productBarcode = cursor.getString(cursor.getColumnIndex(ContractClass.Products.BARCODE));
+						int countProduct = cursor.getInt(cursor.getColumnIndex(ContractClass.Products._COUNT));
+						long id = cursor.getInt(cursor.getColumnIndex(ContractClass.Products._ID));
 						Product product = new Product(nameProduct, descriptionProduct, photoPath, priceSellingProduct,
 								pricePurchaseProduct, productBarcode, countProduct, id);
 						adapter.addItem(product);

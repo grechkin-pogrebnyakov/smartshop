@@ -14,6 +14,7 @@ import android.widget.ListView;
 
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.Product;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
@@ -41,7 +42,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 			Intent result = new Intent();
 			Check check = purchaseDialogFragment.getCheck();
 			check.setCount(purchaseDialogFragment.getProductCount());
-			check.setPriceSellingProduct((int) (purchaseDialogFragment.getProductPrice()));
+			check.setPriceSellingProduct(purchaseDialogFragment.getProductPrice());
 			result.putExtra(KEY_RESPONCE_OBJECT, check);
 			// TODO Add data to result
 			setResult(RESULT_OK, result);
@@ -97,17 +98,17 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 				//simpleCursorAdapter.swapCursor( cursor );
 				if (cursor.moveToFirst()) {
 					do {
-						String nameProduct = cursor.getString(cursor.getColumnIndex("name"));
+						String nameProduct = cursor.getString(cursor.getColumnIndex(ContractClass.Products.NAME));
 						String descriptionProduct = cursor.getString(cursor
-								.getColumnIndex("description"));
-						String photoPath = cursor.getString(cursor.getColumnIndex("photo_path"));
-						int priceSellingProduct = cursor.getInt(cursor
-								.getColumnIndex("price_selling_product"));
-						int pricePurchaseProduct = cursor.getInt(cursor
-								.getColumnIndex("price_cost_product"));
-						int productBarcode = cursor.getInt(cursor.getColumnIndex("barcode"));
-						int countProduct = cursor.getInt(cursor.getColumnIndex("count"));
-						long id = cursor.getLong(cursor.getColumnIndex("_id"));
+								.getColumnIndex(ContractClass.Products.DESCRIPTION));
+						String photoPath = cursor.getString(cursor.getColumnIndex(ContractClass.Products.PHOTO_PATH));
+						double priceSellingProduct = cursor.getDouble(cursor
+								.getColumnIndex(ContractClass.Products.PRICE_SELLING));
+						double pricePurchaseProduct = cursor.getDouble(cursor
+								.getColumnIndex(ContractClass.Products.PRICE_COST));
+						String productBarcode = cursor.getString(cursor.getColumnIndex(ContractClass.Products.BARCODE));
+						int countProduct = cursor.getInt(cursor.getColumnIndex(ContractClass.Products._COUNT));
+						long id = cursor.getLong(cursor.getColumnIndex(ContractClass.Products._ID));
 						Product product = new Product(nameProduct, descriptionProduct, photoPath, priceSellingProduct,
 								pricePurchaseProduct, productBarcode, countProduct, id);
 						adapter.addItem(product);

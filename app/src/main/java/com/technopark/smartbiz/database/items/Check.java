@@ -13,13 +13,13 @@ public class Check implements Parcelable, ItemForProductAdapter {
 
 	private String productName;
 	private String photoPath;
-	private int priceSellingProduct;
-	private int pricePurchaseProduct;
+	private double priceSellingProduct;
+	private double pricePurchaseProduct;
 	private long idFromProductsTable;
 	private int count;
 
 
-	public Check(String productName, String photoPath, int priceSellingProduct, int pricePurchaseProduct, long idFromProductsTable, int count) {
+	public Check(String productName, String photoPath, double priceSellingProduct, double pricePurchaseProduct, long idFromProductsTable, int count) {
 		this.productName = productName;
 		this.photoPath = photoPath;
 		this.idFromProductsTable = idFromProductsTable;
@@ -31,8 +31,8 @@ public class Check implements Parcelable, ItemForProductAdapter {
 	public Check(Parcel source) {
 		productName = source.readString();
 		photoPath = source.readString();
-		priceSellingProduct = source.readInt();
-		pricePurchaseProduct = source.readInt();
+		priceSellingProduct = source.readDouble();
+		pricePurchaseProduct = source.readDouble();
 		idFromProductsTable = source.readLong();
 		count = source.readInt();
 	}
@@ -53,15 +53,15 @@ public class Check implements Parcelable, ItemForProductAdapter {
 		this.photoPath = photoPath;
 	}
 
-	public int getPriceSellingProduct() {
+	public double getPriceSellingProduct() {
 		return priceSellingProduct;
 	}
 
-	public void setPriceSellingProduct(int priceSellingProduct) {
+	public void setPriceSellingProduct(double priceSellingProduct) {
 		this.priceSellingProduct = priceSellingProduct;
 	}
 
-	public int getPricePurchaseProduct() {
+	public double getPricePurchaseProduct() {
 		return pricePurchaseProduct;
 	}
 
@@ -94,8 +94,8 @@ public class Check implements Parcelable, ItemForProductAdapter {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(productName);
 		dest.writeString(photoPath);
-		dest.writeInt(priceSellingProduct);
-		dest.writeInt(pricePurchaseProduct);
+		dest.writeDouble(priceSellingProduct);
+		dest.writeDouble(pricePurchaseProduct);
 		dest.writeLong(idFromProductsTable);
 		dest.writeInt(count);
 	}

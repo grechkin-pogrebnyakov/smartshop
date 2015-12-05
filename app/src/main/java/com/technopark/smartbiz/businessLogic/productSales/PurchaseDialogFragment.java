@@ -23,9 +23,9 @@ import java.util.Locale;
 public class PurchaseDialogFragment extends DialogFragment implements View.OnClickListener {
 
 	private String productName = "";
-	private float productPrice = 0.0f;
+	private double productPrice = 0.0f;
 	private int productCount = 1;
-	private float totalPrice = productCount * productPrice;
+	private double totalPrice = productCount * productPrice;
 	private Check check;
 
 	private View view = null;
@@ -119,7 +119,7 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		this.check = check;
 	}
 
-	public float getTotalPrice() {
+	public double getTotalPrice() {
 		return totalPrice;
 	}
 
@@ -131,11 +131,11 @@ public class PurchaseDialogFragment extends DialogFragment implements View.OnCli
 		this.productCount = productCount;
 	}
 
-	public float getProductPrice() {
+	public double getProductPrice() {
 		return productPrice;
 	}
 
-	public void setProductPrice(float productPrice) {
+	public void setProductPrice(double productPrice) {
 		this.productPrice = productPrice;
 	}
 }

@@ -35,6 +35,7 @@ import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
 import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 
@@ -89,11 +90,11 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 		String[] columns = new String[]{
 				"strftime('%d-%m-%Y', date_time) as date",
-				"sum(price_selling_product * count) as total_price"
+				"sum(price_selling_product * _count) as total_price"
 		};
 
 		Cursor cursor = db
-				.query(DatabaseHelper.CHECKS_TABLE_NAME, columns, null, null, "date", null, null);
+				.query(ContractClass.Сhecks.TABLE_NAME, columns, null, null, ContractClass.Сhecks.DATE_TIME, null, null);
 
 		ArrayList<Entry> entries = new ArrayList<>();
 		ArrayList<String> labels = new ArrayList<>();
@@ -307,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
 					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
 
-					databaseHelper.dropTable(DatabaseHelper.PRODUCTS_TABLE_NAME);
+					databaseHelper.dropTable(ContractClass.Сhecks.TABLE_NAME);
 
 					JSONArray products = jsonObject.getJSONArray(HttpsHelper.RESPONSE);
 					for (int i = 0; i < products.length(); ++i) {
@@ -323,13 +324,13 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 						ContentValues contentValues = new ContentValues();
 
-						contentValues.put("name", productName);
-						contentValues.put("description", descriptionProduct);
-						contentValues.put("price_selling_product", priceSellingProduct);
-						contentValues.put("price_cost_product", pricePurchaseProduct);
-						contentValues.put("barcode", productBarcode);
-						contentValues.put("count", count);
-						contentValues.put("_id", id);
+						contentValues.put(ContractClass.Products.NAME, productName);
+						contentValues.put(ContractClass.Products.DESCRIPTION, descriptionProduct);
+						contentValues.put(ContractClass.Products.PRICE_SELLING, priceSellingProduct);
+						contentValues.put(ContractClass.Products.PRICE_COST, pricePurchaseProduct);
+						contentValues.put(ContractClass.Products.BARCODE, productBarcode);
+						contentValues.put(ContractClass.Products._COUNT, count);
+						contentValues.put(ContractClass.Products._ID, id);
 
 						getContentResolver().insert(SmartShopContentProvider.PRODUCTS_CONTENT_URI, contentValues);
 					}
@@ -357,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
 					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
 
-					databaseHelper.dropTable(DatabaseHelper.CHECKS_TABLE_NAME);
+					databaseHelper.dropTable(ContractClass.Сhecks.TABLE_NAME);
 
 					JSONArray response = jsonObject.getJSONArray(HttpsHelper.RESPONSE);
 					for (int i = 0; i < response.length(); ++i) {
@@ -377,11 +378,11 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 							ContentValues contentValues = new ContentValues();
 
-							contentValues.put("id_from_products_table", itemId);
-							contentValues.put("count", count);
-							contentValues.put("price_selling_product", priceSellingProduct);
-							contentValues.put("price_cost_product", pricePurchaseProduct);
-							contentValues.put("date_time", time);
+							contentValues.put(ContractClass.Сhecks.ID_FROM_PRODUCTS_TABLE, itemId);
+							contentValues.put(ContractClass.Сhecks._COUNT, count);
+							contentValues.put(ContractClass.Сhecks.PRICE_SELLING, priceSellingProduct);
+							contentValues.put(ContractClass.Сhecks.PRICE_COST, pricePurchaseProduct);
+							contentValues.put(ContractClass.Сhecks.DATE_TIME, time);
 
 							getContentResolver().insert(SmartShopContentProvider.CHECKS_CONTENT_URI, contentValues);
 						}

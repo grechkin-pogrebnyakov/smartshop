@@ -10,38 +10,35 @@ import android.util.Log;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-	public static final String PRODUCTS_TABLE_NAME = "products";
-	public static final String CHECKS_TABLE_NAME = "checks";
-
 	private static final String DATABASE_NAME = "smart_shop";
 	private static final int DATABASE_VERSION = 1;
 
 	private static final String LOG_DB = "DatabaseHelper";
 
 	private static final String PRODUCT_TABLE_CREATE =
-			"CREATE TABLE " + PRODUCTS_TABLE_NAME + " " +
+			"CREATE TABLE " + ContractClass.Products.TABLE_NAME + " " +
 					"(" +
-					"_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-					"barcode INTEGER UNIQUE, " +
-					"photo_path TEXT, " +
-					"name TEXT, " +
-					"price_selling_product INTEGER, " +
-					"price_cost_product INTEGER, " +
-					"description TEXT, " +
-					"count INTEGER" +
+					ContractClass.Products._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+					ContractClass.Products.BARCODE + " TEXT UNIQUE, " +
+					ContractClass.Products.PHOTO_PATH + " TEXT, " +
+					ContractClass.Products.NAME + " TEXT, " +
+					ContractClass.Products.PRICE_SELLING + " DOUBLE, " +
+					ContractClass.Products.PRICE_COST + " DOUBLE, " +
+					ContractClass.Products.DESCRIPTION + " TEXT, " +
+					ContractClass.Products._COUNT + " INTEGER" +
 					");";
 
 	private static final String CHECKS_TABLE_CREATE =
-			"CREATE TABLE " + CHECKS_TABLE_NAME + " " +
+			"CREATE TABLE " + ContractClass.Сhecks.TABLE_NAME + " " +
 					"(" +
-					"_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-					"id_from_products_table INTEGER, " +
-					"photo_path TEXT, " +
-					"name TEXT, " +
-					"price_selling_product INTEGER, " +
-					"price_cost_product INTEGER, " +
-					"count INTEGER, " +
-					"date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
+					ContractClass.Сhecks._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+					ContractClass.Сhecks.ID_FROM_PRODUCTS_TABLE + " INTEGER, " +
+					ContractClass.Сhecks.PHOTO_PATH + " TEXT, " +
+					ContractClass.Сhecks.NAME + " TEXT, " +
+					ContractClass.Сhecks.PRICE_SELLING + " DOUBLE, " +
+					ContractClass.Сhecks.PRICE_COST + " DOUBLE, " +
+					ContractClass.Сhecks._COUNT + " INTEGER, " +
+					ContractClass.Сhecks.DATE_TIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
 					");";
 
 	private static final String EMPLOYEE_TABLE_CREATE =
@@ -79,15 +76,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = getWritableDatabase();
 
 		switch (table) {
-			case PRODUCTS_TABLE_NAME:
+			case ContractClass.Products.TABLE_NAME:
 				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
 				db.execSQL(PRODUCT_TABLE_CREATE);
 				break;
-			case CHECKS_TABLE_NAME:
+			case ContractClass.Сhecks.TABLE_NAME:
 				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
 				db.execSQL(CHECKS_TABLE_CREATE);
 		}
-
 		db.close();
 	}
 }

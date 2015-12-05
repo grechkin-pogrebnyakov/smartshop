@@ -11,14 +11,14 @@ public class Product implements Parcelable, ItemForProductAdapter {
     private String productName;
     private String descriptionProduct;
     private String photoPath;
-    private int priceSellingProduct;
-    private int pricePurchaseProduct;
-    private int productBarcode;
+    private double priceSellingProduct;
+    private double pricePurchaseProduct;
+    private String productBarcode;
     private int count;
     private long id;
 
 
-    public Product(String productName, String descriptionProduct, String photoPath, int priceSellingProduct, int pricePurchaseProduct, int productBarcode, int count) {
+    public Product(String productName, String descriptionProduct, String photoPath, double priceSellingProduct, double pricePurchaseProduct, String productBarcode, int count) {
         this.productName = productName;
         this.descriptionProduct = descriptionProduct;
         this.photoPath = photoPath;
@@ -28,7 +28,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
         this.pricePurchaseProduct = pricePurchaseProduct;
     }
 
-    public Product(String productName, String descriptionProduct, String photoPath, int priceSellingProduct, int pricePurchaseProduct, int productBarcode, int count, long id) {
+    public Product(String productName, String descriptionProduct, String photoPath, double priceSellingProduct, double pricePurchaseProduct, String productBarcode, int count, long id) {
         this.productName = productName;
         this.descriptionProduct = descriptionProduct;
         this.photoPath = photoPath;
@@ -43,14 +43,14 @@ public class Product implements Parcelable, ItemForProductAdapter {
         productName = source.readString();
         descriptionProduct = source.readString();
         photoPath = source.readString();
-        priceSellingProduct = source.readInt();
-        pricePurchaseProduct = source.readInt();
-        productBarcode = source.readInt();
+        priceSellingProduct = source.readDouble();
+        pricePurchaseProduct = source.readDouble();
+        productBarcode = source.readString();
         count = source.readInt();
         id = source.readLong();
     }
 
-    public int getProductBarcode() {
+    public String getProductBarcode() {
         return productBarcode;
     }
 
@@ -70,7 +70,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
         return photoPath;
     }
 
-    public int getPriceSellingProduct() {
+    public double getPriceSellingProduct() {
         return priceSellingProduct;
     }
 
@@ -78,7 +78,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
         return new Check(productName, photoPath, priceSellingProduct, pricePurchaseProduct, id, count);
     }
 
-    public int getPricePurchaseProduct() {
+    public double getPricePurchaseProduct() {
         return pricePurchaseProduct;
     }
 
@@ -114,7 +114,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
         this.photoPath = photoPath;
     }
 
-    public void setProductBarcode(int productBarcode) {
+    public void setProductBarcode(String productBarcode) {
         this.productBarcode = productBarcode;
     }
 
@@ -128,9 +128,9 @@ public class Product implements Parcelable, ItemForProductAdapter {
         dest.writeString(productName);
         dest.writeString(descriptionProduct);
         dest.writeString(photoPath);
-        dest.writeInt(priceSellingProduct);
-        dest.writeInt(pricePurchaseProduct);
-        dest.writeInt(productBarcode);
+        dest.writeDouble(priceSellingProduct);
+        dest.writeDouble(pricePurchaseProduct);
+        dest.writeString(productBarcode);
         dest.writeInt(count);
         dest.writeLong(id);
     }

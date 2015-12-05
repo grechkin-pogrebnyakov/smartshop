@@ -18,6 +18,7 @@ import com.technopark.smartbiz.MainActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
@@ -31,9 +32,9 @@ import java.util.Locale;
 
 public class PaymentActivity extends AppCompatActivity implements TextWatcher, HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
-	private float totalPrice = 0.0f;
-	private float oddMoney = 0.0f;
-	private float payment = 0.0f;
+	private double totalPrice = 0.0f;
+	private double oddMoney = 0.0f;
+	private double payment = 0.0f;
 
 	private EditText paymentEditText;
 	private TextView oddMoneyTextView;
@@ -46,7 +47,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			totalPrice = extras.getInt(CheckActivity.TOTAL_PRICE);
+			totalPrice = extras.getDouble(CheckActivity.TOTAL_PRICE);
 		}
 
 		TextView totalTextView = (TextView) findViewById(R.id.activity_payment_textview_total);
@@ -105,8 +106,8 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 
 		String queryString;
-		String formatString = "UPDATE " + DatabaseHelper.PRODUCTS_TABLE_NAME + " " +
-				"SET count = count - %d " +
+		String formatString = "UPDATE " + ContractClass.Products.TABLE_NAME + " " +
+				"SET _count = _count - %d " +
 				"WHERE _id = %d" +
 				";";
 
@@ -126,6 +127,9 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 
 	private void updateOddMoneyEditText() {
 		oddMoney = payment - totalPrice;
+		if (Math.abs(oddMoney) < 0.001) {
+			oddMoney = 0;
+		}
 		oddMoneyTextView.setText(String.format(Locale.US, "%.2f", oddMoney));
 	}
 
@@ -144,7 +148,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 			paymentString.append("0");
 		}
 
-		this.payment = Float.valueOf(paymentString.toString());
+		this.payment = Double.valueOf(paymentString.toString());
 		updateOddMoneyEditText();
 	}
 
@@ -162,12 +166,12 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 
 		for (Check temp : checkList) {
 			check = temp;
-			mNewValues.put("id_from_products_table", check.getIdFromProductsTable());
-			mNewValues.put("photo_path", check.getPhotoPath());
-			mNewValues.put("name", check.getProductName());
-			mNewValues.put("price_selling_product", check.getPriceSellingProduct());
-			mNewValues.put("price_cost_product", check.getPricePurchaseProduct());
-			mNewValues.put("count", check.getCount());
+			mNewValues.put(ContractClass.Сhecks.ID_FROM_PRODUCTS_TABLE, check.getIdFromProductsTable());
+			mNewValues.put(ContractClass.Сhecks.PHOTO_PATH, check.getPhotoPath());
+			mNewValues.put(ContractClass.Сhecks.NAME, check.getProductName());
+			mNewValues.put(ContractClass.Сhecks.PRICE_SELLING, check.getPriceSellingProduct());
+			mNewValues.put(ContractClass.Сhecks.PRICE_COST, check.getPricePurchaseProduct());
+			mNewValues.put(ContractClass.Сhecks._COUNT, check.getCount());
 
 			mNewUri = getContentResolver().insert(
 					SmartShopContentProvider.CHECKS_CONTENT_URI,   // the user dictionary content URI

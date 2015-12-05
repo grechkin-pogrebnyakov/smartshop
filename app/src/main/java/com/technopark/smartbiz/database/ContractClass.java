@@ -42,4 +42,26 @@ public final class ContractClass {
 
 		private Employees() {}
 	}
+
+	public static final class Products implements BaseColumns {
+		public static final String TABLE_NAME = "products";
+		public static final String BARCODE = "barcode";
+		public static final String PHOTO_PATH = "photo_path";
+		public static final String NAME = "name";
+		public static final String PRICE_SELLING = "price_selling_product";
+		public static final String PRICE_COST = "price_cost";
+		public static final String DESCRIPTION = "description";
+
+		private Products() {}
+	}
+
+	public static final class Сhecks implements BaseColumns {
+		public static final String TABLE_NAME = "checks";
+		public static final String ID_FROM_PRODUCTS_TABLE = "id_from_products_table";
+		public static final String PHOTO_PATH = "photo_path";
+		public static final String NAME = "name";
+		public static final String PRICE_SELLING = "price_selling_product";
+		public static final String PRICE_COST = "price_cost";
+		public static final String DATE_TIME = "date_time";
+	}
 }

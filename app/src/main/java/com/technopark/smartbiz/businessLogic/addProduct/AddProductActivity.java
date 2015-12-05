@@ -22,6 +22,7 @@ import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
+import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 
 import org.json.JSONException;
@@ -174,13 +175,13 @@ public class AddProductActivity extends AppCompatActivity implements HttpsHelper
         * Sets the values of each column and inserts the word. The arguments to the "put"
         * method are "column name" and "value"
         */
-		mNewValues.put("barcode", barcode);
-		mNewValues.put("photo_path", photoPath);
-		mNewValues.put("name", name);
-		mNewValues.put("price_selling_product", priceSellingProduct);
-		mNewValues.put("price_cost_product", priceCostProduct);
-		mNewValues.put("description", description);
-		mNewValues.put("count", count);
+		mNewValues.put(ContractClass.Products.BARCODE, barcode);
+		mNewValues.put(ContractClass.Products.PHOTO_PATH, photoPath);
+		mNewValues.put(ContractClass.Products.NAME, name);
+		mNewValues.put(ContractClass.Products.PRICE_SELLING, priceSellingProduct);
+		mNewValues.put(ContractClass.Products.PRICE_COST, priceCostProduct);
+		mNewValues.put(ContractClass.Products.DESCRIPTION, description);
+		mNewValues.put(ContractClass.Products._COUNT, count);
 
 		mNewUri = getContentResolver().insert(
 				SmartShopContentProvider.PRODUCTS_CONTENT_URI,   // the user dictionary content URI
