@@ -1,7 +1,6 @@
-from django.shortcuts import render
-from rest_framework import serializers
-from storeManage import models
+# coding: utf-8
 # Create your views here.
+from storeManage import models
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from rest_framework.renderers import JSONRenderer
@@ -11,19 +10,14 @@ from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateAPIView,ListCreateAPIView
-from storeManage.serializers import ShopSerializer
 from storeManage.models import Shop,Check
-from userManage.models import UserProfile
-from  django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
-from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer,ShopItemUpdateSerializer
+from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer,ShopItemUpdateSerializer, ItemConfirmPriceUpdateSerializer
 import logging
 from my_utils import get_client_ip
+from userManage.utils import send_push_to_other_workers
 import datetime
 
 log = logging.getLogger('smartshop.log')
@@ -90,6 +84,49 @@ class Item_update(GenericAPIView):
         pass
 
 
+class ItemListChangePrice(GenericAPIView):
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ShopItemSerializer
+    def get(self,request):
+        tmp_shop = request.user.profile.oShop
+        if tmp_shop is None :
+            shop = request.user.profile.shop
+        else:
+            shop = tmp_shop
+        items = models.Item.objects.filter(shop=shop, new_price__isnull = False)
+        serializer = self.get_serializer(items, many=True)
+        return Response({'response':serializer.data})
+
+
+class ItemConfirmPriceUpdate(GenericAPIView):
+    serializer_class = ItemConfirmPriceUpdateSerializer
+    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.get_serializer(data = request.data)
+
+        if not serializer.is_valid() :
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        items = models.Item.objects.filter(id=serializer.data.get('item_id'))
+        item = items[0]
+        new_price = item.new_price
+        old_price = item.price
+        if new_price is None :
+            return Response({"error":"item has no new price"}, status=status.HTTP_400_BAD_REQUEST)
+        old_price.is_deleted = True
+        old_price.save()
+        new_price.changer = user
+        new_price.startDate = datetime.datetime.now()
+        new_price.save()
+        item.price = new_price
+        item.new_price = None
+        item.save()
+        send_push_to_other_workers(user, "Внимание! В магазине были поменяны ценники. Цена в приложении изменится автоматически.")
+        return Response({'response': 'success'},status=status.HTTP_200_OK)
+
+
 class CheckView(ListCreateAPIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
@@ -116,7 +153,7 @@ class CheckView(ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
-            return Response('')
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(user=self.request.user)
         return Response({'id': serializer.data.get('id')},status=status.HTTP_201_CREATED)
     def get_queryset(self):
