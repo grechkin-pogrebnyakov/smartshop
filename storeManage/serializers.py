@@ -26,10 +26,12 @@ def change_price(price, pricePurchaseProduct, priceSellingProduct):
     new_price.itemInfo = price.itemInfo
     new_price.pricePurchaseProduct=pricePurchaseProduct
     new_price.priceSellingProduct=priceSellingProduct
-    price.is_deleted = 1
     new_price.save()
-    price.save()
     return new_price
+
+
+class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
+    item_id=serializers.IntegerField()
 
 
 class ShopItemUpdateSerializer(serializers.Serializer):
@@ -74,6 +76,7 @@ class ShopItemSerializer(serializers.Serializer):
     count = serializers.IntegerField()
     id = serializers.IntegerField(read_only=True)
     price_id=serializers.IntegerField(read_only=True)
+    new_price=PriceSerializer(read_only=True)
     def create(self, validated_data):
         owner = validated_data.get('owner')
         oShop = owner.profile.oShop

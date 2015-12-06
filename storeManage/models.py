@@ -25,7 +25,7 @@ class Price(models.Model):
     itemInfo = models.ForeignKey(Item, related_name='prices', null=True)
     priceSellingProduct = models.FloatField()
     pricePurchaseProduct = models.FloatField()
-    is_deleted = models.IntegerField(default=0)
+    is_deleted = models.BooleanField(default=False)
     startDate = models.DateTimeField(null=True)
     changer = models.ForeignKey(User, null=True)
 
