@@ -112,11 +112,6 @@ class RegisterEmployeeView(GenericAPIView):
         log.warn('reqiest for unsupported method. client_ip {0}'.format(get_client_ip(self.request)))
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def get_form_kwargs(self, *args, **kwargs):
-        kwargs = super(RegisterView, self).get_form_kwargs(*args, **kwargs)
-        kwargs['data'] = self.request.data
-        return kwargs
-
     def post(self, request, *args, **kwargs):
         if( not self.request.user.profile.accountType == 'owner' ):
             log.warn('worker register request from worker. client_ip {0}, username {1}'.format(get_client_ip(self.request), self.request.user.username))
@@ -127,6 +122,11 @@ class RegisterEmployeeView(GenericAPIView):
             return self.get_response_with_errors()
         self.serializer.save(owner=self.request.user)
         return Response({'login': self.serializer.login, 'temporary_password': self.serializer.password}, status=status.HTTP_201_CREATED)
+
+    def get_response_with_errors(self, error = None):
+        if( error is None ):
+            error = self.serializer.errors
+        return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
 class VkRegisterView(GenericAPIView):
     """
@@ -191,8 +191,6 @@ class VkRegisterView(GenericAPIView):
             self.user.profile.accessToken = accessToken
             self.user.save()
         return self.get_response()
-
-
 
     def get_response_with_errors(self, error = None):
         if( error is None ):
