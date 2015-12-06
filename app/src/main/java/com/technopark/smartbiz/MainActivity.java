@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
 					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
 
-					databaseHelper.dropTable(ContractClass.Сhecks.TABLE_NAME);
+					databaseHelper.dropTable(ContractClass.Products.TABLE_NAME);
 
 					JSONArray products = jsonObject.getJSONArray(HttpsHelper.RESPONSE);
 					for (int i = 0; i < products.length(); ++i) {
