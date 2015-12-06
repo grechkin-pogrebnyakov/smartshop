@@ -126,7 +126,6 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 						priceCostProductEditText.setEnabled(true);
 						priceSellingProductEditText.setEnabled(true);
 						barcodeEditText.setEnabled(true);
-						countEditText.setEnabled(true);
 						descriptionEditText.setEnabled(true);
 
 						addProductPhotoButton.setEnabled(true);

@@ -124,8 +124,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void registrationButtons() {
 		final Button mEmailSignInButton = (Button) findViewById(R.id.login_button_sing_in);
-
+		Button vkAuthButton = (Button) findViewById(R.id.login_button_vkAuth);
 		final Button newAccountButton = (Button) findViewById(R.id.login_button_new_account);
+
 		newAccountButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -171,7 +172,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			}
 		});
 
-		Button vkAuthButton = (Button) findViewById(R.id.login_button_vkAuth);
+
 		Account[] accounts = AccountManager.get(this).getAccountsByType("com.vkontakte.account");
 		String buttonText;
 		if (accounts.length > 0) {
@@ -548,7 +549,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		};
 
 		int ADDRESS = 0;
-		int IS_PRIMARY = 1;
 	}
 
 
