@@ -80,7 +80,7 @@ public final class ContractClass {
 		public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE_NAME;
 		public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE_NAME;
 
-		public static final String COLUMN_NAME_PRODUCT_ID = "product_id";
+		public static final String COLUMN_NAME_ITEM_ID = "item_id";
 		public static final String COLUMN_NAME_PRODUCT_NAME = "name";
 		public static final String COLUMN_NAME_OLD_PRICE = "old_price";
 		public static final String COLUMN_NAME_NEW_PRICE = "new_price";
@@ -89,7 +89,7 @@ public final class ContractClass {
 
 		public static final String[] DEFAULT_PROJECTION = new String[]{
 				PriceUpdate._ID,
-				PriceUpdate.COLUMN_NAME_PRODUCT_ID,
+				PriceUpdate.COLUMN_NAME_ITEM_ID,
 				PriceUpdate.COLUMN_NAME_PRODUCT_NAME,
 				PriceUpdate.COLUMN_NAME_OLD_PRICE,
 				PriceUpdate.COLUMN_NAME_NEW_PRICE,

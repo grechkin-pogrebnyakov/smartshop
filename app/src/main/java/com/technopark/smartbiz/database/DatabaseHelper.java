@@ -57,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			"CREATE TABLE " + ContractClass.PriceUpdate.TABLE_NAME + " " +
 					"(" +
 					ContractClass.PriceUpdate._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-					ContractClass.PriceUpdate.COLUMN_NAME_PRODUCT_ID + " INTEGER NOT NULL, " +
+					ContractClass.PriceUpdate.COLUMN_NAME_ITEM_ID + " INTEGER NOT NULL, " +
 					ContractClass.PriceUpdate.COLUMN_NAME_PRODUCT_NAME + " TEXT NOT NULL, " +
 					ContractClass.PriceUpdate.COLUMN_NAME_OLD_PRICE + " DOUBLE NOT NULL, " +
 					ContractClass.PriceUpdate.COLUMN_NAME_NEW_PRICE + " DOUBLE NOT NULL" +
@@ -97,6 +97,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			case ContractClass.Сhecks.TABLE_NAME:
 				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
 				db.execSQL(CHECKS_TABLE_CREATE);
+				break;
+			case ContractClass.PriceUpdate.TABLE_NAME:
+				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
+				db.execSQL(PRICE_UPDATE_TABLE_CREATE);
+				break;
 		}
 		db.close();
 	}

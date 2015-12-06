@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		};
 
 		Cursor cursor = db
-				.query(ContractClass.Сhecks.TABLE_NAME, columns, null, null, ContractClass.Сhecks.DATE_TIME, null, null);
+				.query(ContractClass.Сhecks.TABLE_NAME, columns, null, null, "date", null, null);
 
 		ArrayList<Entry> entries = new ArrayList<>();
 		ArrayList<String> labels = new ArrayList<>();
