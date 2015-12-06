@@ -39,6 +39,15 @@ class LoginView(GenericAPIView):
 
     def login(self):
         self.user = self.serializer.validated_data['user']
+        try:
+            self.user.auth_token.delete()
+        except:
+            pass
+        devices = GCMDevice.objects.filter(user=self.user)
+        if(len(devices) > 0):
+            device = devices[0]
+            device.active = False
+            device.save()
         self.token, created = self.token_model.objects.get_or_create(
             user=self.user)
         if getattr(settings, 'REST_SESSION_LOGIN', True):
