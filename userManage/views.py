@@ -31,6 +31,6 @@ class AddDeviceForPushesView(GenericAPIView):
         serializer = self.get_serializer(data=self.request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            return Response(serializer.data)
+            return Response({'response':'success'}, status=status.HTTP_200_OK)
         else:
-            return Response(self.serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
