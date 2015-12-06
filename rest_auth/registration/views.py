@@ -75,9 +75,12 @@ class RegisterView(APIView, SignupView):
         self.form = self.get_form(form_class)
         if self.form.is_valid():
             self.form_valid(self.form)
+            log.info("registration: usernanme '{0}' ip {1}".format(
+                self.request.data.get('username'), get_client_ip(request)))
             return self.get_response()
         else:
-            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
+            log.info("registration error: '{0}' ip {1}".format(
+                self.form.errors, get_client_ip(request)))
             return self.get_response_with_errors()
 
     def get_response(self):
@@ -118,9 +121,12 @@ class RegisterEmployeeView(GenericAPIView):
             return self.get_response_with_errors({'details':'request is not from owner'})
         self.serializer = self.get_serializer(data=request.data)
         if not self.serializer.is_valid():
-            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
+            log.warn("error adding worker: '{0}' user '{1}' ip {2}".format(
+                self.serializer.errors,self.request.user.username, get_client_ip(request)))
             return self.get_response_with_errors()
         self.serializer.save(owner=self.request.user)
+        log.info("add worker '{0}' user '{1}' ip {2}".format(
+            self.serializer.login,self.request.user.username, get_client_ip(request)))
         return Response({'login': self.serializer.login, 'temporary_password': self.serializer.password}, status=status.HTTP_201_CREATED)
 
     def get_response_with_errors(self, error = None):
@@ -176,7 +182,8 @@ class VkRegisterView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=request.data)
         if not self.serializer.is_valid():
-            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
+            log.warn("error vk login: '{0}' ip {1}".format(
+                self.serializer.errors, get_client_ip(request)))
             return self.get_response_with_errors()
         username = 'vk_user_'+self.serializer.validated_data.get('user_id')
         users = User.objects.filter(username = username)
@@ -184,12 +191,15 @@ class VkRegisterView(GenericAPIView):
             self.serializer.save()
         self.login_serializer = LoginSerializer(data={'username':username, 'password':'123456'})
         if ( not self.login_serializer.is_valid() ):
+            log.error("mazafaka!!! {0} ip {1}".format(self.login_serializer.errors, get_client_ip(request)))
             return self.get_error_response()
         self.login()
         accessToken = self.serializer.validated_data.get('access_token')
         if (self.user.profile.accessToken != accessToken) :
             self.user.profile.accessToken = accessToken
             self.user.save()
+        log.info("vk login: user '{0}' ip {1}".format(
+                self.user.username, get_client_ip(request)))
         return self.get_response()
 
     def get_response_with_errors(self, error = None):

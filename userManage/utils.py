@@ -15,7 +15,7 @@ def send_push_to_other_workers(worker, message, dict=None):
         shop = worker.profile.oShop
     else:
         shop = tmp_shop
-    devices = GCMDevice.objects.filter(Q(user__profile__shop=shop) | Q(user__profile__oShop=shop)).exclude(user =worker)
+    devices = GCMDevice.objects.filter(Q(user__profile__shop=shop) | Q(user__profile__oShop=shop)).exclude(user = worker)
     if dict is None :
         return devices.send_message(message)
     return devices.send_message(message, dict)

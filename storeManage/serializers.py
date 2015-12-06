@@ -56,7 +56,9 @@ class ShopItemUpdateSerializer(serializers.Serializer):
         price = item.price
         if price.pricePurchaseProduct != pricePurchaseProduct or price.priceSellingProduct != priceSellingProduct:
             item.new_price = change_price(price, pricePurchaseProduct, priceSellingProduct)
-            log.info(send_push_to_workers(item.shop, 'Внимание! В цены некоторых товаров обновились!'))
+            push_res = send_push_to_workers(item.shop, 'Внимание! Цены некоторых товаров обновились!')
+            if push_res is not None:
+                log.debug(push_res)
         item.save()
         return item
 

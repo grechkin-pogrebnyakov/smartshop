@@ -59,9 +59,12 @@ class LoginView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=self.request.data)
         if not self.serializer.is_valid():
-            log.info('invalid data. client_ip {0}'.format(get_client_ip(self.request)))
+            log.warn("error at login: '{0}' ip {1}".format(
+                self.serializer.errors, get_client_ip(request)))
             return self.get_error_response()
         self.login()
+        log.info("login: user '{0}' ip {1}".format(
+            self.user.username, get_client_ip(request)))
         return self.get_response()
 
 
@@ -90,7 +93,8 @@ class LogoutView(APIView):
             device.save()
 
         logout(request)
-
+        log.info("logout: user '{0}' ip {1}".format(
+            self.request.user.username, get_client_ip(request)))
         return Response({"success": "Successfully logged out."},
                         status=status.HTTP_200_OK)
 
@@ -209,12 +213,16 @@ class PasswordChangeView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            log.info('invalid password to change. client ip {0}, login "{1}"'.format(get_client_ip(self.request), request.user.username))
+            log.warn("error changing password: '{0}' user '{1}' ip {2}".format(
+                serializer.errors,self.request.user.username, get_client_ip(request)))
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
+
         serializer.save()
         userProfile = request.user.profile
         userProfile.defaultPassword=False
         userProfile.save()
+        log.info("change password: user '{0}' ip {1}".format(
+            self.request.user.username, get_client_ip(request)))
         return Response({"success": "New password has been saved."})

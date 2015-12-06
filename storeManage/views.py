@@ -63,8 +63,12 @@ class Item(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
+            log.warn("error adding item: '{0}' user '{1}' ip {2}".format(
+                serializer.errors,self.request.user.username, get_client_ip(request)))
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer.save(owner=self.request.user)
+        log.info("add item: id '{0}' price_id '{1}' user '{2}' ip {3}".format(
+            serializer.data.get('id'), serializer.price_id ,self.request.user.username, get_client_ip(request)))
         return Response({'id': serializer.data.get("id"),'price_id':serializer.price_id},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         pass
@@ -77,8 +81,12 @@ class Item_update(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
+            log.warn("error updating item: '{0}' user '{1}' ip {2}".format(
+                serializer.errors,self.request.user.username, get_client_ip(request)))
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
+        log.info("updating item: id '{0}' user '{1}' ip {2}".format(
+            serializer.validated_data.get('id'),self.request.user.username, get_client_ip(request)))
         return Response({'response': 'success'},status=status.HTTP_200_OK)
     def get_queryset(self):
         pass
@@ -114,6 +122,8 @@ class ItemConfirmPriceUpdate(GenericAPIView):
         new_price = item.new_price
         old_price = item.price
         if new_price is None :
+            log.warn("attempt to update item without new price: '{0}' user '{1}' ip {2}".format(
+                item.id,self.request.user.username, get_client_ip(request)))
             return Response({"error":"item has no new price"}, status=status.HTTP_400_BAD_REQUEST)
         old_price.is_deleted = True
         old_price.save()
@@ -123,7 +133,11 @@ class ItemConfirmPriceUpdate(GenericAPIView):
         item.price = new_price
         item.new_price = None
         item.save()
-        send_push_to_other_workers(user, "Внимание! В магазине были поменяны ценники. Цена в приложении изменится автоматически.")
+        push_res = send_push_to_other_workers(user, "Внимание! В магазине были поменяны ценники. Цена в приложении изменится автоматически.")
+        if push_res is not None:
+            log.debug(push_res)
+        log.info("confirm price change: item_id '{0}' price_id '{1}' user '{2}' ip {3}".format(
+            item.id, new_price.id,self.request.user.username, get_client_ip(request)))
         return Response({'response': 'success'},status=status.HTTP_200_OK)
 
 
@@ -152,9 +166,13 @@ class CheckView(ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            log.warn('form is not valid. client_ip {0}'.format(get_client_ip(self.request)))
+            log.warn("error adding check: '{0}' user '{1}' ip {2}".format(
+                serializer.errors,self.request.user.username, get_client_ip(request)))
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(user=self.request.user)
+        types = ['check', 'supply', 'discard']
+        log.info("adding {0}: id '{1}' user '{2}' ip {3}".format( types[serializer.data.get('type')],
+            serializer.data.get('id'),self.request.user.username, get_client_ip(request)))
         return Response({'id': serializer.data.get('id')},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         return None
