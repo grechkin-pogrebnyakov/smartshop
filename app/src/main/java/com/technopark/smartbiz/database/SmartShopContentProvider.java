@@ -68,6 +68,9 @@ public class SmartShopContentProvider extends ContentProvider {
 	private static final int EMPLOYEES = 5;
 	private static final int EMPLOYEES_ID = 6;
 
+	private static final int PRICE_UPDATE = 7;
+	private static final int PRICE_UPDATE_ID = 8;
+
 	// описание и создание UriMatcher
 	private static final UriMatcher uriMatcher;
 
@@ -79,13 +82,19 @@ public class SmartShopContentProvider extends ContentProvider {
 		uriMatcher.addURI(AUTHORITY, CHECKS_PATH + "/#", URI_CHECKS_ID);
 		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.Employees.PATH_EMPLOYEES, EMPLOYEES);
 		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.Employees.PATH_EMPLOYEES + "/#", EMPLOYEES_ID);
+		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.PriceUpdate.PATH_PRICE_UPDATE, PRICE_UPDATE);
+		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.PriceUpdate.PATH_PRICE_UPDATE + "/#", PRICE_UPDATE_ID);
 	}
 
 	private static Map<String, String> employeesProjectionMap = new HashMap<>();
+	private static Map<String, String> priceUpdateProjectionMap = new HashMap<>();
 
 	static {
 		for (String temp : ContractClass.Employees.DEFAULT_PROJECTION) {
 			employeesProjectionMap.put(temp, temp);
+		}
+		for (String temp : ContractClass.PriceUpdate.DEFAULT_PROJECTION) {
+			priceUpdateProjectionMap.put(temp, temp);
 		}
 	}
 
@@ -178,6 +187,22 @@ public class SmartShopContentProvider extends ContentProvider {
 				cursor.setNotificationUri(getContext().getContentResolver(), uri);
 				break;
 
+			case PRICE_UPDATE_ID:
+				queryBuilder.appendWhere(ContractClass.PriceUpdate._ID + "=" + uri.getLastPathSegment());
+				//fall through
+
+			case PRICE_UPDATE:
+				queryBuilder.setTables(ContractClass.PriceUpdate.TABLE_NAME);
+				queryBuilder.setProjectionMap(priceUpdateProjectionMap);
+
+				if (TextUtils.isEmpty(sortOrder)) {
+					sortOrder = ContractClass.PriceUpdate.DEFAULT_SORT_ORDER;
+				}
+
+				cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor.setNotificationUri(getContext().getContentResolver(), uri);
+				break;
+
 			default:
 				throw new IllegalArgumentException("Wrong URI: " + uri);
 		}
@@ -204,6 +229,11 @@ public class SmartShopContentProvider extends ContentProvider {
 				return ContractClass.Employees.CONTENT_TYPE;
 			case EMPLOYEES_ID:
 				return ContractClass.Employees.CONTENT_ITEM_TYPE;
+
+			case PRICE_UPDATE:
+				return ContractClass.PriceUpdate.CONTENT_TYPE;
+			case PRICE_UPDATE_ID:
+				return ContractClass.PriceUpdate.CONTENT_ITEM_TYPE;
 		}
 		return null;
 	}
@@ -232,6 +262,11 @@ public class SmartShopContentProvider extends ContentProvider {
 			case EMPLOYEES:
 				rowID = db.insert(ContractClass.Employees.TABLE_NAME, null, values);
 				resultUri = ContentUris.withAppendedId(ContractClass.Employees.CONTENT_URI, rowID);
+				break;
+
+			case PRICE_UPDATE:
+				rowID = db.insert(ContractClass.PriceUpdate.TABLE_NAME, null, values);
+				resultUri = ContentUris.withAppendedId(ContractClass.PriceUpdate.CONTENT_URI, rowID);
 				break;
 
 			default:
@@ -297,6 +332,18 @@ public class SmartShopContentProvider extends ContentProvider {
 				count = db.delete(ContractClass.Employees.TABLE_NAME, finalSelection, selectionArgs);
 				break;
 
+			case PRICE_UPDATE_ID:
+				id = uri.getLastPathSegment();
+				finalSelection = ContractClass.PriceUpdate._ID + "=" + id;
+				if (!TextUtils.isEmpty(selection)) {
+					finalSelection = finalSelection + " AND " + selection;
+				}
+				//fall through
+
+			case PRICE_UPDATE:
+				count = db.delete(ContractClass.PriceUpdate.TABLE_NAME, finalSelection, selectionArgs);
+				break;
+
 			default:
 				throw new IllegalArgumentException("Wrong URI: " + uri);
 		}
@@ -358,6 +405,18 @@ public class SmartShopContentProvider extends ContentProvider {
 
 			case EMPLOYEES:
 				count = db.update(ContractClass.Employees.TABLE_NAME, values, finalSelection, selectionArgs);
+				break;
+
+			case PRICE_UPDATE_ID:
+				id = uri.getLastPathSegment();
+				finalSelection = ContractClass.PriceUpdate._ID + "=" + id;
+				if (!TextUtils.isEmpty(selection)) {
+					finalSelection = finalSelection + " AND " + selection;
+				}
+				//fall through
+
+			case PRICE_UPDATE:
+				count = db.update(ContractClass.PriceUpdate.TABLE_NAME, values, finalSelection, selectionArgs);
 				break;
 
 			default:

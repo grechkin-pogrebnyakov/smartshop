@@ -12,6 +12,11 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.SmartShopPreferences;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -69,8 +74,16 @@ public class RegistrationIntentService extends IntentService {
 	 * @param token The new token.
 	 */
 	private void sendRegistrationToServer(String token) {
-		// TODO: Implement this method to send any registration to your app's servers.
-		// Add custom implementation, as needed.
+		JSONObject requestJsonObject = new JSONObject();
+		try {
+			requestJsonObject.put("gcm_registration_id", token);
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Profile.URL_REGISTER_DEVICE, requestJsonObject, null, getApplicationContext())
+				.execute(HttpsHelper.Method.POST);
 	}
 
 	/**

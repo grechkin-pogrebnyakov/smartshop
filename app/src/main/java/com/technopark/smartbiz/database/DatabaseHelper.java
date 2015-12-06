@@ -51,6 +51,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					ContractClass.Employees.COLUMN_NAME_LOGIN + " TEXT NOT NULL " +
 					")";
 
+	private static final String PRICE_UPDATE_TABLE_CREATE =
+			"CREATE TABLE " + ContractClass.PriceUpdate.TABLE_NAME + " " +
+					"(" +
+					ContractClass.PriceUpdate._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+					ContractClass.PriceUpdate.COLUMN_NAME_PRODUCT_ID + " INTEGER NOT NULL, " +
+					ContractClass.PriceUpdate.COLUMN_NAME_PRODUCT_NAME + " TEXT NOT NULL, " +
+					ContractClass.PriceUpdate.COLUMN_NAME_OLD_PRICE + " DOUBLE NOT NULL, " +
+					ContractClass.PriceUpdate.COLUMN_NAME_NEW_PRICE + " DOUBLE NOT NULL" +
+					")";
+
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -60,10 +70,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Log.d(LOG_DB, PRODUCT_TABLE_CREATE);
 		Log.d(LOG_DB, CHECKS_TABLE_CREATE);
 		Log.d(LOG_DB, EMPLOYEE_TABLE_CREATE);
+		Log.d(LOG_DB, PRICE_UPDATE_TABLE_CREATE);
 
 		db.execSQL(PRODUCT_TABLE_CREATE);
 		db.execSQL(CHECKS_TABLE_CREATE);
 		db.execSQL(EMPLOYEE_TABLE_CREATE);
+		db.execSQL(PRICE_UPDATE_TABLE_CREATE);
 	}
 
 	@Override
