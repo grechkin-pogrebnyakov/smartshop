@@ -16,19 +16,10 @@ public class Product implements Parcelable, ItemForProductAdapter {
     private String productBarcode;
     private int count;
     private long id;
+    private long priceId;
 
 
-    public Product(String productName, String descriptionProduct, String photoPath, double priceSellingProduct, double pricePurchaseProduct, String productBarcode, int count) {
-        this.productName = productName;
-        this.descriptionProduct = descriptionProduct;
-        this.photoPath = photoPath;
-        this.productBarcode = productBarcode;
-        this.count = count;
-        this.priceSellingProduct = priceSellingProduct;
-        this.pricePurchaseProduct = pricePurchaseProduct;
-    }
-
-    public Product(String productName, String descriptionProduct, String photoPath, double priceSellingProduct, double pricePurchaseProduct, String productBarcode, int count, long id) {
+    public Product(String productName, String descriptionProduct, String photoPath, double priceSellingProduct, double pricePurchaseProduct, String productBarcode, int count, long id, long priceId) {
         this.productName = productName;
         this.descriptionProduct = descriptionProduct;
         this.photoPath = photoPath;
@@ -37,6 +28,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
         this.priceSellingProduct = priceSellingProduct;
         this.pricePurchaseProduct = pricePurchaseProduct;
         this.id = id;
+        this.priceId = priceId;
     }
 
     public Product(Parcel source) {
@@ -48,6 +40,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
         productBarcode = source.readString();
         count = source.readInt();
         id = source.readLong();
+        priceId = source.readLong();
     }
 
     public String getProductBarcode() {
@@ -75,7 +68,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
     }
 
     public Check getCheck () {
-        return new Check(productName, photoPath, priceSellingProduct, pricePurchaseProduct, id, count);
+        return new Check(productName, photoPath, priceSellingProduct, pricePurchaseProduct, id, priceId, count);
     }
 
     public double getPricePurchaseProduct() {
@@ -133,6 +126,7 @@ public class Product implements Parcelable, ItemForProductAdapter {
         dest.writeString(productBarcode);
         dest.writeInt(count);
         dest.writeLong(id);
+        dest.writeLong(priceId);
     }
 
     public static final Parcelable.Creator<Product> CREATOR = new Creator<Product>() {

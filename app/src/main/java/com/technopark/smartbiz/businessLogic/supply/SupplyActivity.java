@@ -163,7 +163,7 @@ public class SupplyActivity extends AppCompatActivity implements HttpsHelper.Htt
 		try {
 			for (ItemForProductAdapter check : adapter.getListItems()) {
 
-				tempCheck.put("item_id", ((Check) check).getIdFromProductsTable());
+				tempCheck.put("price_id", ((Check) check).getPriceId());
 				tempCheck.put("count", check.getCount());
 
 				tempArray.put(tempCheck);
@@ -197,7 +197,8 @@ public class SupplyActivity extends AppCompatActivity implements HttpsHelper.Htt
 					.getColumnIndex(ContractClass.Products.PRICE_COST));
 			int countProduct = cursor.getInt(cursor.getColumnIndex(ContractClass.Products._COUNT));
 			long id = cursor.getLong(cursor.getColumnIndex(ContractClass.Products._ID));
-			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, countProduct);
+			long priceId = cursor.getLong(cursor.getColumnIndex(ContractClass.Products.PRICE_ID));
+			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, priceId, countProduct);
 			showDialog(check);
 		}
 		else {

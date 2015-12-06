@@ -25,7 +25,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					ContractClass.Products.PRICE_SELLING + " DOUBLE, " +
 					ContractClass.Products.PRICE_COST + " DOUBLE, " +
 					ContractClass.Products.DESCRIPTION + " TEXT, " +
-					ContractClass.Products._COUNT + " INTEGER" +
+					ContractClass.Products._COUNT + " INTEGER, " +
+					ContractClass.Products.PRICE_ID + " INTEGER" +
 					");";
 
 	private static final String CHECKS_TABLE_CREATE =
@@ -38,7 +39,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					ContractClass.Сhecks.PRICE_SELLING + " DOUBLE, " +
 					ContractClass.Сhecks.PRICE_COST + " DOUBLE, " +
 					ContractClass.Сhecks._COUNT + " INTEGER, " +
-					ContractClass.Сhecks.DATE_TIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL" +
+					ContractClass.Сhecks.DATE_TIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, " +
+					ContractClass.Сhecks.PRICE_ID + " INTEGER" +
 					");";
 
 	private static final String EMPLOYEE_TABLE_CREATE =
@@ -48,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					ContractClass.Employees.COLUMN_NAME_FIRST_NAME + " TEXT NOT NULL, " +
 					ContractClass.Employees.COLUMN_NAME_LAST_NAME + " TEXT NOT NULL, " +
 					ContractClass.Employees.COLUMN_NAME_FATHER_NAME + " TEXT, " +
-					ContractClass.Employees.COLUMN_NAME_LOGIN + " TEXT NOT NULL " +
+					ContractClass.Employees.COLUMN_NAME_LOGIN + " TEXT NOT NULL" +
 					")";
 
 	private static final String PRICE_UPDATE_TABLE_CREATE =
