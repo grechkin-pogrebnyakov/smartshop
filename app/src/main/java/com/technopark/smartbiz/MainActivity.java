@@ -274,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		mainChart.setVisibility(View.GONE);
 		goToAddProduct.setVisibility(View.GONE);
 		editShopProfileButton.setVisibility(View.GONE);
-		supplyButton.setVisibility(View.GONE);
 		employeesButton.setVisibility(View.GONE);
 		employeeRegistrationButton.setVisibility(View.GONE);
 	}
