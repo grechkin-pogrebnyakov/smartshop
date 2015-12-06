@@ -21,7 +21,7 @@ from  django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import authentication, permissions
 from django.conf import settings
-from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer,ShopItem_updateSerializer, ShopItemUpdatePriceSerializer
+from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer,ShopItemUpdateSerializer
 import logging
 from my_utils import get_client_ip
 import datetime
@@ -71,33 +71,21 @@ class Item(GenericAPIView):
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer.save(owner=self.request.user)
-        return Response({'id': serializer.data.get("id")},status=status.HTTP_201_CREATED)
+        return Response({'id': serializer.data.get("id"),'price_id':serializer.price_id},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         pass
+
 
 class Item_update(GenericAPIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = ShopItem_updateSerializer
+    serializer_class = ShopItemUpdateSerializer
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
-        return Response({'id': serializer.data.get("id")},status=status.HTTP_201_CREATED)
-    def get_queryset(self):
-        pass
-
-class Item_price_update(GenericAPIView):
-    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = ShopItemUpdatePriceSerializer
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer.save()
-        return Response({'id': serializer.data.get("id")},status=status.HTTP_201_CREATED)
+        return Response({'response': 'success'},status=status.HTTP_200_OK)
     def get_queryset(self):
         pass
 
@@ -120,8 +108,7 @@ class CheckView(ListCreateAPIView):
             cshop = request.user.profile.oShop
         else:
             cshop = request.user.profile.shop
-        userProfs = User.objects.filter(Q(profile__shop=cshop) | Q(profile__oShop=cshop))
-        checks = Check.objects.filter(creation_time__range=[time1,time2], author__in=userProfs, type=type)
+        checks = Check.objects.filter(creation_time__range=[time1,time2], shop=cshop, type=type)
         serializer = self.get_serializer(checks, many=True)
         return Response({'response':serializer.data})
 

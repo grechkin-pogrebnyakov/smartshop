@@ -11,7 +11,6 @@ urlpatterns = patterns('',
     url(r'^check/add/$',views.CheckView.as_view()),
     url(r'^check/list/$',views.CheckView.as_view()),
     url(r'^item/update/$',views.Item_update.as_view()),
-    url(r'^item/update/price/$',views.Item_price_update.as_view()),
 
     url(r'^api-token-auth', t_v.obtain_auth_token),
     #url(r'^items/',include())
