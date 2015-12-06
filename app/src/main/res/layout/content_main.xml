@@ -137,6 +137,17 @@
                 android:textStyle="bold"
                 />
 
+            <Button
+                android:id="@+id/content_main_button_price_update"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/content_main_button_sync"
+                android:layout_marginTop="16dp"
+                android:text="@string/content_main_button_price_update"
+                android:textStyle="bold"
+                />
+
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>

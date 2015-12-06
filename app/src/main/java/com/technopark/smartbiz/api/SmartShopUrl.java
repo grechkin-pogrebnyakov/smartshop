@@ -97,4 +97,17 @@ public final class SmartShopUrl {
 			private Check() {}
 		}
 	}
+
+	public static final class Profile {
+
+		private static final String PROFILE = "/profile";
+
+		private static final String REGISTER_DEVICE = "/register_device/";
+
+		private static final String URL_PROFILE = URL_API + PROFILE;
+
+		public static final String URL_REGISTER_DEVICE = URL_PROFILE + REGISTER_DEVICE;
+
+		private Profile() {}
+	}
 }

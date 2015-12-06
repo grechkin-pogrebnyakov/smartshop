@@ -24,6 +24,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
+import com.technopark.smartbiz.businessLogic.changesPriceList.ListChangesPriceActivity;
 import com.technopark.smartbiz.businessLogic.discard.DiscardActivity;
 import com.technopark.smartbiz.businessLogic.employees.EmployeeListActivity;
 import com.technopark.smartbiz.businessLogic.employees.EmployeeRegistrationActivity;
@@ -268,6 +269,16 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 						.execute(HttpsHelper.Method.GET);
 			}
 		});
+
+		Button priceUpdate = (Button) findViewById(R.id.content_main_button_price_update);
+		priceUpdate.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), ListChangesPriceActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivity(intent);
+			}
+		});
 	}
 
 	private void retainElementsForEmployee() {
@@ -312,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
 					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
 
-					databaseHelper.dropTable(ContractClass.Сhecks.TABLE_NAME);
+					databaseHelper.dropTable(ContractClass.Products.TABLE_NAME);
 
 					JSONArray products = jsonObject.getJSONArray(HttpsHelper.RESPONSE);
 					for (int i = 0; i < products.length(); ++i) {
