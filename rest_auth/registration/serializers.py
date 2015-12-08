@@ -6,6 +6,10 @@ from requests.exceptions import HTTPError
 
 from userManage.models import User, UserProfile, Shop
 from my_utils import generate_password
+import requests
+import logging
+
+log = logging.getLogger('smartshop.log')
 # Import is needed only if we are using social login, in which
 # case the allauth.socialaccount will be declared
 # try:
@@ -157,6 +161,36 @@ class VkRegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(allow_blank=True,default='')
     access_token = serializers.CharField(max_length=255,write_only=True)
 
+    def validate(self, attrs):
+        try:
+            uid = int(attrs['user_id'])
+        except:
+            log.warn("user_id is not int user_id='{0}'".format(attrs['user_id']))
+            raise serializers.ValidationError('user_id is not number')
+        url = 'https://api.vk.com/method/users.get?&access_token={0}'.format(attrs['access_token'])
+        r = requests.get(url)
+        data = r.json()
+        resp = data.get('response')
+        if resp is None:
+            error = data.get('error')
+            log.warn("error vk login: '{0}'".format(error))
+            code = int(error.get('error_code'))
+            if code == 5:
+                raise serializers.ValidationError('wrong access token')
+            elif code == 10:
+                raise serializers.ValidationError('wrong access token: unknown app')
+            else:
+                raise serializers.ValidationError(error)
+        log.info("got data from vk: '{0}'".format(resp))
+        if len(resp) == 0:
+            log.warn("got zero length response from vk: {0}".format(data))
+        user_data = resp[0]
+        if user_data.get('uid') != uid:
+            raise serializers.ValidationError("wrong access token")
+        return attrs
+
+
+
     def create(self, validated_data):
         login = 'vk_user_'+validated_data.get('user_id')
         user = User(username=login,first_name=validated_data.get('first_name'),
@@ -166,7 +200,7 @@ class VkRegisterSerializer(serializers.Serializer):
         oShop = Shop(name=user.username)
         oShop.save()
         profile = UserProfile(accountType='owner', oShop=oShop, user=user, registrationType='vk',
-                              accessToken=validated_data.get('accessToken'))
+                              accessToken=validated_data.get('access_token'))
         profile.save()
         self.user = user
         return user

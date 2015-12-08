@@ -207,7 +207,7 @@ class VkRegisterView(GenericAPIView):
         accessToken = self.serializer.validated_data.get('access_token')
         if (self.user.profile.accessToken != accessToken) :
             self.user.profile.accessToken = accessToken
-            self.user.save()
+            self.user.profile.save()
         log.info("vk login: user '{0}' ip {1}".format(
                 self.user.username, get_client_ip(request)))
         return self.get_response()
