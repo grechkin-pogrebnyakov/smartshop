@@ -72,6 +72,8 @@ class Item(GenericAPIView):
         return Response({'id': serializer.data.get("id"),'price_id':serializer.price_id},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         pass
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 
 class Item_update(GenericAPIView):
@@ -88,8 +90,12 @@ class Item_update(GenericAPIView):
         log.info("updating item: id '{0}' user '{1}' ip {2}".format(
             serializer.validated_data.get('id'),self.request.user.username, get_client_ip(request)))
         return Response({'response': 'success'},status=status.HTTP_200_OK)
+
     def get_queryset(self):
         pass
+
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 
 class ItemListChangePrice(GenericAPIView):
@@ -97,7 +103,7 @@ class ItemListChangePrice(GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ShopItemSerializer
     def get(self,request):
-        tmp_shop = request.user.profile.oShop
+        tmp_shop = request.user.profile.oShop#это говнокод его надо перенести в Item
         if tmp_shop is None :
             shop = request.user.profile.shop
         else:
@@ -105,6 +111,7 @@ class ItemListChangePrice(GenericAPIView):
         items = models.Item.objects.filter(shop=shop, new_price__isnull = False)
         serializer = self.get_serializer(items, many=True)
         return Response({'response':serializer.data})
+
 
 
 class ItemConfirmPriceUpdate(GenericAPIView):
@@ -117,8 +124,8 @@ class ItemConfirmPriceUpdate(GenericAPIView):
 
         if not serializer.is_valid() :
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        items = models.Item.objects.filter(id=serializer.data.get('item_id'))
-        item = items[0]
+
+        item = serializer.validated_data.get('item')
         new_price = item.new_price
         old_price = item.price
         if new_price is None :
@@ -140,6 +147,8 @@ class ItemConfirmPriceUpdate(GenericAPIView):
             item.id, new_price.id,self.request.user.username, get_client_ip(request)))
         return Response({'response': 'success'},status=status.HTTP_200_OK)
 
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 class CheckView(ListCreateAPIView):
     authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
@@ -176,3 +185,6 @@ class CheckView(ListCreateAPIView):
         return Response({'id': serializer.data.get('id')},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         return None
+
+    def get_serializer_context(self):
+        return {'request': self.request}
