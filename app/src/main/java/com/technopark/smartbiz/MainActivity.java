@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -21,6 +20,12 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
@@ -60,8 +65,9 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 	private AccessControl accessControl;
 	private LineChart mainChart;
-	private Button logOut, purchaseButton, showProductsButton, discardButton,
-			goToAddProduct, editShopProfileButton, supplyButton, employeesButton, employeeRegistrationButton;
+
+
+	private Drawer drawer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +88,135 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		// Start IntentService to register this application with GCM.
 		Intent intent = new Intent(this, RegistrationIntentService.class);
 		startService(intent);
+
+		setupDrawer();
+	}
+
+	private void setupDrawer() {
+		drawer = new DrawerBuilder()
+				.withActivity(this)
+				.addDrawerItems(
+						new PrimaryDrawerItem().withName("Home"),
+						new DividerDrawerItem(),
+						new SecondaryDrawerItem().withName("Список продуктов").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent show = new Intent(getApplicationContext(), ListAddedProducts.class);
+								startActivity(show);
+
+								return true;
+							}
+						}),
+						new SecondaryDrawerItem().withName("Добавить продукт").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
+								startActivity(goAddProduct);
+
+								return true;
+							}
+						}),
+						new DividerDrawerItem(),
+						new SecondaryDrawerItem().withName("Продать").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent intent = new Intent(MainActivity.this, CheckActivity.class);
+								startActivity(intent);
+
+								return true;
+							}
+						}),
+						new SecondaryDrawerItem().withName("Поставка").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent intent = new Intent(getApplicationContext(), SupplyActivity.class);
+								startActivity(intent);
+
+								return true;
+							}
+						}),
+						new SecondaryDrawerItem().withName("Списание").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent intent = new Intent(getApplicationContext(), DiscardActivity.class);
+								startActivity(intent);
+								return true;
+							}
+						}),
+						new DividerDrawerItem(),
+						new SecondaryDrawerItem().withName("Список сотрудников").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent intent = new Intent(getApplicationContext(), EmployeeListActivity.class);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+								startActivity(intent);
+
+								return true;
+							}
+						}),
+						new SecondaryDrawerItem().withName("Зарегистрировать сотрудника").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent intent = new Intent(getApplicationContext(), EmployeeRegistrationActivity.class);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+								startActivity(intent);
+
+								return true;
+							}
+						}),
+						new DividerDrawerItem(),
+						new SecondaryDrawerItem().withName("Список изменений").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent intent = new Intent(getApplicationContext(), ListChangesPriceActivity.class);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+								startActivity(intent);
+
+								return true;
+							}
+						}),
+						new SecondaryDrawerItem().withName("Профиль магазина").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								Intent show = new Intent(getApplicationContext(), ShopProfileActivity.class);
+								show.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+								startActivity(show);
+
+								return true;
+							}
+						}),
+						new DividerDrawerItem(),
+						new SecondaryDrawerItem().withName("Синхронизировать с сервером").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_LIST, null, productCallback, getApplicationContext())
+										.execute(HttpsHelper.Method.GET);
+
+								// TODO Calculate time
+								new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Check.URL_CHECK_LIST + "?time1=12099242&time2=12209039393&type=0", null, checkCallback, getApplicationContext())
+										.execute(HttpsHelper.Method.GET);
+
+								return true;
+							}
+						}),
+						new SecondaryDrawerItem().withName("Выйти").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+							@Override
+							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+								sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+								sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
+								startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+
+								return true;
+							}
+						})
+				)
+				.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+					@Override
+					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+						return false;
+					}
+				})
+				.build();
 	}
 
 	private void setupChart() {
@@ -133,13 +268,16 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 	@Override
 	public void onBackPressed() {
-		moveTaskToBack(true);
+		if (drawer.isDrawerOpen()) {
+			drawer.closeDrawer();
+		}
+		else {
+			moveTaskToBack(true);
+		}
 	}
 
 	@Override
-	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {
-
-	}
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {}
 
 	@Override
 	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
@@ -166,128 +304,15 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 	private void initializationActivitiElementsForOwner() {
 		// общие элементы
-		logOut = (Button) findViewById(R.id.button_logout);
-		logOut.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
-				sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
-				startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-			}
-		});
-
-		purchaseButton = (Button) findViewById(R.id.content_main_button_purchase);
-		purchaseButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, CheckActivity.class);
-				startActivity(intent);
-			}
-		});
-
-		showProductsButton = (Button) findViewById(R.id.content_main_button_show_products);
-		showProductsButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent show = new Intent(getApplicationContext(), ListAddedProducts.class);
-				startActivity(show);
-			}
-		});
-
-		discardButton = (Button) findViewById(R.id.content_main_button_discarding);
-		discardButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), DiscardActivity.class);
-				startActivity(intent);
-			}
-		});
 
 		//элементы для владельца
 		mainChart = (LineChart) findViewById(R.id.content_main_chart);
 		setupChart();
 		fillChart();
-
-		goToAddProduct = (Button) findViewById(R.id.go_to_add_product);
-		goToAddProduct.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
-				startActivity(goAddProduct);
-			}
-		});
-
-
-		editShopProfileButton = (Button) findViewById(R.id.content_main_button_edit_shop_profile);
-		editShopProfileButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent show = new Intent(getApplicationContext(), ShopProfileActivity.class);
-				show.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(show);
-			}
-		});
-
-		supplyButton = (Button) findViewById(R.id.content_main_button_supply);
-		supplyButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), SupplyActivity.class);
-				startActivity(intent);
-			}
-		});
-
-		employeesButton = (Button) findViewById(R.id.content_main_button_employees);
-		employeesButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), EmployeeListActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(intent);
-			}
-		});
-
-		employeeRegistrationButton = (Button) findViewById(R.id.content_main_button_employee_registration);
-		employeeRegistrationButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), EmployeeRegistrationActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(intent);
-			}
-		});
-
-		Button syncButton = (Button) findViewById(R.id.content_main_button_sync);
-		syncButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_LIST, null, productCallback, getApplicationContext())
-						.execute(HttpsHelper.Method.GET);
-
-				// TODO Calculate time
-				new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Check.URL_CHECK_LIST + "?time1=12099242&time2=12209039393&type=0", null, checkCallback, getApplicationContext())
-						.execute(HttpsHelper.Method.GET);
-			}
-		});
-
-		Button priceUpdate = (Button) findViewById(R.id.content_main_button_price_update);
-		priceUpdate.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), ListChangesPriceActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(intent);
-			}
-		});
 	}
 
 	private void retainElementsForEmployee() {
 		mainChart.setVisibility(View.GONE);
-		goToAddProduct.setVisibility(View.GONE);
-		editShopProfileButton.setVisibility(View.GONE);
-		showProductsButton.setVisibility(View.GONE);
-		employeesButton.setVisibility(View.GONE);
-		employeeRegistrationButton.setVisibility(View.GONE);
 	}
 
 	private class CheckContentObserver extends ContentObserver {

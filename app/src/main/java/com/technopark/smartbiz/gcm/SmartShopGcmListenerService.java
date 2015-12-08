@@ -58,7 +58,7 @@ public class SmartShopGcmListenerService extends GcmListenerService {
 
 		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-				.setSmallIcon(R.drawable.ic_cast_dark)
+				.setSmallIcon(R.drawable.ic_assignment_white_24dp)
 				.setContentTitle("SmartShop")
 				.setContentText(message)
 				.setAutoCancel(true)
