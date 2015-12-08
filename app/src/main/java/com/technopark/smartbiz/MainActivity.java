@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -66,8 +65,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 	private AccessControl accessControl;
 	private LineChart mainChart;
-	private Button logOut, purchaseButton, showProductsButton, discardButton,
-			goToAddProduct, editShopProfileButton, supplyButton, employeesButton, employeeRegistrationButton;
+
 
 	private Drawer drawer;
 
@@ -315,11 +313,6 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 	private void retainElementsForEmployee() {
 		mainChart.setVisibility(View.GONE);
-		goToAddProduct.setVisibility(View.GONE);
-		editShopProfileButton.setVisibility(View.GONE);
-		showProductsButton.setVisibility(View.GONE);
-		employeesButton.setVisibility(View.GONE);
-		employeeRegistrationButton.setVisibility(View.GONE);
 	}
 
 	private class CheckContentObserver extends ContentObserver {
