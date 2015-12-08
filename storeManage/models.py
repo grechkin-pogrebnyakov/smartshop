@@ -18,6 +18,8 @@ class Item(models.Model):
     shop = models.ForeignKey(Shop)
     price = models.OneToOneField('Price', related_name='item')
     new_price = models.OneToOneField('Price', null=True, related_name='i_hate_this_fucking_django')
+    image = models.ImageField(upload_to='media/items')
+    image_hash = models.CharField(max_length=32, blank=True, default='')
 
 
 class Price(models.Model):

@@ -65,7 +65,7 @@ class Item(GenericAPIView):
         if not serializer.is_valid():
             log.warn("error adding item: '{0}' user '{1}' ip {2}".format(
                 serializer.errors,self.request.user.username, get_client_ip(request)))
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(owner=self.request.user)
         log.info("add item: id '{0}' price_id '{1}' user '{2}' ip {3}".format(
             serializer.data.get('id'), serializer.price_id ,self.request.user.username, get_client_ip(request)))

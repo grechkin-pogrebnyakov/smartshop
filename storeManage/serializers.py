@@ -8,7 +8,8 @@ from userManage.utils import send_push_to_workers
 import time,datetime
 from django.forms import model_to_dict
 import logging
-
+from drf_extra_fields.fields import Base64ImageField
+import hashlib
 log = logging.getLogger('smartshop.log')
 
 
@@ -79,6 +80,16 @@ class ShopItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     price_id=serializers.IntegerField(read_only=True)
     new_price=PriceSerializer(read_only=True)
+    image = Base64ImageField(required=False, write_only=True)
+    image_url = serializers.SerializerMethodField('get_image_url2', required=False, read_only=True)
+    image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
+
+    def get_image_url2(self, obj):
+        if obj.image:
+            return obj.image.url
+        else:
+            return ''
+
     def create(self, validated_data):
         owner = validated_data.get('owner')
         oShop = owner.profile.oShop
@@ -98,6 +109,13 @@ class ShopItemSerializer(serializers.Serializer):
         item.productBarcode=validated_data.get("productBarcode")
         item.shop=oShop
         item.price = price
+        image = validated_data.get('image')
+        if image is not None:
+            item.image.save(image.name, image, save=False)
+            md5 = hashlib.md5()
+            for chunk in image.chunks():
+                md5.update(chunk)
+            item.image_hash = md5.hexdigest()
         item.save()
         price.itemInfo = item
         price.save()
