@@ -8,8 +8,18 @@ from userManage.utils import send_push_to_workers
 import time,datetime
 from django.forms import model_to_dict
 import logging
-from drf_extra_fields.fields import Base64ImageField
+import base64
+import imghdr
+import uuid
+from django.core.files.base import ContentFile
 import hashlib
+
+ALLOWED_IMAGE_TYPES = (
+    "jpeg",
+    "jpg",
+    "png",
+    "gif"
+)
 log = logging.getLogger('smartshop.log')
 
 
@@ -80,9 +90,32 @@ class ShopItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     price_id=serializers.IntegerField(read_only=True)
     new_price=PriceSerializer(read_only=True)
-    image = Base64ImageField(required=False, write_only=True)
+    image = serializers.CharField(required=False, write_only=True)
     image_url = serializers.SerializerMethodField('get_image_url2', required=False, read_only=True)
     image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
+
+    def validate(self, attrs):
+        base64_data = attrs.get('image')
+        if base64_data is not None:
+            try:
+                decoded_file = base64.b64decode(base64_data)
+            except TypeError:
+                raise serializers.ValidationError("Please upload a valid image.")
+            # Generate file name:
+            file_name = str(uuid.uuid4())[:12]  # 12 characters are more than enough.
+            # Get the file name extension:
+            file_extension = self.get_file_extension(file_name, decoded_file)
+            if file_extension not in ALLOWED_IMAGE_TYPES:
+                raise serializers.ValidationError("The type of the image couldn't been determined.")
+            complete_file_name = file_name + "." + file_extension
+            data = ContentFile(decoded_file, name=complete_file_name)
+            attrs['image'] = data
+        return attrs
+
+    def get_file_extension(self, filename, decoded_file):
+        extension = imghdr.what(filename, decoded_file)
+        extension = "jpg" if extension == "jpeg" else extension
+        return extension
 
     def get_image_url2(self, obj):
         if obj.image:
