@@ -85,7 +85,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 		try {
 			for (Check check : checkArrayList) {
 
-				tempCheck.put("item_id", check.getIdFromProductsTable());
+				tempCheck.put("price_id", check.getPriceId());
 				tempCheck.put("count", check.getCount());
 
 				tempArray.put(tempCheck);
@@ -172,6 +172,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 			mNewValues.put(ContractClass.Сhecks.PRICE_SELLING, check.getPriceSellingProduct());
 			mNewValues.put(ContractClass.Сhecks.PRICE_COST, check.getPricePurchaseProduct());
 			mNewValues.put(ContractClass.Сhecks._COUNT, check.getCount());
+			mNewValues.put(ContractClass.Сhecks.PRICE_ID, check.getPriceId());
 
 			mNewUri = getContentResolver().insert(
 					SmartShopContentProvider.CHECKS_CONTENT_URI,   // the user dictionary content URI

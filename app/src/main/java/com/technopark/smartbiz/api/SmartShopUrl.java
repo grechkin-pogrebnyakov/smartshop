@@ -65,12 +65,16 @@ public final class SmartShopUrl {
 			private static final String ADD = "/add/";
 			private static final String LIST = "/list/";
 			private static final String EDIT = "/update/";
+			private static final String CHANGE_PRICE_LIST = "/change_price_list/";
+			private static final String CONFIRM_PRICE_UPDATE = "/confirm_price_update/";
 
 			private static final String URL_ITEM = URL_SHOP + ITEM;
 
 			public static final String URL_ITEM_ADD = URL_ITEM + ADD;
 			public static final String URL_ITEM_LIST = URL_ITEM + LIST;
 			public static final String URL_ITEM_EDIT = URL_ITEM + EDIT;
+			public static final String URL_CHANGE_PRICE_LIST = URL_ITEM + CHANGE_PRICE_LIST;
+			public static final String URL_CONFIRM_PRICE_UPDATE = URL_ITEM + CONFIRM_PRICE_UPDATE;
 
 			private Item() {}
 		}

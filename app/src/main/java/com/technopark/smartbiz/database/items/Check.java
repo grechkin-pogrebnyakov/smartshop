@@ -16,13 +16,15 @@ public class Check implements Parcelable, ItemForProductAdapter {
 	private double priceSellingProduct;
 	private double pricePurchaseProduct;
 	private long idFromProductsTable;
+	private long priceId;
 	private int count;
 
 
-	public Check(String productName, String photoPath, double priceSellingProduct, double pricePurchaseProduct, long idFromProductsTable, int count) {
+	public Check(String productName, String photoPath, double priceSellingProduct, double pricePurchaseProduct, long idFromProductsTable, long priceId, int count) {
 		this.productName = productName;
 		this.photoPath = photoPath;
 		this.idFromProductsTable = idFromProductsTable;
+		this.priceId = priceId;
 		this.count = count;
 		this.priceSellingProduct = priceSellingProduct;
 		this.pricePurchaseProduct = pricePurchaseProduct;
@@ -34,6 +36,7 @@ public class Check implements Parcelable, ItemForProductAdapter {
 		priceSellingProduct = source.readDouble();
 		pricePurchaseProduct = source.readDouble();
 		idFromProductsTable = source.readLong();
+		priceId = source.readLong();
 		count = source.readInt();
 	}
 
@@ -97,6 +100,7 @@ public class Check implements Parcelable, ItemForProductAdapter {
 		dest.writeDouble(priceSellingProduct);
 		dest.writeDouble(pricePurchaseProduct);
 		dest.writeLong(idFromProductsTable);
+		dest.writeLong(priceId);
 		dest.writeInt(count);
 	}
 
@@ -111,4 +115,12 @@ public class Check implements Parcelable, ItemForProductAdapter {
 			return new Check[size];
 		}
 	};
+
+	public long getPriceId() {
+		return priceId;
+	}
+
+	public void setPriceId(long priceId) {
+		this.priceId = priceId;
+	}
 }

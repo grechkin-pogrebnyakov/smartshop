@@ -263,9 +263,11 @@ public class AddProductActivity extends AppCompatActivity implements HttpsHelper
 		try {
 			if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
 				int id = jsonObject.getInt("id");
+				int priceId = jsonObject.getInt("price_id");
 
 				ContentValues contentValues = new ContentValues();
 				contentValues.put("_id", id);
+				contentValues.put(ContractClass.Products.PRICE_ID, priceId);
 
 				getContentResolver().update(
 						SmartShopContentProvider.PRODUCTS_CONTENT_URI,

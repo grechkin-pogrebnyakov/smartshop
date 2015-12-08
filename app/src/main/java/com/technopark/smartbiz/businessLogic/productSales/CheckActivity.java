@@ -172,7 +172,8 @@ public class CheckActivity extends AppCompatActivity {
 					.getColumnIndex(ContractClass.Products.PRICE_COST));
 			int countProduct = cursor.getInt(cursor.getColumnIndex(ContractClass.Products._COUNT));
 			long id = cursor.getLong(cursor.getColumnIndex(ContractClass.Products._ID));
-			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, countProduct);
+			long priceId = cursor.getLong(cursor.getColumnIndex(ContractClass.Products.PRICE_ID));
+			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, priceId, countProduct);
 			showDialog(check);
 		} else {
 			Toast.makeText(getApplicationContext(), "Продукт не найден !",

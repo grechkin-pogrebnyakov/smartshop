@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		};
 
 		Cursor cursor = db
-				.query(ContractClass.Сhecks.TABLE_NAME, columns, null, null, ContractClass.Сhecks.DATE_TIME, null, null);
+				.query(ContractClass.Сhecks.TABLE_NAME, columns, null, null, "date", null, null);
 
 		ArrayList<Entry> entries = new ArrayList<>();
 		ArrayList<String> labels = new ArrayList<>();
@@ -332,11 +332,14 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 						String productName = product.getString("productName");
 						String descriptionProduct = product.getString("descriptionProduct");
-						String priceSellingProduct = product.getString("priceSellingProduct");
-						String pricePurchaseProduct = product.getString("pricePurchaseProduct");
 						String productBarcode = product.getString("productBarcode");
 						String count = product.getString("count");
 						String id = product.getString("id");
+						String priceId = product.getString("price_id");
+
+						JSONObject price = product.getJSONObject("price");
+						String priceSellingProduct = price.getString("priceSellingProduct");
+						String pricePurchaseProduct = price.getString("pricePurchaseProduct");
 
 						ContentValues contentValues = new ContentValues();
 
@@ -347,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 						contentValues.put(ContractClass.Products.BARCODE, productBarcode);
 						contentValues.put(ContractClass.Products._COUNT, count);
 						contentValues.put(ContractClass.Products._ID, id);
+						contentValues.put(ContractClass.Products.PRICE_ID, priceId);
 
 						getContentResolver().insert(SmartShopContentProvider.PRODUCTS_CONTENT_URI, contentValues);
 					}
@@ -389,8 +393,10 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 							String itemId = check.getString("item_id");
 							String count = check.getString("count");
-							String priceSellingProduct = check.getString("priceSellingProduct");
-							String pricePurchaseProduct = check.getString("pricePurchaseProduct");
+
+							JSONObject price = check.getJSONObject("price");
+							String priceSellingProduct = price.getString("priceSellingProduct");
+							String pricePurchaseProduct = price.getString("pricePurchaseProduct");
 
 							ContentValues contentValues = new ContentValues();
 
