@@ -21,6 +21,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
@@ -82,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		// Start IntentService to register this application with GCM.
 		Intent intent = new Intent(this, RegistrationIntentService.class);
 		startService(intent);
+
+		new DrawerBuilder().withActivity(this).build();
 	}
 
 	private void setupChart() {
@@ -137,9 +140,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 	}
 
 	@Override
-	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {
-
-	}
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {}
 
 	@Override
 	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
