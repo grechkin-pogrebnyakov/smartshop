@@ -58,8 +58,8 @@ class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
             data['new_price'] = new_price
         except ObjectDoesNotExist:
             log.warn("attempt to confirm update of not existed item: '{0}' user '{1}' ip {2}".format(
-                    data['item_id'], user.username, get_client_ip(request)))
-            raise serializers.ValidationError({'item_id': 'no item existing'})
+                data['item_id'], user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'item_id': 'item not exist'})
         return data
 
     def create(self, validated_data):
@@ -105,7 +105,9 @@ class ShopItemUpdateSerializer(serializers.Serializer):
                 raise serializers.ValidationError({"id": "item is not yours"})
             data['item'] = item
         except ObjectDoesNotExist:
-            raise serializers.ValidationError({'error': 'no item existing'})
+            log.warn("attempt to update not existed item: '{0}' user '{1}' ip {2}".format(
+                data['id'], user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'id': 'item not exist'})
         return data
 
     def create(self,validated_data):
@@ -160,10 +162,13 @@ class ShopItemSerializer(serializers.Serializer):
     new_price = PriceSerializer(read_only=True)
 
     def validate(self, data):
-        oShop = self.context['request'].user.profile.oShop
-        if oShop==None:
+        request = self.context['request']
+        user = request.user
+        shop = user.profile.oShop
+        if shop is None:
+            log.warn("worker attempts to create item: user '{0}' ip {1}".format(user.username, get_client_ip(request)))
             raise serializers.ValidationError({"user": "not shop owner"})
-        data['shop']=oShop
+        data['shop']=shop
         return data
 
     def create(self, validated_data):
@@ -204,25 +209,37 @@ class CheckSerializer(serializers.Serializer):
     creation_time=serializers.DateTimeField(read_only=True)
 
     def validate(self, data):
+        request = self.context['request']
+        user = request.user
         if int(data['type']) not in [0, 1, 2]:
+            log.warn("unsupported check type: '{0}' user '{1}' ip {2}".format(
+                data['type'], user.username, get_client_ip(request)))
             raise serializers.ValidationError({'type': 'not allowed'})
-        shop = self.context['request'].user.profile.shop
+        shop = user.profile.shop
         if shop is None :
-            shop = self.context['request'].user.profile.oShop
-        if not shop:
-            raise serializers.ValidationError("no shop found")
-        try:
-            for pos in data.get('check_positions'):
+            shop = user.profile.oShop
+        if shop is None:
+            log.error("user without shop and oShop: id {0} username '{1}' ip {2}".format(
+                user.id, user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'user': "no shop found"})
+        for pos in data.get('check_positions'):
+            try:
                 price = Price.objects.get(id=pos.get('price_id'))
-                if price.is_deleted:
-                    raise serializers.ValidationError({'check_positions': 'price deleted'})
-                item = price.item
-                if item.shop != shop:
-                    raise serializers.ValidationError({'check_positions': 'not your item'})
-                pos['price'] = price
-                pos['item'] = item
-        except ObjectDoesNotExist:
-            raise serializers.ValidationError({'check_positions': 'item not exist'})
+            except ObjectDoesNotExist:
+                log.warn("price not exist: '{0}' user '{1}' ip {2}".format(
+                    pos['price_id'], user.username, get_client_ip(request)))
+                raise serializers.ValidationError({'check_positions': 'item not exist'})
+            if price.is_deleted:
+                log.warn("attempt to create check with deleted price: '{0}' user '{1}' ip {2}".format(
+                    pos['price_id'], user.username, get_client_ip(request)))
+                raise serializers.ValidationError({'check_positions': 'price deleted'})
+            item = price.itemInfo
+            if item.shop != shop:
+                log.warn("attempt to create check with price from other shop: '{0}' user '{1}' ip {2}".format(
+                    pos['price_id'], user.username, get_client_ip(request)))
+                raise serializers.ValidationError({'check_positions': 'not your item'})
+            pos['price'] = price
+            pos['item'] = item
         data['shop'] = shop
         return data
 
