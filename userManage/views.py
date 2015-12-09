@@ -20,7 +20,7 @@ class UserProfileView(ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UserSerializer
 
-    def get(self,request,format=None):
+    def get(self, request, *args, **kwargs):
         profile = request.user
         serializer = self.get_serializer(profile,many=False)
         return Response(serializer.data)
