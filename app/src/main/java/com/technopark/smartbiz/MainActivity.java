@@ -361,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 						String count = product.getString("count");
 						String id = product.getString("id");
 						String priceId = product.getString("price_id");
+						String imageUrl = product.getString("image_url");
 
 						JSONObject price = product.getJSONObject("price");
 						String priceSellingProduct = price.getString("priceSellingProduct");
@@ -376,6 +377,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 						contentValues.put(ContractClass.Products._COUNT, count);
 						contentValues.put(ContractClass.Products._ID, id);
 						contentValues.put(ContractClass.Products.PRICE_ID, priceId);
+						contentValues.put(ContractClass.Products.PHOTO_PATH, imageUrl);
 
 						getContentResolver().insert(SmartShopContentProvider.PRODUCTS_CONTENT_URI, contentValues);
 					}

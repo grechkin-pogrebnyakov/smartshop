@@ -7,7 +7,7 @@ public final class SmartShopUrl {
 
 	private static final String SCHEME = "https://";
 	private static final String HOST = "107.167.191.62";
-	private static final String URL_HOST = SCHEME + HOST;
+	public static final String URL_HOST = SCHEME + HOST;
 
 	private static final String API = "/api";
 	private static final String URL_API = URL_HOST + API;

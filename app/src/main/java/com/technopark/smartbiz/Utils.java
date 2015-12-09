@@ -1,10 +1,15 @@
 package com.technopark.smartbiz;
 
 import android.content.ContentValues;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Iterator;
 
 /**
@@ -53,4 +58,20 @@ public final class Utils {
 		return (responseCode >= 200 && responseCode < 300);
 	}
 
+	public static String imageToBase64String(String photoPath) {
+		String base64String = "";
+		File imageFile = new File(photoPath);
+
+		if (imageFile.exists()) {
+			Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+
+			ByteArrayOutputStream bao = new ByteArrayOutputStream();
+			bitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bao);
+			byte[] bytes = bao.toByteArray();
+			base64String = Base64.encodeToString(bytes, Base64.DEFAULT);
+		}
+
+		return base64String;
+	}
 }

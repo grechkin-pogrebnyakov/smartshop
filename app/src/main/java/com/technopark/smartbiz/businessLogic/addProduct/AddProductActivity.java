@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
@@ -121,6 +122,7 @@ public class AddProductActivity extends AppCompatActivity implements HttpsHelper
 		if (!productId.equals("-1")) {
 			Map<String, String> map = new HashMap<>();
 
+			String imageString = Utils.imageToBase64String(photoPath);
 			// TODO Move product column name to Contract
 			map.put("productName", name);
 			map.put("descriptionProduct", description);
@@ -128,6 +130,7 @@ public class AddProductActivity extends AppCompatActivity implements HttpsHelper
 			map.put("pricePurchaseProduct", priceCostProduct);
 			map.put("productBarcode", barcode);
 			map.put("count", count);
+			map.put("image", imageString);
 
 			final JSONObject productJsonObject = new JSONObject(map);
 
