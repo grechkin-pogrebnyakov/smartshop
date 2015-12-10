@@ -69,7 +69,8 @@ class Item(GenericAPIView):
         serializer.save(owner=self.request.user)
         log.info("add item: id '{0}' price_id '{1}' user '{2}' ip {3}".format(
             serializer.data.get('id'), serializer.price_id ,self.request.user.username, get_client_ip(request)))
-        return Response({'id': serializer.data.get("id"),'price_id':serializer.price_id},status=status.HTTP_201_CREATED)
+        return Response({'id': serializer.data.get("id"),'price_id':serializer.price_id,
+                         'image_hash': serializer.data.get('image_hash')},status=status.HTTP_201_CREATED)
     def get_queryset(self):
         pass
 
@@ -87,7 +88,7 @@ class Item_update(GenericAPIView):
         serializer.save()
         log.info("updating item: id '{0}' user '{1}' ip {2}".format(
             serializer.validated_data.get('id'),self.request.user.username, get_client_ip(request)))
-        return Response({'response': 'success'},status=status.HTTP_200_OK)
+        return Response({'response': 'success', 'image_hash': serializer.data.get('image_hash')}, status=status.HTTP_200_OK)
     def get_queryset(self):
         pass
 

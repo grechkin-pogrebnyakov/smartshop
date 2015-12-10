@@ -41,6 +41,12 @@ def change_price(price, pricePurchaseProduct, priceSellingProduct):
     return new_price
 
 
+def get_file_extension(filename, decoded_file):
+    extension = imghdr.what(filename, decoded_file)
+    extension = "jpg" if extension == "jpeg" else extension
+    return extension
+
+
 class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
     item_id=serializers.IntegerField()
 
@@ -53,6 +59,26 @@ class ShopItemUpdateSerializer(serializers.Serializer):
     productBarcode = serializers.CharField(max_length=255)
     id = serializers.IntegerField()
     price_id = serializers.IntegerField(read_only=True)
+    image = serializers.CharField(required=False, write_only=True)
+    image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
+
+    def validate_image(self, base64_data):
+        if base64_data is not None:
+            try:
+                decoded_file = base64.b64decode(base64_data)
+            except TypeError:
+                raise serializers.ValidationError("Please upload a valid image.")
+            # Generate file name:
+            file_name = str(uuid.uuid4())[:12]  # 12 characters are more than enough.
+            # Get the file name extension:
+            file_extension = get_file_extension(file_name, decoded_file)
+            if file_extension not in ALLOWED_IMAGE_TYPES:
+                raise serializers.ValidationError("The type of the image couldn't been determined.")
+            complete_file_name = file_name + "." + file_extension
+            data = ContentFile(decoded_file, name=complete_file_name)
+        else:
+            data = None
+        return data
 
     def create(self,validated_data):
         items = Item.objects.filter(id=validated_data.get('id'))
@@ -70,6 +96,15 @@ class ShopItemUpdateSerializer(serializers.Serializer):
             push_res = send_push_to_workers(item.shop, 'Внимание! Цены некоторых товаров обновились!')
             if push_res is not None:
                 log.debug(push_res)
+
+        image = validated_data.get('image')
+        if image is not None:
+            item.image.delete()
+            item.image.save(image.name, image, save=False)
+            md5 = hashlib.md5()
+            for chunk in image.chunks():
+                md5.update(chunk)
+            item.image_hash = md5.hexdigest()
         item.save()
         return item
 
@@ -91,11 +126,17 @@ class ShopItemSerializer(serializers.Serializer):
     price_id=serializers.IntegerField(read_only=True)
     new_price=PriceSerializer(read_only=True)
     image = serializers.CharField(required=False, write_only=True)
-    image_url = serializers.SerializerMethodField('get_image_url2', required=False, read_only=True)
+    image_url = serializers.SerializerMethodField('get_image_url_blya', required=False, read_only=True)
     image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
 
-    def validate(self, attrs):
-        base64_data = attrs.get('image')
+# сука, имя get_image_url занято
+    def get_image_url_blya(self, obj):
+        if obj.image:
+            return obj.image.url
+        else:
+            return ''
+
+    def validate_image(self, base64_data):
         if base64_data is not None:
             try:
                 decoded_file = base64.b64decode(base64_data)
@@ -104,24 +145,14 @@ class ShopItemSerializer(serializers.Serializer):
             # Generate file name:
             file_name = str(uuid.uuid4())[:12]  # 12 characters are more than enough.
             # Get the file name extension:
-            file_extension = self.get_file_extension(file_name, decoded_file)
+            file_extension = get_file_extension(file_name, decoded_file)
             if file_extension not in ALLOWED_IMAGE_TYPES:
                 raise serializers.ValidationError("The type of the image couldn't been determined.")
             complete_file_name = file_name + "." + file_extension
             data = ContentFile(decoded_file, name=complete_file_name)
-            attrs['image'] = data
-        return attrs
-
-    def get_file_extension(self, filename, decoded_file):
-        extension = imghdr.what(filename, decoded_file)
-        extension = "jpg" if extension == "jpeg" else extension
-        return extension
-
-    def get_image_url2(self, obj):
-        if obj.image:
-            return obj.image.url
         else:
-            return ''
+            data = None
+        return data
 
     def create(self, validated_data):
         owner = validated_data.get('owner')
