@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.technopark.smartbiz.MainActivity;
+import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.api.HttpsHelper;
@@ -216,8 +216,7 @@ public class DiscardActivity extends AppCompatActivity implements HttpsHelper.Ht
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
-		Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		Intent intent = new Intent(getApplicationContext(), HomeProxyActivity.class);
 		startActivity(intent);
 	}
 

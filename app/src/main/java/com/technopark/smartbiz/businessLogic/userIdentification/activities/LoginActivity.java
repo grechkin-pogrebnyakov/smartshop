@@ -33,7 +33,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.technopark.smartbiz.MainActivity;
+import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
 import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
@@ -162,11 +162,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			@Override
 			public void onClick(View view) {
 				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
-//					mPasswordRepeatView.setVisibility(View.GONE);
-//					registrtionButton.setVisibility(View.GONE);
-//					newAccountButton.setVisibility(View.VISIBLE);
+					//					mPasswordRepeatView.setVisibility(View.GONE);
+					//					registrtionButton.setVisibility(View.GONE);
+					//					newAccountButton.setVisibility(View.VISIBLE);
 					startActionInitiatedByUser(ACTION_REGISTRATION);
-				} else {
+				}
+				else {
 					startActionInitiatedByUser(ACTION_AUTHORIZATION);
 				}
 			}
@@ -432,7 +433,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 				switch (resultActionCode.getInt(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 					case UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS:
-						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+						Intent goMainActivity = new Intent(getApplicationContext(), HomeProxyActivity.class);
 						startActivity(goMainActivity);
 						finish();
 						break;
@@ -460,7 +461,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 				switch (resultActionCode.getInt(UserIdentificationContract.VK_AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_SUCCESS:
-						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+						Intent goMainActivity = new Intent(getApplicationContext(), HomeProxyActivity.class);
 						startActivity(goMainActivity);
 						finish();
 						break;
@@ -488,7 +489,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 				switch (resultActionCode.getInt(UserIdentificationContract.REGISTRATION_RESPONSE_STATUS_KEY)) {
 					case UserIdentificationContract.REGISTRATION_STATUS_SUCCESS:
-						Intent goMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+						Intent goMainActivity = new Intent(getApplicationContext(), HomeProxyActivity.class);
 						startActivity(goMainActivity);
 						finish();
 						break;
@@ -524,10 +525,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					e.printStackTrace();
 				}
 			}
+
 			@Override
 			public void onError(VKError error) {
 				//Do error stuff
 			}
+
 			@Override
 			public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
 				//I don't really believe in progress
@@ -537,7 +540,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void showActivityForAccessStatus(String accessRightIdentificator) {
 		if (accessRightIdentificator.contains(UserIdentificationContract.SUCCESS_AUTHORIZATION)) {
-			startActivity(new Intent(getApplicationContext(), MainActivity.class));
+			startActivity(new Intent(getApplicationContext(), HomeProxyActivity.class));
 			finish();
 		}
 	}

@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.technopark.smartbiz.MainActivity;
+import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
@@ -188,8 +188,7 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
-		Intent submit = new Intent(getApplicationContext(), MainActivity.class);
-		submit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		Intent submit = new Intent(getApplicationContext(), HomeProxyActivity.class);
 		startActivity(submit);
 	}
 

@@ -44,6 +44,10 @@
             android:theme="@style/VK.Transparent"
             />
         <activity
+            android:name=".HomeProxyActivity"
+            android:noHistory="true"
+            />
+        <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar"

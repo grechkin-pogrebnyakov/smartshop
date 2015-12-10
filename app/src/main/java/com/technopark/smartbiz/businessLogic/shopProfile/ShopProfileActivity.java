@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.technopark.smartbiz.MainActivity;
+import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
 
 public class ShopProfileActivity extends AppCompatActivity {
@@ -31,7 +31,7 @@ public class ShopProfileActivity extends AppCompatActivity {
 			public void onClick(View v) {
 				saveData();
 
-				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+				Intent intent = new Intent(getApplicationContext(), HomeProxyActivity.class);
 				startActivity(intent);
 			}
 		});
