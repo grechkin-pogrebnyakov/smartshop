@@ -21,9 +21,8 @@ class GcmIdSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = validated_data.get('user')
         registration_id = validated_data.get('gcm_registration_id')
-        device = None
         devices=GCMDevice.objects.filter(user=user.id)
-        if( len(devices) == 0 ):
+        if len(devices) == 0:
             device = GCMDevice(user=user)
         else:
             device = devices[0]
