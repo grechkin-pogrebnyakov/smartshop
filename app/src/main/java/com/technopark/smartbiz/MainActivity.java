@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +43,8 @@ import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
 import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.Authorization;
+import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.LogOut;
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
@@ -202,10 +206,14 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 						new SecondaryDrawerItem().withName("Выйти").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 							@Override
 							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
-								sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
-								startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-
+//								sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+//								sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
+//								startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+								if (isNetworkConnected()) {
+									new LogOut(UserIdentificationContract.REQUEST_CODE_LOG_OUT_ACTION, getApplicationContext(),
+											MainActivity.this).startLogOut();
+									return true;
+								}
 								return true;
 							}
 						})
@@ -217,6 +225,44 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 					}
 				})
 				.build();
+	}
+
+	@Override
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponse) {
+		switch (requestActionCode) {
+			case UserIdentificationContract.REQUEST_CODE_LOG_OUT_ACTION:
+				logOutResultAction(jsonResponse);
+				break;
+		}
+	}
+
+	private void logOutResultAction(JSONObject resultActionCode) {
+		try {
+			if (resultActionCode.has(UserIdentificationContract.LOG_OUT_RESPONSE_STATUS_KEY)) {
+				switch (resultActionCode.getInt(UserIdentificationContract.LOG_OUT_RESPONSE_STATUS_KEY)) {
+					case UserIdentificationContract.LOGOUT_STATUS_SUCCESS:
+						sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+						sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
+						startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+						break;
+					case UserIdentificationContract.LOGOUT_STATUS_FAIL:
+						sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+						sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
+						startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+						break;
+				}
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean isNetworkConnected() {
+		ConnectivityManager connMgr = (ConnectivityManager)
+				getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		return (networkInfo != null && networkInfo.isConnected());
 	}
 
 	private void setupChart() {
@@ -276,14 +322,12 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		}
 	}
 
-	@Override
-	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {}
 
 	@Override
 	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
 		switch (requestActionCode) {
 			case UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN:
-				initializationActivitiByStatus(accessRightIdentificator);
+				initializationActivityByStatus(accessRightIdentificator);
 				break;
 		}
 	}
@@ -293,8 +337,8 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 	}
 
-	private void initializationActivitiByStatus(String accessRightIdentificator) {
-		initializationActivitiElementsForOwner();
+	private void initializationActivityByStatus(String accessRightIdentificator) {
+		initializationActivityElementsForOwner();
 		switch (accessRightIdentificator) {
 			case UserIdentificationContract.SUCCESS_AUTHORIZATION_EMPLOYEE:
 				retainElementsForEmployee();
@@ -302,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		}
 	}
 
-	private void initializationActivitiElementsForOwner() {
+	private void initializationActivityElementsForOwner() {
 		// общие элементы
 
 		//элементы для владельца
@@ -341,7 +385,8 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback productCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
 		@Override
-		public void onPreExecute() {}
+		public void onPreExecute() {
+		}
 
 		@Override
 		public void onPostExecute(JSONObject jsonObject) {
@@ -392,12 +437,14 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		}
 
 		@Override
-		public void onCancelled() {}
+		public void onCancelled() {
+		}
 	};
 
 	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback checkCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
 		@Override
-		public void onPreExecute() {}
+		public void onPreExecute() {
+		}
 
 		@Override
 		public void onPostExecute(JSONObject jsonObject) {
@@ -450,6 +497,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		}
 
 		@Override
-		public void onCancelled() {}
+		public void onCancelled() {
+		}
 	};
 }

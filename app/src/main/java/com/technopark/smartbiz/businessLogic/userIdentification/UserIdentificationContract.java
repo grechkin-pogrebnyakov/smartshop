@@ -15,6 +15,8 @@ public final class UserIdentificationContract {
 	public static final int REQUEST_CODE_AUTHORIZATION_ACTION = 2;
 	public static final int REQUEST_CODE_CHANGE_PASSWORD_ACTION = 3;
 	public static final int REQUEST_CODE_VK_AUTHORIZATION_ACTION = 4;
+	public static final int REQUEST_CODE_LOG_OUT_ACTION = 5;
+
 
 	public static final int REQUEST_CODE_ACCESS_LOGIN = 3;
 
@@ -50,4 +52,8 @@ public final class UserIdentificationContract {
 	public static final String VK_AUTHORIZATION_FIRST_NAME = "first_name";
 	public static final String VK_AUTHORIZATION_LAST_NAME = "last_name";
 	public static final int VK_AUTHORIZATION_STATUS_CHANGE_PASSWORD = 10;
+
+	public final static int LOGOUT_STATUS_SUCCESS = 11;
+	public final static int LOGOUT_STATUS_FAIL = 12;
+	public final static String LOG_OUT_RESPONSE_STATUS_KEY = "authResponceStatus";
 }

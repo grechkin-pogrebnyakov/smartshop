@@ -56,11 +56,11 @@ public class ChangePasswordActivity extends AppCompatActivity implements Interac
 	}
 
 	@Override
-	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponse) {
 		showProgress(false);
 		switch (requestActionCode) {
 			case UserIdentificationContract.REQUEST_CODE_CHANGE_PASSWORD_ACTION:
-				changePasswordResultAction(jsonResponce);
+				changePasswordResultAction(jsonResponse);
 				break;
 		}
 	}

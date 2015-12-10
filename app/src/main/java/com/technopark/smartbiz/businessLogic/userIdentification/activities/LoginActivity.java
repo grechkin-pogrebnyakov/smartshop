@@ -397,17 +397,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	}
 
 	@Override
-	public void netActionResponse(int requestActionCode, JSONObject jsonResponce) {
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponse) {
 		showProgress(false);
 		switch (requestActionCode) {
 			case UserIdentificationContract.REQUEST_CODE_AUTHORIZATION_ACTION:
-				authorizationResultAction(jsonResponce);
+				authorizationResultAction(jsonResponse);
 				break;
 			case UserIdentificationContract.REQUEST_CODE_REGISTRATION_ACTION:
-				registrationResultAction(jsonResponce);
+				registrationResultAction(jsonResponse);
 				break;
 			case UserIdentificationContract.REQUEST_CODE_VK_AUTHORIZATION_ACTION:
-				vkAuthorizationResultAction(jsonResponce);
+				vkAuthorizationResultAction(jsonResponse);
 				break;
 		}
 	}
