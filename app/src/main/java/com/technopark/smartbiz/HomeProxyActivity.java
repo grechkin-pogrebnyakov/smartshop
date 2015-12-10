@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.technopark.smartbiz.businessLogic.productSales.CheckActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
+import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract.Role;
 
 /**
  * Created by titaevskiy.s on 10.12.15
@@ -33,10 +35,5 @@ public class HomeProxyActivity extends AppCompatActivity {
 
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
-	}
-
-	public enum Role {
-		OWNER,
-		SELLER,
 	}
 }

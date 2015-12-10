@@ -1,8 +1,11 @@
 package com.technopark.smartbiz;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Base64;
 
 import org.json.JSONException;
@@ -74,4 +77,11 @@ public final class Utils {
 
 		return base64String;
 	}
+
+	public static boolean isNetworkEnabled(Context context) {
+		ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		return (networkInfo != null && networkInfo.isConnected());
+	}
+
 }

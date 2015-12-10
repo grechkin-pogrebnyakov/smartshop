@@ -85,17 +85,20 @@
         <activity
             android:name=".businessLogic.productSales.PurchaseActivity"
             android:label="@string/title_activity_purchase"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
             android:name=".businessLogic.productSales.CheckActivity"
             android:label="@string/title_activity_check"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
             android:name=".businessLogic.productSales.PaymentActivity"
             android:label="@string/title_activity_payment"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity

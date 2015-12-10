@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 
-public class CheckActivity extends AppCompatActivity {
+public class CheckActivity extends ActivityWithNavigationDrawer {
 
 	private static int SELECT_PRODUCT = 1;
 	public static String KEY_RESPONCE_OBJECT = "check";
@@ -76,6 +77,10 @@ public class CheckActivity extends AppCompatActivity {
 			}
 		});
 		purchaseDialogFragment.setAddButtonCallback(dialogListener);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 	}
 
 	private void initializationButtons() {
@@ -124,7 +129,8 @@ public class CheckActivity extends AppCompatActivity {
 			case R.id.scan_product:
 				scanBarcode();
 				return false;
-			default: return false;
+			default:
+				return false;
 		}
 	}
 
@@ -175,7 +181,8 @@ public class CheckActivity extends AppCompatActivity {
 			long priceId = cursor.getLong(cursor.getColumnIndex(ContractClass.Products.PRICE_ID));
 			Check check = new Check(nameProduct, photoPath, priceSellingProduct, pricePurchaseProduct, id, priceId, countProduct);
 			showDialog(check);
-		} else {
+		}
+		else {
 			Toast.makeText(getApplicationContext(), "Продукт не найден !",
 					Toast.LENGTH_LONG).show();
 		}

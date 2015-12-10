@@ -7,10 +7,19 @@
     tools:context="com.technopark.smartbiz.businessLogic.productSales.PaymentActivity"
     >
 
+    <android.support.v7.widget.Toolbar
+        android:id="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        />
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
         android:text="@string/textView2"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />

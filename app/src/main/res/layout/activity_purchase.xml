@@ -7,10 +7,19 @@
     tools:context="com.technopark.smartbiz.businessLogic.productSales.PurchaseActivity"
     >
 
+    <android.support.v7.widget.Toolbar
+        android:id="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        />
+
     <ListView
         android:id="@+id/activity_purchase_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/toolbar"
         />
+
 </RelativeLayout>

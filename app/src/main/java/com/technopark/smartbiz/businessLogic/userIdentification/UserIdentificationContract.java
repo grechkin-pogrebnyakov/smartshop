@@ -56,4 +56,11 @@ public final class UserIdentificationContract {
 	public final static int LOGOUT_STATUS_SUCCESS = 11;
 	public final static int LOGOUT_STATUS_FAIL = 12;
 	public final static String LOG_OUT_RESPONSE_STATUS_KEY = "authResponceStatus";
+
+	public enum Role {
+		OWNER,
+		SELLER,
+	}
+
+	private UserIdentificationContract() {}
 }

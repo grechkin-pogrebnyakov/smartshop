@@ -7,11 +7,8 @@ import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -22,29 +19,12 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
-import com.technopark.smartbiz.businessLogic.addProduct.AddProductActivity;
-import com.technopark.smartbiz.businessLogic.changesPriceList.ListChangesPriceActivity;
-import com.technopark.smartbiz.businessLogic.discard.DiscardActivity;
-import com.technopark.smartbiz.businessLogic.employees.EmployeeListActivity;
-import com.technopark.smartbiz.businessLogic.employees.EmployeeRegistrationActivity;
-import com.technopark.smartbiz.businessLogic.productSales.CheckActivity;
-import com.technopark.smartbiz.businessLogic.shopProfile.ShopProfileActivity;
-import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
-import com.technopark.smartbiz.businessLogic.supply.SupplyActivity;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
 import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
-import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.Authorization;
-import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.LogOut;
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
@@ -59,7 +39,7 @@ import java.util.ArrayList;
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 
-public class MainActivity extends AppCompatActivity implements InteractionWithUI {
+public class MainActivity extends ActivityWithNavigationDrawer implements InteractionWithUI {
 
 	public static final String APP_PREFERENCES = "mysettings";
 
@@ -69,9 +49,6 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 	private AccessControl accessControl;
 	private LineChart mainChart;
-
-
-	private Drawer drawer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 
 		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
 		accessControl.displayActivityOfAccessRights();
@@ -92,139 +70,6 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		// Start IntentService to register this application with GCM.
 		Intent intent = new Intent(this, RegistrationIntentService.class);
 		startService(intent);
-
-		setupDrawer();
-	}
-
-	private void setupDrawer() {
-		drawer = new DrawerBuilder()
-				.withActivity(this)
-				.addDrawerItems(
-						new PrimaryDrawerItem().withName("Home"),
-						new DividerDrawerItem(),
-						new SecondaryDrawerItem().withName("Список продуктов").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent show = new Intent(getApplicationContext(), ListAddedProducts.class);
-								startActivity(show);
-
-								return true;
-							}
-						}),
-						new SecondaryDrawerItem().withName("Добавить продукт").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent goAddProduct = new Intent(getApplicationContext(), AddProductActivity.class);
-								startActivity(goAddProduct);
-
-								return true;
-							}
-						}),
-						new DividerDrawerItem(),
-						new SecondaryDrawerItem().withName("Продать").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent intent = new Intent(MainActivity.this, CheckActivity.class);
-								startActivity(intent);
-
-								return true;
-							}
-						}),
-						new SecondaryDrawerItem().withName("Поставка").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent intent = new Intent(getApplicationContext(), SupplyActivity.class);
-								startActivity(intent);
-
-								return true;
-							}
-						}),
-						new SecondaryDrawerItem().withName("Списание").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent intent = new Intent(getApplicationContext(), DiscardActivity.class);
-								startActivity(intent);
-								return true;
-							}
-						}),
-						new DividerDrawerItem(),
-						new SecondaryDrawerItem().withName("Список сотрудников").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent intent = new Intent(getApplicationContext(), EmployeeListActivity.class);
-								intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-								startActivity(intent);
-
-								return true;
-							}
-						}),
-						new SecondaryDrawerItem().withName("Зарегистрировать сотрудника").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent intent = new Intent(getApplicationContext(), EmployeeRegistrationActivity.class);
-								intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-								startActivity(intent);
-
-								return true;
-							}
-						}),
-						new DividerDrawerItem(),
-						new SecondaryDrawerItem().withName("Список изменений").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent intent = new Intent(getApplicationContext(), ListChangesPriceActivity.class);
-								intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-								startActivity(intent);
-
-								return true;
-							}
-						}),
-						new SecondaryDrawerItem().withName("Профиль магазина").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								Intent show = new Intent(getApplicationContext(), ShopProfileActivity.class);
-								show.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-								startActivity(show);
-
-								return true;
-							}
-						}),
-						new DividerDrawerItem(),
-						new SecondaryDrawerItem().withName("Синхронизировать с сервером").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-								new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_LIST, null, productCallback, getApplicationContext())
-										.execute(HttpsHelper.Method.GET);
-
-								// TODO Calculate time
-								new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Check.URL_CHECK_LIST + "?time1=12099242&time2=12209039393&type=0", null, checkCallback, getApplicationContext())
-										.execute(HttpsHelper.Method.GET);
-
-								return true;
-							}
-						}),
-						new SecondaryDrawerItem().withName("Выйти").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-							@Override
-							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-//								sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
-//								sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
-//								startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-								if (isNetworkConnected()) {
-									new LogOut(UserIdentificationContract.REQUEST_CODE_LOG_OUT_ACTION, getApplicationContext(),
-											MainActivity.this).startLogOut();
-									return true;
-								}
-								return true;
-							}
-						})
-				)
-				.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-					@Override
-					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-						return false;
-					}
-				})
-				.build();
 	}
 
 	@Override
@@ -256,13 +101,6 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private boolean isNetworkConnected() {
-		ConnectivityManager connMgr = (ConnectivityManager)
-				getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		return (networkInfo != null && networkInfo.isConnected());
 	}
 
 	private void setupChart() {
@@ -311,17 +149,6 @@ public class MainActivity extends AppCompatActivity implements InteractionWithUI
 		super.onDestroy();
 		getContentResolver().unregisterContentObserver(checkContentObserver);
 	}
-
-	@Override
-	public void onBackPressed() {
-		if (drawer.isDrawerOpen()) {
-			drawer.closeDrawer();
-		}
-		else {
-			moveTaskToBack(true);
-		}
-	}
-
 
 	@Override
 	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
