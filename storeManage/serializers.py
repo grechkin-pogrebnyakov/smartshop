@@ -10,7 +10,18 @@ from django.core.exceptions import ObjectDoesNotExist
 import logging
 from my_utils import get_client_ip
 from userManage.utils import send_push_to_other_workers
+import base64
+import imghdr
+import uuid
+from django.core.files.base import ContentFile
+import hashlib
 
+ALLOWED_IMAGE_TYPES = (
+    "jpeg",
+    "jpg",
+    "png",
+    "gif"
+)
 log = logging.getLogger('smartshop.log')
 
 
@@ -26,8 +37,8 @@ class ShopSerializer(serializers.ModelSerializer):
 def change_price(price, pricePurchaseProduct, priceSellingProduct):
     new_price = Price()
     new_price.itemInfo = price.itemInfo
-    new_price.pricePurchaseProduct=pricePurchaseProduct
-    new_price.priceSellingProduct=priceSellingProduct
+    new_price.pricePurchaseProduct = pricePurchaseProduct
+    new_price.priceSellingProduct = priceSellingProduct
     new_price.save()
     return new_price
 
@@ -37,8 +48,14 @@ def above_zero(num):
         raise serializers.ValidationError("value {0} is below zero".format(num))
 
 
+def get_file_extension(filename, decoded_file):
+    extension = imghdr.what(filename, decoded_file)
+    extension = "jpg" if extension == "jpeg" else extension
+    return extension
+
+
 class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
-    item_id=serializers.IntegerField()
+    item_id = serializers.IntegerField()
 
     def validate(self, data):
         request = self.context['request']
@@ -93,6 +110,26 @@ class ShopItemUpdateSerializer(serializers.Serializer):
     productBarcode = serializers.CharField(max_length=255)
     id = serializers.IntegerField()
     price_id = serializers.IntegerField(read_only=True)
+    image = serializers.CharField(required=False, write_only=True)
+    image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
+
+    def validate_image(self, base64_data):
+        if base64_data is not None:
+            try:
+                decoded_file = base64.b64decode(base64_data)
+            except TypeError:
+                raise serializers.ValidationError("Please upload a valid image.")
+            # Generate file name:
+            file_name = str(uuid.uuid4())[:12]  # 12 characters are more than enough.
+            # Get the file name extension:
+            file_extension = get_file_extension(file_name, decoded_file)
+            if file_extension not in ALLOWED_IMAGE_TYPES:
+                raise serializers.ValidationError("The type of the image couldn't been determined.")
+            complete_file_name = file_name + "." + file_extension
+            data = ContentFile(decoded_file, name=complete_file_name)
+        else:
+            data = None
+        return data
 
     def validate(self, data):
         request = self.context['request']
@@ -112,9 +149,9 @@ class ShopItemUpdateSerializer(serializers.Serializer):
 
     def create(self,validated_data):
         item = validated_data.get("item")
-        item.productName=validated_data.get("productName")
-        item.descriptionProduct=validated_data.get("descriptionProduct")
-        item.productBarcode=validated_data.get("productBarcode")
+        item.productName = validated_data.get("productName")
+        item.descriptionProduct = validated_data.get("descriptionProduct")
+        item.productBarcode = validated_data.get("productBarcode")
         pricePurchaseProduct = validated_data.get("pricePurchaseProduct")
         priceSellingProduct = validated_data.get("priceSellingProduct")
         price = item.price
@@ -139,6 +176,14 @@ class ShopItemUpdateSerializer(serializers.Serializer):
                 push_res = send_push_to_workers(item.shop, 'Внимание! Цены некоторых товаров обновились!')
                 if push_res is not None:
                     log.debug(push_res)
+        image = validated_data.get('image')
+        if image is not None:
+            item.image.delete()
+            item.image.save(image.name, image, save=False)
+            md5 = hashlib.md5()
+            for chunk in image.chunks():
+                md5.update(chunk)
+            item.image_hash = md5.hexdigest()
         item.save()
         return item
 
@@ -160,6 +205,9 @@ class ShopItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     price_id = serializers.IntegerField(read_only=True)
     new_price = PriceSerializer(read_only=True)
+    image = serializers.CharField(required=False, write_only=True)
+    image_url = serializers.SerializerMethodField('get_image_url_blya', required=False, read_only=True)
+    image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
 
     def validate(self, data):
         request = self.context['request']
@@ -169,6 +217,31 @@ class ShopItemSerializer(serializers.Serializer):
             log.warn("worker attempts to create item: user '{0}' ip {1}".format(user.username, get_client_ip(request)))
             raise serializers.ValidationError({"user": "not shop owner"})
         data['shop']=shop
+        return data
+
+# сука, имя get_image_url занято
+    def get_image_url_blya(self, obj):
+        if obj.image:
+            return obj.image.url
+        else:
+            return ''
+
+    def validate_image(self, base64_data):
+        if base64_data is not None:
+            try:
+                decoded_file = base64.b64decode(base64_data)
+            except TypeError:
+                raise serializers.ValidationError("Please upload a valid image.")
+            # Generate file name:
+            file_name = str(uuid.uuid4())[:12]  # 12 characters are more than enough.
+            # Get the file name extension:
+            file_extension = get_file_extension(file_name, decoded_file)
+            if file_extension not in ALLOWED_IMAGE_TYPES:
+                raise serializers.ValidationError("The type of the image couldn't been determined.")
+            complete_file_name = file_name + "." + file_extension
+            data = ContentFile(decoded_file, name=complete_file_name)
+        else:
+            data = None
         return data
 
     def create(self, validated_data):
@@ -183,10 +256,17 @@ class ShopItemSerializer(serializers.Serializer):
         price.startDate = datetime.datetime.now()
         price.save()
         self.price_id = price.id
-        item.descriptionProduct=validated_data.get("descriptionProduct")
-        item.productBarcode=validated_data.get("productBarcode")
-        item.shop=validated_data.get('shop')
+        item.descriptionProduct = validated_data.get("descriptionProduct")
+        item.productBarcode = validated_data.get("productBarcode")
+        item.shop = validated_data.get('shop')
         item.price = price
+        image = validated_data.get('image')
+        if image is not None:
+            item.image.save(image.name, image, save=False)
+            md5 = hashlib.md5()
+            for chunk in image.chunks():
+                md5.update(chunk)
+            item.image_hash = md5.hexdigest()
         item.save()
         price.itemInfo = item
         price.save()
@@ -206,7 +286,7 @@ class CheckSerializer(serializers.Serializer):
     type = serializers.IntegerField()
     author = serializers.CharField(max_length=255,read_only=True)
     shop_id = serializers.IntegerField(read_only=True)
-    creation_time=serializers.DateTimeField(read_only=True)
+    creation_time = serializers.DateTimeField(read_only=True)
 
     def validate(self, data):
         request = self.context['request']
