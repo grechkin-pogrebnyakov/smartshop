@@ -7,12 +7,12 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
@@ -20,7 +20,7 @@ import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.Product;
 
-public class PurchaseActivity extends ActivityWithNavigationDrawer implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PurchaseActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private String DIALOG = "purchaseDialogFragment";
 	public static String KEY_RESPONCE_OBJECT = "check";
@@ -84,7 +84,6 @@ public class PurchaseActivity extends ActivityWithNavigationDrawer implements Lo
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
-		setDrawerToolbar(toolbar);
 	}
 
 	@Override

@@ -8,22 +8,22 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteProductFromListDialogFragment;
-import com.technopark.smartbiz.businessLogic.editProduct.EditProductActivity;
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteProductFromListDialogFragment;
+import com.technopark.smartbiz.businessLogic.editProduct.EditProductActivity;
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Product;
 
 
-public class ListAddedProducts extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+public class ListAddedProducts extends ActivityWithNavigationDrawer implements LoaderManager.LoaderCallbacks<Cursor>,
 		DeleteProductFromListDialogFragment.NoticeDialogListener {
 
 	private ListView listViewAddedProducts;
@@ -42,8 +42,10 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list_added_products);
+
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 
 		mCallbacks = this;
 		// Инициализируем загрузчик с идентификатором '1' и 'mCallbacks'.
@@ -147,6 +149,6 @@ public class ListAddedProducts extends AppCompatActivity implements LoaderManage
 	private void deleteProduct() {
 		String mSelectionClause = "_id = ?";
 		String[] mSelectionArgs = {String.valueOf(product.getId())};
-		getContentResolver().delete(SmartShopContentProvider.PRODUCTS_CONTENT_URI, mSelectionClause, mSelectionArgs );
+		getContentResolver().delete(SmartShopContentProvider.PRODUCTS_CONTENT_URI, mSelectionClause, mSelectionArgs);
 	}
 }

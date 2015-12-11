@@ -8,13 +8,14 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
@@ -28,7 +29,7 @@ import org.json.JSONObject;
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 
-public class ListChangesPriceActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SubmitChangePriceDialogFragment.NoticeDialogListener, HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
+public class ListChangesPriceActivity extends ActivityWithNavigationDrawer implements LoaderManager.LoaderCallbacks<Cursor>, SubmitChangePriceDialogFragment.NoticeDialogListener, HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	private static final int LOADER_ID = 1;
 
@@ -40,6 +41,10 @@ public class ListChangesPriceActivity extends AppCompatActivity implements Loade
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list_changes_price);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 
 		final String[] from = new String[]{
 				ContractClass.PriceUpdate.COLUMN_NAME_PRODUCT_NAME,

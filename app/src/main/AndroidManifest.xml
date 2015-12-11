@@ -56,7 +56,6 @@
         <activity
             android:name=".businessLogic.addProduct.AddProductActivity"
             android:label="@string/title_activity_add_product"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             >
@@ -70,7 +69,6 @@
         <activity
             android:name=".businessLogic.editProduct.EditProductActivity"
             android:label="@string/title_activity_edit_product"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             >
@@ -91,7 +89,6 @@
         <activity
             android:name=".businessLogic.productSales.CheckActivity"
             android:label="@string/title_activity_check"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
@@ -104,34 +101,38 @@
         <activity
             android:name=".businessLogic.shopProfile.ShopProfileActivity"
             android:label="@string/title_activity_shop_profile"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
             android:name=".businessLogic.supply.SupplyActivity"
             android:label="Поставка"
-            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
             android:name=".businessLogic.discard.DiscardActivity"
             android:label="Списание"
-            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
             android:name=".businessLogic.employees.EmployeeListActivity"
             android:label="Список сотрудников"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity
             android:name=".businessLogic.employees.EmployeeRegistrationActivity"
             android:label="Регистрация сотрудника"
+            android:theme="@style/AppTheme.NoActionBar"
             >
         </activity>
         <activity android:name=".businessLogic.userIdentification.activities.ChangePasswordActivity"/>
         <activity
             android:name=".businessLogic.changesPriceList.ListChangesPriceActivity"
             android:label="Список изменений"
+            android:theme="@style/AppTheme.NoActionBar"
             />
 
         <service

@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.api.HttpsHelper;
@@ -38,7 +38,7 @@ import java.util.Map;
 
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
-public class AddProductActivity extends AppCompatActivity implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
+public class AddProductActivity extends ActivityWithNavigationDrawer implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -57,8 +57,6 @@ public class AddProductActivity extends AppCompatActivity implements HttpsHelper
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_product);
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
 
 		photoPath = "";
 
@@ -67,6 +65,9 @@ public class AddProductActivity extends AppCompatActivity implements HttpsHelper
 
 		initializationButtonsListener();
 
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 	}
 
 	private void initializationEditTextFields() {

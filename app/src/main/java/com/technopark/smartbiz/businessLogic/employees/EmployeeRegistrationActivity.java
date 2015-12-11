@@ -4,13 +4,14 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.api.HttpsHelper;
@@ -25,7 +26,7 @@ import java.util.Map;
 
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
-public class EmployeeRegistrationActivity extends AppCompatActivity implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
+public class EmployeeRegistrationActivity extends ActivityWithNavigationDrawer implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	public static final String TEMPORARY_PASSWORD = "TEMPORARY_PASSWORD";
 
@@ -37,6 +38,10 @@ public class EmployeeRegistrationActivity extends AppCompatActivity implements H
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_employee_registration);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 
 		Button submitButton = (Button) findViewById(R.id.activity_employee_registration_button_submit);
 		submitButton.setOnClickListener(new View.OnClickListener() {

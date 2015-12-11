@@ -5,16 +5,17 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.database.ContractClass;
 
-public class EmployeeListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EmployeeListActivity extends ActivityWithNavigationDrawer implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	public static final int LOADER_ID = 0;
 
@@ -24,6 +25,10 @@ public class EmployeeListActivity extends AppCompatActivity implements LoaderMan
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_employee_list);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 
 		final String[] from = new String[]{
 				ContractClass.Employees.COLUMN_NAME_FIRST_NAME,

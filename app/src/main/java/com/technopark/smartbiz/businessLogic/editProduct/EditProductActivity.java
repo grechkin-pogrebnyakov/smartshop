@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,10 +24,10 @@ import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
+import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Product;
-import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
 
 import org.json.JSONObject;
 
@@ -62,6 +61,7 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_product);
+
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
@@ -200,7 +200,7 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 	}
 
 	private int updateRecord(long id, String name, String priceCostProduct, String priceSellingProduct,
-	                         String count, String barcode, String description, String photoPath) {
+			String count, String barcode, String description, String photoPath) {
 		// Defines a new Uri object that receives the result of the insertion
 		int mNewUri;
 
@@ -242,7 +242,6 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 
 		new HttpsHelper.HttpsAsyncTask(SmartShopUrl.Shop.Item.URL_ITEM_EDIT, productJsonObject, this, this)
 				.execute(HttpsHelper.Method.POST);
-
 
 
 		return mNewUri;
