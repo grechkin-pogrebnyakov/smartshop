@@ -182,7 +182,10 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 								.remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)
 								.remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
 
-						startActivity(new Intent(ActivityWithNavigationDrawer.this, LoginActivity.class));
+						final Intent intent = new Intent(ActivityWithNavigationDrawer.this, LoginActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+						startActivity(intent);
 
 						//if (Utils.isNetworkEnabled()) {
 						//	new LogOut(UserIdentificationContract.REQUEST_CODE_LOG_OUT_ACTION, getApplicationContext(), MainActivity.this).startLogOut();
