@@ -60,6 +60,7 @@ public final class UserIdentificationContract {
 	public enum Role {
 		OWNER,
 		SELLER,
+		Error
 	}
 
 	private UserIdentificationContract() {}

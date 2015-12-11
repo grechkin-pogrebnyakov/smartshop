@@ -11,13 +11,11 @@ import com.technopark.smartbiz.businessLogic.userIdentification.activities.Login
  */
 public class AccessControl {
 
-	private Context context;
 	private SharedPreferences sharedPreferences;
 	private InteractionWithUI interactionWithUI;
 	private int requestActionCode;
 
 	public AccessControl(Context context, InteractionWithUI interactionWithUI, int requestActionCode) {
-		this.context = context;
 		this.interactionWithUI = interactionWithUI;
 		this.requestActionCode = requestActionCode;
 		sharedPreferences = context.getSharedPreferences(LoginActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
@@ -29,6 +27,19 @@ public class AccessControl {
 			Log.e("statusAuthorization", statusAuthorization);
 			interactionWithUI.callbackAccessControl(requestActionCode, statusAuthorization);
 		}
+	}
+
+	public static UserIdentificationContract.Role getCurrentUserRole(Context context){
+		SharedPreferences sharedPreferences = context.getSharedPreferences(LoginActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
+		if (sharedPreferences.contains(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)) {
+			switch (sharedPreferences.getString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY, "")){
+				case UserIdentificationContract.SUCCESS_AUTHORIZATION_OWNER:
+					return UserIdentificationContract.Role.OWNER;
+				case UserIdentificationContract.SUCCESS_AUTHORIZATION_EMPLOYEE:
+					return UserIdentificationContract.Role.SELLER;
+			}
+		}
+		return UserIdentificationContract.Role.Error;
 	}
 
 }
