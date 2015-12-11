@@ -12,8 +12,8 @@ class Shop(models.Model):
 
 class Item(models.Model):
     productName = models.CharField(max_length=255)
-    descriptionProduct = models.CharField(max_length=255)
-    productBarcode = models.CharField(max_length=255)
+    descriptionProduct = models.CharField(max_length=255, default='')
+    productBarcode = models.CharField(max_length=255, default='')
     count = models.IntegerField()
     shop = models.ForeignKey(Shop)
     price = models.OneToOneField('Price', related_name='item')

@@ -93,7 +93,7 @@ class ItemUpdate(GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         log.info("updating item: id '{0}' user '{1}' ip {2}".format(
-            serializer.validated_data.get('id'),self.request.user.username, get_client_ip(request)))
+            serializer.validated_data.get('id'), self.request.user.username, get_client_ip(request)))
         return Response({'response': 'success', 'image_hash': serializer.data.get('image_hash')}, status=status.HTTP_200_OK)
 
     def get_serializer_context(self):

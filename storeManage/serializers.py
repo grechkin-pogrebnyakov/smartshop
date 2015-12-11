@@ -103,18 +103,18 @@ class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
 
 
 class ShopItemUpdateSerializer(serializers.Serializer):
-    productName = serializers.CharField(max_length=255)
-    descriptionProduct = serializers.CharField(max_length=255)
-    priceSellingProduct = serializers.FloatField(write_only=True, validators=[above_zero])
-    pricePurchaseProduct = serializers.FloatField(write_only=True, validators=[above_zero])
-    productBarcode = serializers.CharField(max_length=255)
+    productName = serializers.CharField(max_length=255, required=False)
+    descriptionProduct = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    priceSellingProduct = serializers.FloatField(write_only=True, validators=[above_zero], required=False)
+    pricePurchaseProduct = serializers.FloatField(write_only=True, validators=[above_zero], required=False)
+    productBarcode = serializers.CharField(max_length=255, required=False, allow_blank=True)
     id = serializers.IntegerField()
     price_id = serializers.IntegerField(read_only=True)
-    image = serializers.CharField(required=False, write_only=True)
+    image = serializers.CharField(required=False, write_only=True, allow_blank=True)
     image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
 
     def validate_image(self, base64_data):
-        if base64_data is not None:
+        if base64_data is not None and base64_data != '':
             try:
                 decoded_file = base64.b64decode(base64_data)
             except TypeError:
@@ -147,26 +147,36 @@ class ShopItemUpdateSerializer(serializers.Serializer):
             raise serializers.ValidationError({'id': 'item not exist'})
         return data
 
-    def create(self,validated_data):
+    def create(self, validated_data):
         item = validated_data.get("item")
-        item.productName = validated_data.get("productName")
-        item.descriptionProduct = validated_data.get("descriptionProduct")
-        item.productBarcode = validated_data.get("productBarcode")
-        pricePurchaseProduct = validated_data.get("pricePurchaseProduct")
-        priceSellingProduct = validated_data.get("priceSellingProduct")
+        product_name = validated_data.get("productName")
+        if product_name is not None:
+            item.productName = product_name
+        description = validated_data.get("descriptionProduct")
+        if description is not None:
+            item.descriptionProduct = description
+        barcode = validated_data.get("productBarcode")
+        if barcode is not None:
+            item.productBarcode = barcode
+        price_purchase_product = validated_data.get("pricePurchaseProduct")
+        price_selling_product = validated_data.get("priceSellingProduct")
         price = item.price
-        if price.pricePurchaseProduct != pricePurchaseProduct or price.priceSellingProduct != priceSellingProduct:
-            new_price = change_price(price, pricePurchaseProduct, priceSellingProduct)
+        if price_purchase_product is None:
+            price_purchase_product = price.pricePurchaseProduct
+        if price_selling_product is None:
+            price_selling_product = price.priceSellingProduct
+        if price.pricePurchaseProduct != price_selling_product or price.priceSellingProduct != price_selling_product:
+            new_price = change_price(price, price_purchase_product, price_selling_product)
             # хак: если хозяин сначала изменил цену продажи, а потом -- закупки,
             # цена закупки у неподтверждённого ценника тоже меняется, при этом пуши не шлются.
-            if priceSellingProduct == price.priceSellingProduct:
+            if price_selling_product == price.priceSellingProduct:
                 user = self.context['request'].user
                 new_price.changer = user
                 new_price.startDate = datetime.datetime.now()
                 new_price.save()
                 item_new_price = item.new_price
                 if item_new_price is not None:
-                    item_new_price.pricePurchaseProduct = pricePurchaseProduct
+                    item_new_price.pricePurchaseProduct = price_purchase_product
                     item_new_price.save()
                 item.price.is_deleted = True
                 item.price.save()
@@ -196,17 +206,17 @@ class PriceSerializer(serializers.ModelSerializer):
 
 class ShopItemSerializer(serializers.Serializer):
     productName = serializers.CharField(max_length=255)
-    descriptionProduct = serializers.CharField(max_length=255)
+    descriptionProduct = serializers.CharField(max_length=255, required=False, allow_blank=True)
     price = PriceSerializer(read_only=True)
     priceSellingProduct = serializers.FloatField(write_only=True, validators=[above_zero])
     pricePurchaseProduct = serializers.FloatField(write_only=True, validators=[above_zero])
-    productBarcode = serializers.CharField(max_length=255)
+    productBarcode = serializers.CharField(max_length=255, required=False, allow_blank=True)
     count = serializers.IntegerField(validators=[above_zero])
     id = serializers.IntegerField(read_only=True)
     price_id = serializers.IntegerField(read_only=True)
     new_price = PriceSerializer(read_only=True)
-    image = serializers.CharField(required=False, write_only=True)
-    image_url = serializers.SerializerMethodField('get_image_url_blya', required=False, read_only=True)
+    image = serializers.CharField(required=False, write_only=True, allow_blank=True)
+    image_url = serializers.SerializerMethodField('get_image_url_blya', read_only=True)
     image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
 
     def validate(self, data):
@@ -216,7 +226,7 @@ class ShopItemSerializer(serializers.Serializer):
         if shop is None:
             log.warn("worker attempts to create item: user '{0}' ip {1}".format(user.username, get_client_ip(request)))
             raise serializers.ValidationError({"user": "not shop owner"})
-        data['shop']=shop
+        data['shop'] = shop
         return data
 
 # сука, имя get_image_url занято
@@ -227,7 +237,7 @@ class ShopItemSerializer(serializers.Serializer):
             return ''
 
     def validate_image(self, base64_data):
-        if base64_data is not None:
+        if base64_data is not None and base64_data != '':
             try:
                 decoded_file = base64.b64decode(base64_data)
             except TypeError:
@@ -256,8 +266,12 @@ class ShopItemSerializer(serializers.Serializer):
         price.startDate = datetime.datetime.now()
         price.save()
         self.price_id = price.id
-        item.descriptionProduct = validated_data.get("descriptionProduct")
-        item.productBarcode = validated_data.get("productBarcode")
+        description = validated_data.get("descriptionProduct")
+        if description is not None:
+            item.descriptionProduct = description
+        barcode = validated_data.get("productBarcode")
+        if barcode is not None:
+            item.productBarcode = barcode
         item.shop = validated_data.get('shop')
         item.price = price
         image = validated_data.get('image')
