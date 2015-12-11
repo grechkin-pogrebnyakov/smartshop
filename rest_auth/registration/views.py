@@ -117,7 +117,7 @@ class RegisterEmployeeView(GenericAPIView):
         return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def post(self, request, *args, **kwargs):
-        if( not self.request.user.profile.accountType == 'owner' ):
+        if not self.request.user.profile.accountType == 'owner':
             log.warn('worker register request from worker. client_ip {0}, username {1}'.format(get_client_ip(self.request), self.request.user.username))
             return self.get_response_with_errors({'details':'request is not from owner'})
         self.serializer = self.get_serializer(data=request.data)
@@ -131,7 +131,7 @@ class RegisterEmployeeView(GenericAPIView):
         return Response({'login': self.serializer.login, 'temporary_password': self.serializer.password}, status=status.HTTP_201_CREATED)
 
     def get_response_with_errors(self, error = None):
-        if( error is None ):
+        if error is None:
             error = self.serializer.errors
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
@@ -147,7 +147,6 @@ class VkRegisterView(GenericAPIView):
     """
 
     permission_classes = (AllowAny,)
-#    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
     token_model = Token
     response_serializer = TokenSerializer
@@ -160,7 +159,7 @@ class VkRegisterView(GenericAPIView):
         except:
             pass
         devices = GCMDevice.objects.filter(user=self.user)
-        if(len(devices) > 0):
+        if len(devices) > 0:
             device = devices[0]
             device.active = False
             device.save()
@@ -197,28 +196,28 @@ class VkRegisterView(GenericAPIView):
             return self.get_response_with_errors()
         username = 'vk_user_'+self.serializer.validated_data.get('user_id')
         users = User.objects.filter(username = username)
-        if( len(users) == 0 ) :
+        if len(users) == 0:
             self.serializer.save()
         self.login_serializer = LoginSerializer(data={'username':username, 'password':'123456'})
-        if ( not self.login_serializer.is_valid() ):
+        if not self.login_serializer.is_valid():
             log.error("mazafaka!!! {0} ip {1}".format(self.login_serializer.errors, get_client_ip(request)))
             return self.get_error_response()
         self.login()
         accessToken = self.serializer.validated_data.get('access_token')
-        if (self.user.profile.accessToken != accessToken) :
+        if self.user.profile.accessToken != accessToken:
             self.user.profile.accessToken = accessToken
             self.user.profile.save()
         log.info("vk login: user '{0}' ip {1}".format(
                 self.user.username, get_client_ip(request)))
         return self.get_response()
 
-    def get_response_with_errors(self, error = None):
-        if( error is None ):
+    def get_response_with_errors(self, error=None):
+        if error is None:
             error = self.serializer.errors
         return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
-class VerifyEmailView(APIView, ConfirmEmailView):
 
+class VerifyEmailView(APIView, ConfirmEmailView):
     permission_classes = (AllowAny,)
     allowed_methods = ('POST', 'OPTIONS', 'HEAD')
 
@@ -231,30 +230,3 @@ class VerifyEmailView(APIView, ConfirmEmailView):
         confirmation = self.get_object()
         confirmation.confirm(self.request)
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
-
-
-# class SocialLoginView(LoginView):
-#     """
-#     class used for social authentications
-#     example usage for facebook with access_token
-#     -------------
-#     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-#
-#     class FacebookLogin(SocialLoginView):
-#         adapter_class = FacebookOAuth2Adapter
-#     -------------
-#
-#     example usage for facebook with code
-#
-#     -------------
-#     from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-#     from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-#
-#     class FacebookLogin(SocialLoginView):
-#         adapter_class = FacebookOAuth2Adapter
-#          client_class = OAuth2Client
-#          callback_url = 'localhost:8000'
-#     -------------
-#     """
-#
-#     serializer_class = SocialLoginSerializer
