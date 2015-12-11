@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
@@ -20,7 +21,7 @@ import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.Product;
 
-public class PurchaseActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PurchaseActivity extends ActivityWithNavigationDrawer implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private String DIALOG = "purchaseDialogFragment";
 	public static String KEY_RESPONCE_OBJECT = "check";
@@ -84,6 +85,14 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		setArrowDrawerToggle();
 	}
 
 	@Override

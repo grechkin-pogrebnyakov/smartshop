@@ -204,7 +204,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setupDrawerBuilder();
+		setupDrawerBuilder(savedInstanceState);
 	}
 
 	@Override
@@ -230,14 +230,22 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	 * Создание и заполнение дровер-билдера
 	 * Узнаются разрешения текущего пользователя, после чего
 	 * из мапы с итемами дровера выбираются доступные пользователю
+	 * @param savedInstanceState
 	 */
-	private void setupDrawerBuilder() {
+	private void setupDrawerBuilder(Bundle savedInstanceState) {
 		final List<Permission> permissions = AccessControl.getCurrentUserPermissions(this);
 
 		drawerBuilder = new DrawerBuilder()
 				.withActivity(this)
 				.withDisplayBelowStatusBar(true)
-				.addDrawerItems();
+				.withSavedInstance(savedInstanceState)
+				.withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
+					@Override
+					public boolean onNavigationClickListener(View clickedView) {
+						ActivityWithNavigationDrawer.this.finish();
+						return true;
+					}
+				});
 
 		for (Pair<Permission, IDrawerItem> pair : permissionToIDrawerItem) {
 			if (pair.first.equals(Permission.FOR_ALL) || permissions.contains(pair.first)) {
@@ -250,6 +258,13 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 		if (drawerBuilder != null) {
 			drawerBuilder.withToolbar(toolbar)
 					.withActionBarDrawerToggleAnimated(true);
+		}
+	}
+
+	public void setArrowDrawerToggle() {
+		if (drawer != null) {
+			drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 	}
 }

@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
@@ -31,7 +32,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class PaymentActivity extends AppCompatActivity implements TextWatcher, HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
+public class PaymentActivity extends ActivityWithNavigationDrawer implements TextWatcher, HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 
 	private double totalPrice = 0.0f;
 	private double oddMoney = 0.0f;
@@ -79,6 +80,14 @@ public class PaymentActivity extends AppCompatActivity implements TextWatcher, H
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		setArrowDrawerToggle();
 	}
 
 	private void sendToServer(ArrayList<Check> checkArrayList) {
