@@ -158,7 +158,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 							@Override
 							public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 								SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.APP_PREFERENCES, MODE_PRIVATE);
-								;
+
 								sharedPreferences.edit()
 										.remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)
 										.remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
