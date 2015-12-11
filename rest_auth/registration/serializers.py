@@ -8,6 +8,7 @@ from userManage.models import User, UserProfile, Shop
 from my_utils import generate_password
 import requests
 import logging
+from django.db import transaction
 
 log = logging.getLogger('smartshop.log')
 # Import is needed only if we are using social login, in which
@@ -133,24 +134,25 @@ class RegisterEmployeeSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         owner = validated_data.get('owner')
-        oShop = owner.profile.oShop
-        number = len(UserProfile.objects.filter(shop=oShop)) + 1
-        self.login = "{0}_employee_{1}".format(owner.username,number)
-        self.password = generate_password()
-        user = User(username = self.login)
-        user.set_password(self.password)
-        user.last_name = validated_data.get("last_name")
-        user.first_name = validated_data.get("first_name")
-        user.save()
-        profile = UserProfile()
-        father_name = validated_data.get("father_name")
-        if( father_name ):
-            profile.father_name = father_name
-        profile.shop = oShop
-        profile.accountType = 'worker'
-        profile.defaultPassword=True
-        profile.user = user
-        profile.save()
+        with transaction.atomic():
+            oShop = owner.profile.oShop
+            number = len(UserProfile.objects.filter(shop=oShop)) + 1
+            self.login = "{0}_employee_{1}".format(owner.username,number)
+            self.password = generate_password()
+            user = User(username = self.login)
+            user.set_password(self.password)
+            user.last_name = validated_data.get("last_name")
+            user.first_name = validated_data.get("first_name")
+            user.save()
+            profile = UserProfile()
+            father_name = validated_data.get("father_name")
+            if father_name:
+                profile.father_name = father_name
+            profile.shop = oShop
+            profile.accountType = 'worker'
+            profile.defaultPassword = True
+            profile.user = user
+            profile.save()
         return user
 
 

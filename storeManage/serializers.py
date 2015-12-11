@@ -15,6 +15,7 @@ import imghdr
 import uuid
 from django.core.files.base import ContentFile
 import hashlib
+from django.db import transaction
 
 ALLOWED_IMAGE_TYPES = (
     "jpeg",
@@ -83,16 +84,17 @@ class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
         request = self.context['request']
         item = validated_data['item']
         new_price = validated_data['new_price']
-        old_price = item.price
-        old_price.is_deleted = True
-        old_price.save()
         user = validated_data['user']
-        new_price.changer = user
-        new_price.startDate = datetime.datetime.now()
-        new_price.save()
-        item.price = new_price
-        item.new_price = None
-        item.save()
+        with transaction.atomic():
+            old_price = item.price
+            old_price.is_deleted = True
+            old_price.save()
+            new_price.changer = user
+            new_price.startDate = datetime.datetime.now()
+            new_price.save()
+            item.price = new_price
+            item.new_price = None
+            item.save()
         push_res = send_push_to_other_workers(user, "Внимание! В магазине были поменяны ценники. "
                                                     "Цена в приложении изменится автоматически.")
         if push_res is not None:
@@ -149,52 +151,53 @@ class ShopItemUpdateSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         item = validated_data.get("item")
-        product_name = validated_data.get("productName")
-        if product_name is not None:
-            item.productName = product_name
-        description = validated_data.get("descriptionProduct")
-        if description is not None:
-            item.descriptionProduct = description
-        barcode = validated_data.get("productBarcode")
-        if barcode is not None:
-            item.productBarcode = barcode
-        price_purchase_product = validated_data.get("pricePurchaseProduct")
-        price_selling_product = validated_data.get("priceSellingProduct")
-        price = item.price
-        if price_purchase_product is None:
-            price_purchase_product = price.pricePurchaseProduct
-        if price_selling_product is None:
-            price_selling_product = price.priceSellingProduct
-        if price.pricePurchaseProduct != price_selling_product or price.priceSellingProduct != price_selling_product:
-            new_price = change_price(price, price_purchase_product, price_selling_product)
-            # хак: если хозяин сначала изменил цену продажи, а потом -- закупки,
-            # цена закупки у неподтверждённого ценника тоже меняется, при этом пуши не шлются.
-            if price_selling_product == price.priceSellingProduct:
-                user = self.context['request'].user
-                new_price.changer = user
-                new_price.startDate = datetime.datetime.now()
-                new_price.save()
-                item_new_price = item.new_price
-                if item_new_price is not None:
-                    item_new_price.pricePurchaseProduct = price_purchase_product
-                    item_new_price.save()
-                item.price.is_deleted = True
-                item.price.save()
-                item.price = new_price
-            else:
-                item.new_price = new_price
-                push_res = send_push_to_workers(item.shop, 'Внимание! Цены некоторых товаров обновились!')
-                if push_res is not None:
-                    log.debug(push_res)
-        image = validated_data.get('image')
-        if image is not None:
-            item.image.delete()
-            item.image.save(image.name, image, save=False)
-            md5 = hashlib.md5()
-            for chunk in image.chunks():
-                md5.update(chunk)
-            item.image_hash = md5.hexdigest()
-        item.save()
+        with transaction.atomic():
+            product_name = validated_data.get("productName")
+            if product_name is not None:
+                item.productName = product_name
+            description = validated_data.get("descriptionProduct")
+            if description is not None:
+                item.descriptionProduct = description
+            barcode = validated_data.get("productBarcode")
+            if barcode is not None:
+                item.productBarcode = barcode
+            price_purchase_product = validated_data.get("pricePurchaseProduct")
+            price_selling_product = validated_data.get("priceSellingProduct")
+            price = item.price
+            if price_purchase_product is None:
+                price_purchase_product = price.pricePurchaseProduct
+            if price_selling_product is None:
+                price_selling_product = price.priceSellingProduct
+            if price.pricePurchaseProduct != price_selling_product or price.priceSellingProduct != price_selling_product:
+                new_price = change_price(price, price_purchase_product, price_selling_product)
+                # хак: если хозяин сначала изменил цену продажи, а потом -- закупки,
+                # цена закупки у неподтверждённого ценника тоже меняется, при этом пуши не шлются.
+                if price_selling_product == price.priceSellingProduct:
+                    user = self.context['request'].user
+                    new_price.changer = user
+                    new_price.startDate = datetime.datetime.now()
+                    new_price.save()
+                    item_new_price = item.new_price
+                    if item_new_price is not None:
+                        item_new_price.pricePurchaseProduct = price_purchase_product
+                        item_new_price.save()
+                    item.price.is_deleted = True
+                    item.price.save()
+                    item.price = new_price
+                else:
+                    item.new_price = new_price
+                    push_res = send_push_to_workers(item.shop, 'Внимание! Цены некоторых товаров обновились!')
+                    if push_res is not None:
+                        log.debug(push_res)
+            image = validated_data.get('image')
+            if image is not None:
+                item.image.delete()
+                item.image.save(image.name, image, save=False)
+                md5 = hashlib.md5()
+                for chunk in image.chunks():
+                    md5.update(chunk)
+                item.image_hash = md5.hexdigest()
+            item.save()
         return item
 
 
@@ -256,34 +259,35 @@ class ShopItemSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         owner = validated_data.get('owner')
-        item = Item()
-        item.count=validated_data.get("count")
-        item.productName=validated_data.get("productName")
-        price = Price()
-        price.pricePurchaseProduct = validated_data.get("pricePurchaseProduct")
-        price.priceSellingProduct = validated_data.get("priceSellingProduct")
-        price.changer = owner
-        price.startDate = datetime.datetime.now()
-        price.save()
-        self.price_id = price.id
-        description = validated_data.get("descriptionProduct")
-        if description is not None:
-            item.descriptionProduct = description
-        barcode = validated_data.get("productBarcode")
-        if barcode is not None:
-            item.productBarcode = barcode
-        item.shop = validated_data.get('shop')
-        item.price = price
-        image = validated_data.get('image')
-        if image is not None:
-            item.image.save(image.name, image, save=False)
-            md5 = hashlib.md5()
-            for chunk in image.chunks():
-                md5.update(chunk)
-            item.image_hash = md5.hexdigest()
-        item.save()
-        price.itemInfo = item
-        price.save()
+        with transaction.atomic():
+            item = Item()
+            item.count=validated_data.get("count")
+            item.productName=validated_data.get("productName")
+            price = Price()
+            price.pricePurchaseProduct = validated_data.get("pricePurchaseProduct")
+            price.priceSellingProduct = validated_data.get("priceSellingProduct")
+            price.changer = owner
+            price.startDate = datetime.datetime.now()
+            price.save()
+            self.price_id = price.id
+            description = validated_data.get("descriptionProduct")
+            if description is not None:
+                item.descriptionProduct = description
+            barcode = validated_data.get("productBarcode")
+            if barcode is not None:
+                item.productBarcode = barcode
+            item.shop = validated_data.get('shop')
+            item.price = price
+            image = validated_data.get('image')
+            if image is not None:
+                item.image.save(image.name, image, save=False)
+                md5 = hashlib.md5()
+                for chunk in image.chunks():
+                    md5.update(chunk)
+                item.image_hash = md5.hexdigest()
+            item.save()
+            price.itemInfo = item
+            price.save()
         return item
 
 
@@ -341,17 +345,18 @@ class CheckSerializer(serializers.Serializer):
         user = validated_data.get('user')
         type = validated_data.get('type')
         shop = validated_data.get('shop')
-        check = Check(author=user, type=type, shop=shop)
-        check.time = datetime.datetime.now()
-        check.save()
-        for pos in validated_data.get('check_positions'):
-            price = pos['price']
-            item = pos['item']
-            db_count = pos.get('count')
-            position = CheckPosition(item=item, count=db_count, relatedCheck=check, price=price)
-            position.save()
-            if type == 1:
-                db_count = -db_count
-            item.count = item.count-db_count
-            item.save()
+        with transaction.atomic():
+            check = Check(author=user, type=type, shop=shop)
+            check.time = datetime.datetime.now()
+            check.save()
+            for pos in validated_data.get('check_positions'):
+                price = pos['price']
+                item = pos['item']
+                db_count = pos.get('count')
+                position = CheckPosition(item=item, count=db_count, relatedCheck=check, price=price)
+                position.save()
+                if type == 1:
+                    db_count = -db_count
+                item.count = item.count-db_count
+                item.save()
         return check
