@@ -4,7 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.technopark.smartbiz.Permission;
 import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Abovyan on 29.11.15.
@@ -14,6 +21,22 @@ public class AccessControl {
 	private SharedPreferences sharedPreferences;
 	private InteractionWithUI interactionWithUI;
 	private int requestActionCode;
+
+	private static final Map<UserIdentificationContract.Role, List<Permission>> rolePermissionsMap = new HashMap<UserIdentificationContract.Role, List<Permission>>() {{
+		put(
+				UserIdentificationContract.Role.OWNER,
+				Arrays.asList(
+						Permission.OWNER,
+						Permission.SELLER
+				)
+		);
+		put(
+				UserIdentificationContract.Role.SELLER,
+				Collections.singletonList(
+						Permission.SELLER
+				)
+		);
+	}};
 
 	public AccessControl(Context context, InteractionWithUI interactionWithUI, int requestActionCode) {
 		this.interactionWithUI = interactionWithUI;
@@ -29,10 +52,10 @@ public class AccessControl {
 		}
 	}
 
-	public static UserIdentificationContract.Role getCurrentUserRole(Context context){
+	public static UserIdentificationContract.Role getCurrentUserRole(Context context) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(LoginActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
 		if (sharedPreferences.contains(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)) {
-			switch (sharedPreferences.getString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY, "")){
+			switch (sharedPreferences.getString(UserIdentificationContract.STATUS_AUTHORIZATION_KEY, "")) {
 				case UserIdentificationContract.SUCCESS_AUTHORIZATION_OWNER:
 					return UserIdentificationContract.Role.OWNER;
 				case UserIdentificationContract.SUCCESS_AUTHORIZATION_EMPLOYEE:
@@ -42,4 +65,7 @@ public class AccessControl {
 		return UserIdentificationContract.Role.Error;
 	}
 
+	public static List<Permission> getCurrentUserPermissions(Context context) {
+		return rolePermissionsMap.get(getCurrentUserRole(context));
+	}
 }
