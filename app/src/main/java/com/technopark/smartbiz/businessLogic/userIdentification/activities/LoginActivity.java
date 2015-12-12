@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -35,6 +34,7 @@ import android.widget.Toast;
 
 import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
 import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
@@ -69,18 +69,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private final String ACTION_AUTHORIZATION = "authorization";
 	private final String ACTION_REGISTRATION = "registration";
-	private final String ACTION_PASSWORD_CHANGE = "passwordChange";
 	private final String ACTION_VALIDATION = "validation";
-	private SharedPreferences sharedPreferences;
 	private AccessControl accessControl;
 
 	// Ссылки на графические компоненты
-	private AutoCompleteTextView mEmailView;
+	private AutoCompleteTextView mLoginView;
 	private EditText mPasswordView;
 	private EditText mPasswordRepeatView;
 	private View mProgressView;
 	private View mLoginFormView;
-	private Button registrtionButton;
+	private Button buttonRegistration;
 
 	private static final String[] sMyScope = new String[]{
 			VKScope.FRIENDS,
@@ -94,12 +92,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 
-		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
 		accessControl.displayActivityOfAccessRights();
 		// Инициализация приложения...
 		// Инициализируем компоненты формы логина
-		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
+		mLoginView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
 		mPasswordRepeatView = (EditText) findViewById(R.id.login_password_repeat);
 		mPasswordRepeatView.setVisibility(View.GONE);
@@ -115,7 +112,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				return false;
 			}
 		});
-
 		registrationButtons();
 
 		mLoginFormView = findViewById(R.id.login_form);
@@ -134,26 +130,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					case "Новый акаунт":
 						mPasswordRepeatView.setVisibility(View.VISIBLE);
 						newAccountButton.setVisibility(View.GONE);
-						registrtionButton.setVisibility(View.VISIBLE);
+						buttonRegistration.setVisibility(View.VISIBLE);
 						mEmailSignInButton.setText("Зарегистрироваться");
 						break;
 				}
 			}
 		});
 
-		registrtionButton = (Button) findViewById(R.id.login_button_registration);
-		registrtionButton.setVisibility(View.GONE);
-		registrtionButton.setOnClickListener(new OnClickListener() {
+		buttonRegistration = (Button) findViewById(R.id.login_button_registration);
+		buttonRegistration.setVisibility(View.GONE);
+		buttonRegistration.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
 					mPasswordRepeatView.setVisibility(View.GONE);
-					registrtionButton.setVisibility(View.GONE);
+					buttonRegistration.setVisibility(View.GONE);
 					newAccountButton.setVisibility(View.VISIBLE);
 					mEmailSignInButton.setText("Войти");
 				}
 				startActionInitiatedByUser(ACTION_AUTHORIZATION);
-				//startActionInitiatedByUser(ACTION_REGISTRATION);
 			}
 		});
 
@@ -162,9 +157,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			@Override
 			public void onClick(View view) {
 				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
-					//					mPasswordRepeatView.setVisibility(View.GONE);
-					//					registrtionButton.setVisibility(View.GONE);
-					//					newAccountButton.setVisibility(View.VISIBLE);
 					startActionInitiatedByUser(ACTION_REGISTRATION);
 				}
 				else {
@@ -201,12 +193,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			@Override
 			public void onResult(VKAccessToken res) {
 				// Пользователь успешно авторизовался
+				Utils.showProgress(true, mLoginFormView, mProgressView, LoginActivity.this);
 				startVkAuthorization(res.accessToken, res.email, res.userId);
 			}
 
 			@Override
 			public void onError(VKError error) {
 				// Произошла ошибка авторизации (например, пользователь запретил авторизацию)
+				Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 				showToast("Ошибка авторизации !");
 			}
 		})) {
@@ -229,16 +223,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	 * Представляются ошибки и не производиться попытка авторизации.
 	 */
 	private void startActionInitiatedByUser(String action) {
-		//		if (mAuthTask != null) {
-		//			return;
-		//		}
-
 		// Сброс ошибок.
-		mEmailView.setError(null);
+		mLoginView.setError(null);
 		mPasswordView.setError(null);
 
 		// Получаем значения введенные пользователем для попытки авторизации.
-		String email = mEmailView.getText().toString().replace(" ", "");
+		String email = mLoginView.getText().toString().replace(" ", "");
 		String password = mPasswordView.getText().toString();
 		String repeatPassword = mPasswordRepeatView.getVisibility() == View.VISIBLE ? mPasswordRepeatView.getText().toString() : null;
 
@@ -261,13 +251,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 		// Проверка правильности email.
 		if (TextUtils.isEmpty(email)) {
-			mEmailView.setError(getString(R.string.error_field_required));
-			focusView = mEmailView;
+			mLoginView.setError(getString(R.string.error_field_required));
+			focusView = mLoginView;
 			cancel = true;
 		}
 		else if (!isEmailValid(email)) {
-			mEmailView.setError(getString(R.string.error_invalid_email));
-			focusView = mEmailView;
+			mLoginView.setError(getString(R.string.error_invalid_email));
+			focusView = mLoginView;
 			cancel = true;
 		}
 
@@ -279,7 +269,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		else {
 			// Показываем прогресс выполнения задачи аутентификации в background
 			// выполняем попытку входа.
-			showProgress(true);
+			Utils.showProgress(true, mLoginFormView, mProgressView, LoginActivity.this);
 
 			if (isNetworkConnected()) {
 				switch (action) {
@@ -294,7 +284,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				}
 			}
 			else {
-				showProgress(false);
+				Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 				(Toast.makeText(getApplicationContext(), "Отсутствует соединение с интернетом !", Toast.LENGTH_SHORT)).show();
 			}
 		}
@@ -323,43 +313,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		}
 		else {
 			return false;
-		}
-	}
-
-	/**
-	 * Показывает прогресс на пользовательском интерфейсе и закрывается после входа.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-	private void showProgress(final boolean show) {
-		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-		// for very easy animations. If available, use these APIs to fade-in
-		// the progress spinner.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-			int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-			mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-			mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-					show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-				}
-			});
-
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-			mProgressView.animate().setDuration(shortAnimTime).alpha(
-					show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-				}
-			});
-		}
-		else {
-			// The ViewPropertyAnimator APIs are not available, so simply show
-			// and hide the relevant UI components.
-			mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-			mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
 		}
 	}
 
@@ -399,7 +352,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	@Override
 	public void netActionResponse(int requestActionCode, JSONObject jsonResponse) {
-		showProgress(false);
+		Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 		switch (requestActionCode) {
 			case UserIdentificationContract.REQUEST_CODE_AUTHORIZATION_ACTION:
 				authorizationResultAction(jsonResponse);
@@ -438,7 +391,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						finish();
 						break;
 					case UserIdentificationContract.AUTHORIZATION_STATUS_FAIL:
-						showProgress(false);
+						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 						break;
 					case UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD:
 						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
@@ -446,7 +399,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						finish();
 						break;
 					default:
-						showProgress(false);
+						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 				}
 			}
 		}
@@ -466,7 +419,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						finish();
 						break;
 					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_FAIL:
-						showProgress(false);
+						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 						break;
 					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_CHANGE_PASSWORD:
 						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
@@ -474,7 +427,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						finish();
 						break;
 					default:
-						showProgress(false);
+						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 				}
 			}
 		}
@@ -494,10 +447,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 						finish();
 						break;
 					case UserIdentificationContract.REGISTRATION_STATUS_FAIL:
-						showProgress(false);
+						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 						break;
 					default:
-						showProgress(false);
+						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
 				}
 			}
 		}
@@ -508,7 +461,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void startVkAuthorization(final String token, final String email, final String userId) {
 		VKRequest request = VKApi.users().get();
-		final List<String> tempMass = new ArrayList<>();
 		final VkAuthorization vkAuthorization = new VkAuthorization(
 				UserIdentificationContract.REQUEST_CODE_VK_AUTHORIZATION_ACTION,
 				getApplicationContext(), LoginActivity.this);
@@ -561,7 +513,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				new ArrayAdapter<>(LoginActivity.this,
 						android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
-		mEmailView.setAdapter(adapter);
+		mLoginView.setAdapter(adapter);
 	}
 
 

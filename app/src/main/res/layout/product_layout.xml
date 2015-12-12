@@ -38,7 +38,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:layout_marginRight="10dp"
+        android:textSize="@dimen/abc_action_bar_content_inset_material"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -50,5 +52,7 @@
         android:layout_toRightOf="@+id/clap_photo_product"
         android:layout_toEndOf="@+id/clap_photo_product"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:layout_marginRight="10dp"
+        android:textSize="@dimen/abc_action_bar_content_inset_material"
+        />
 </RelativeLayout>

@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.database.ContractClass;
@@ -37,6 +38,9 @@ public class ListChangesPriceActivity extends ActivityWithNavigationDrawer imple
 	private long row_id;
 	private long item_id;
 
+	private View progressView;
+	private View listChangesPriceActionView;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,6 +49,9 @@ public class ListChangesPriceActivity extends ActivityWithNavigationDrawer imple
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		setDrawerToolbar(toolbar);
+
+		progressView = findViewById(R.id.activity_list_changes_price_progress_view);
+		listChangesPriceActionView = findViewById(R.id.activity_list_changes_price_view_action);
 
 		final String[] from = new String[]{
 				ContractClass.PriceUpdate.COLUMN_NAME_PRODUCT_NAME,
@@ -127,7 +134,9 @@ public class ListChangesPriceActivity extends ActivityWithNavigationDrawer imple
 	}
 
 	@Override
-	public void onPreExecute() {}
+	public void onPreExecute() {
+		Utils.showProgress(true, listChangesPriceActionView, progressView, ListChangesPriceActivity.this);
+	}
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
@@ -159,8 +168,9 @@ public class ListChangesPriceActivity extends ActivityWithNavigationDrawer imple
 
 					getContentResolver().insert(ContractClass.PriceUpdate.CONTENT_URI, contentValues);
 				}
+				Utils.showProgress(false, listChangesPriceActionView, progressView, ListChangesPriceActivity.this);
 			}
-
+			Utils.showProgress(false, listChangesPriceActionView, progressView, ListChangesPriceActivity.this);
 			Toast.makeText(getApplicationContext(), "Изменения успешно синхронизированы!", Toast.LENGTH_LONG)
 					.show();
 		}
@@ -170,5 +180,7 @@ public class ListChangesPriceActivity extends ActivityWithNavigationDrawer imple
 	}
 
 	@Override
-	public void onCancelled() {}
+	public void onCancelled() {
+		Utils.showProgress(false, listChangesPriceActionView, progressView, ListChangesPriceActivity.this);
+	}
 }

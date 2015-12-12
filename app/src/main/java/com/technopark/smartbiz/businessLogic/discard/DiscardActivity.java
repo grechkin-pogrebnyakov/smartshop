@@ -18,6 +18,7 @@ import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
@@ -43,6 +44,9 @@ public class DiscardActivity extends ActivityWithNavigationDrawer implements Htt
 	private DatabaseHelper dbHelper;
 	private String DIALOG = "purchaseDialogFragment";
 
+	private View progressView;
+	private View discardActionView;
+
 	private PurchaseDialogFragment purchaseDialogFragment = new PurchaseDialogFragment();
 
 	private DialogFragmentCallback dialogListener = new DialogFragmentCallback() {
@@ -64,6 +68,9 @@ public class DiscardActivity extends ActivityWithNavigationDrawer implements Htt
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		setDrawerToolbar(toolbar);
+
+		progressView = findViewById(R.id.activity_discard_progress_view);
+		discardActionView = findViewById(R.id.activity_discard_view_discard_action);
 
 		dbHelper = new DatabaseHelper(this);
 
@@ -217,14 +224,19 @@ public class DiscardActivity extends ActivityWithNavigationDrawer implements Htt
 	}
 
 	@Override
-	public void onPreExecute() {}
+	public void onPreExecute() {
+		Utils.showProgress(true, discardActionView, progressView, DiscardActivity.this);
+	}
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
 		Intent intent = new Intent(getApplicationContext(), HomeProxyActivity.class);
 		startActivity(intent);
+		Utils.showProgress(false, discardActionView, progressView, DiscardActivity.this);
 	}
 
 	@Override
-	public void onCancelled() {}
+	public void onCancelled() {
+		Utils.showProgress(false, discardActionView, progressView, DiscardActivity.this);
+	}
 }

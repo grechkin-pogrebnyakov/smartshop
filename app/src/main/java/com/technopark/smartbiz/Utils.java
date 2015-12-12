@@ -1,12 +1,17 @@
 package com.technopark.smartbiz;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.util.Base64;
+import android.view.View;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,6 +87,43 @@ public final class Utils {
 		ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 		return (networkInfo != null && networkInfo.isConnected());
+	}
+
+	/**
+	 * Показывает прогресс на пользовательском интерфейсе и закрывается после входа.
+	 */
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+	public static void showProgress(final boolean show, final View formActionView, final View progressBarView, Context context) {
+		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+		// for very easy animations. If available, use these APIs to fade-in
+		// the progress spinner.
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+			int shortAnimTime = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+			formActionView.setVisibility(show ? View.GONE : View.VISIBLE);
+			formActionView.animate().setDuration(shortAnimTime).alpha(
+					show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					formActionView.setVisibility(show ? View.GONE : View.VISIBLE);
+				}
+			});
+
+			progressBarView.setVisibility(show ? View.VISIBLE : View.GONE);
+			progressBarView.animate().setDuration(shortAnimTime).alpha(
+					show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					progressBarView.setVisibility(show ? View.VISIBLE : View.GONE);
+				}
+			});
+		}
+		else {
+			// The ViewPropertyAnimator APIs are not available, so simply show
+			// and hide the relevant UI components.
+			progressBarView.setVisibility(show ? View.VISIBLE : View.GONE);
+			formActionView.setVisibility(show ? View.GONE : View.VISIBLE);
+		}
 	}
 
 }
