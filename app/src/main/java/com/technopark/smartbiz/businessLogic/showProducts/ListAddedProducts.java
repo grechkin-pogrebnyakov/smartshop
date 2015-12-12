@@ -10,13 +10,18 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteAnimationListenter;
 import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteProductFromListDialogFragment;
+import com.technopark.smartbiz.businessLogic.deleteProduct.SwipeDetector;
 import com.technopark.smartbiz.businessLogic.editProduct.EditProductActivity;
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
@@ -57,6 +62,8 @@ public class ListAddedProducts extends ActivityWithNavigationDrawer implements L
 		listViewAddedProducts = (ListView) findViewById(R.id.clap_name_product_textView);
 		adapter = new ProductAdapter(this);
 		listViewAddedProducts.setAdapter(adapter);
+		final SwipeDetector swipeDetector = new SwipeDetector();
+		listViewAddedProducts.setOnTouchListener(swipeDetector);
 		listViewAddedProducts.setOnScrollListener(new EndlessScrollListener() {
 			@Override
 			public void loadData(int offset) {
@@ -67,10 +74,23 @@ public class ListAddedProducts extends ActivityWithNavigationDrawer implements L
 		listViewAddedProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				Intent intent = new Intent(getApplicationContext(), EditProductActivity.class);
-				intent.putExtra(SEND_PRODUCT_NAME, (Product) adapter.getListItems().get(i));
-				startActivity(intent);
-				finish();
+				// Если был обнаружен свайп, то удаляем айтем
+				if (swipeDetector.swipeDetected()) {
+					float toX;
+					if (swipeDetector.getAction() == SwipeDetector.Action.LR ||
+							swipeDetector.getAction() == SwipeDetector.Action.RL) {
+						product = (Product) adapter.getItem(i);
+						toX = swipeDetector.getAction() == SwipeDetector.Action.LR ? 1 : 0;
+						view.startAnimation(getDeleteAnimation(0, (toX == 0) ? -view.getWidth() : 2 * view.getWidth()));
+					}
+				}
+				// Иначе выбираем айтем
+				else {
+					Intent intent = new Intent(getApplicationContext(), EditProductActivity.class);
+					intent.putExtra(SEND_PRODUCT_NAME, (Product) adapter.getListItems().get(i));
+					startActivity(intent);
+					finish();
+				}
 			}
 		});
 
@@ -150,5 +170,18 @@ public class ListAddedProducts extends ActivityWithNavigationDrawer implements L
 		String mSelectionClause = "_id = ?";
 		String[] mSelectionArgs = {String.valueOf(product.getId())};
 		getContentResolver().delete(SmartShopContentProvider.PRODUCTS_CONTENT_URI, mSelectionClause, mSelectionArgs);
+	}
+
+	/**
+	 * Запуск анимации удаления
+	 */
+	private Animation getDeleteAnimation(float fromX, float toX) {
+		Animation animation = new TranslateAnimation(fromX, toX, 0, 0);
+		animation.setStartOffset(100);
+		animation.setDuration(800);
+		animation.setAnimationListener(new DeleteAnimationListenter(ListAddedProducts.this));
+		animation.setInterpolator(AnimationUtils.loadInterpolator(this,
+				android.R.anim.anticipate_overshoot_interpolator));
+		return animation;
 	}
 }
