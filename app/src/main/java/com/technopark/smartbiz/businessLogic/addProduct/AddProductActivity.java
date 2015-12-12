@@ -106,7 +106,6 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 				integrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES);
 			}
 		});
-
 		addProductPhotoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {

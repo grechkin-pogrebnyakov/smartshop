@@ -57,20 +57,21 @@
             android:name=".businessLogic.addProduct.AddProductActivity"
             android:label="@string/title_activity_add_product"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".businessLogic.showProducts.ListAddedProducts"
             android:label="@string/title_activity_list_added_products"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".businessLogic.editProduct.EditProductActivity"
             android:label="@string/title_activity_edit_product"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"
             >
         </activity>
 
@@ -84,18 +85,21 @@
             android:name=".businessLogic.productSales.PurchaseActivity"
             android:label="@string/title_activity_purchase"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".businessLogic.productSales.CheckActivity"
             android:label="@string/title_activity_check"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".businessLogic.productSales.PaymentActivity"
             android:label="@string/title_activity_payment"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
