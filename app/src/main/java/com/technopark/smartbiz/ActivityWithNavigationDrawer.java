@@ -3,6 +3,7 @@ package com.technopark.smartbiz;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
@@ -38,7 +39,15 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	private final ArrayList<Pair<Permission, IDrawerItem>> permissionToIDrawerItem = new ArrayList<Pair<Permission, IDrawerItem>>() {{
 		add(new Pair<Permission, IDrawerItem>(
 				Permission.FOR_ALL,
-				new PrimaryDrawerItem().withName("Home")
+				new PrimaryDrawerItem().withName("Home").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+					@Override
+					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+						Intent intent = new Intent(ActivityWithNavigationDrawer.this, HomeProxyActivity.class);
+						startActivity(intent);
+
+						return true;
+					}
+				})
 		));
 		add(new Pair<Permission, IDrawerItem>(
 				Permission.FOR_ALL,
@@ -50,6 +59,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(ActivityWithNavigationDrawer.this, ListAddedProducts.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
 
 						return true;
@@ -62,6 +72,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(ActivityWithNavigationDrawer.this, AddProductActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
 
 						return true;
@@ -78,6 +89,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(ActivityWithNavigationDrawer.this, CheckActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
 
 						return true;
@@ -90,6 +102,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(getApplicationContext(), SupplyActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
 
 						return true;
@@ -102,7 +115,9 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(ActivityWithNavigationDrawer.this, DiscardActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
+
 						return true;
 					}
 				})
@@ -117,7 +132,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(ActivityWithNavigationDrawer.this, EmployeeListActivity.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
 
 						return true;
@@ -130,7 +145,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(ActivityWithNavigationDrawer.this, EmployeeRegistrationActivity.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
 						startActivity(intent);
 
 						return true;
@@ -147,7 +162,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent intent = new Intent(ActivityWithNavigationDrawer.this, ListChangesPriceActivity.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
 
 						return true;
@@ -160,7 +175,7 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 						Intent show = new Intent(ActivityWithNavigationDrawer.this, ShopProfileActivity.class);
-						show.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+						show.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(show);
 
 						return true;
@@ -230,7 +245,8 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	 * Создание и заполнение дровер-билдера
 	 * Узнаются разрешения текущего пользователя, после чего
 	 * из мапы с итемами дровера выбираются доступные пользователю
-	 * @param savedInstanceState
+	 *
+	 * @param savedInstanceState - bundle
 	 */
 	private void setupDrawerBuilder(Bundle savedInstanceState) {
 		final List<Permission> permissions = AccessControl.getCurrentUserPermissions(this);
@@ -264,7 +280,11 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	public void setArrowDrawerToggle() {
 		if (drawer != null) {
 			drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+			ActionBar actionBar = getSupportActionBar();
+			if (actionBar != null) {
+				actionBar.setDisplayHomeAsUpEnabled(true);
+			}
 		}
 	}
 }
