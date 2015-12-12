@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
@@ -34,9 +36,13 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Abovyan on 15.11.15.
@@ -51,8 +57,12 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 	private Button addProductButton;
 	private Button scanBarcodeButton;
 
+	private View progressView;
+	private View editProductFormView;
+
 	private EditText nameEditText, priceCostProductEditText, priceSellingProductEditText,
 			barcodeEditText, countEditText, descriptionEditText;
+	List<EditText> listEditText = new ArrayList<>();
 
 	private Product product;
 
@@ -64,6 +74,9 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+
+		progressView = findViewById(R.id.activity_add_product_progress_view);
+		editProductFormView = findViewById(R.id.activity_add_product_view_for_add_product);
 
 		titleTextView = (TextView) findViewById(R.id.content_add_product_textView_description_operation);
 		titleTextView.setVisibility(View.GONE);
@@ -98,12 +111,15 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 		countEditText.setText(String.valueOf(product.getCount()));
 		descriptionEditText.setText(product.getDescriptionProduct());
 
-		nameEditText.setEnabled(false);
-		priceCostProductEditText.setEnabled(false);
-		priceSellingProductEditText.setEnabled(false);
-		barcodeEditText.setEnabled(false);
-		countEditText.setEnabled(false);
-		descriptionEditText.setEnabled(false);
+		listEditText.add(nameEditText);
+		listEditText.add(priceCostProductEditText);
+		listEditText.add(priceSellingProductEditText);
+		listEditText.add(barcodeEditText);
+		listEditText.add(countEditText);
+		listEditText.add(descriptionEditText);
+
+		setDisableEditTexts(listEditText);
+		setColorEditTexts(listEditText, Color.DKGRAY);
 	}
 
 	private void initializationButtons() {
@@ -121,13 +137,12 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 		addProductButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				switch (addProductButton.getText().toString()) {
+ 				switch (addProductButton.getText().toString()) {
 					case "Редактировать":
-						nameEditText.setEnabled(true);
-						priceCostProductEditText.setEnabled(true);
-						priceSellingProductEditText.setEnabled(true);
-						barcodeEditText.setEnabled(true);
-						descriptionEditText.setEnabled(true);
+						Set<EditText> editTextsSet = new HashSet<>();
+						editTextsSet.add(countEditText);
+						setEnableEditTextsExcept(listEditText, editTextsSet);
+						setColorEditTextsExcept(listEditText, editTextsSet, Color.BLACK);
 
 						addProductPhotoButton.setEnabled(true);
 						scanBarcodeButton.setEnabled(true);
@@ -314,7 +329,9 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 	}
 
 	@Override
-	public void onPreExecute() { }
+	public void onPreExecute() {
+		Utils.showProgress(true, editProductFormView, progressView, EditProductActivity.this);
+	}
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
@@ -324,5 +341,37 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 	}
 
 	@Override
-	public void onCancelled() { }
+	public void onCancelled() {
+		Utils.showProgress(false, editProductFormView, progressView, EditProductActivity.this);
+	}
+
+	private void setEnableEditTexts(List<EditText> listEditText) {
+		for (EditText editText : listEditText) {
+			editText.setEnabled(true);
+		}
+	}
+
+	private void setEnableEditTextsExcept(List<EditText> listEditText, Set<EditText> exceptSet) {
+		for (EditText editText : listEditText) {
+			if (!exceptSet.contains(editText)) editText.setEnabled(true);
+		}
+	}
+
+	private void setDisableEditTexts(List<EditText> listEditText) {
+		for (EditText editText : listEditText) {
+			editText.setEnabled(false);
+		}
+	}
+
+	private void setColorEditTexts(List<EditText> listEditText, int color) {
+		for (EditText editText : listEditText) {
+			editText.setTextColor(color);
+		}
+	}
+
+	private void setColorEditTextsExcept(List<EditText> listEditText, Set<EditText> exceptSet, int color) {
+		for (EditText editText : listEditText) {
+			if (!exceptSet.contains(editText)) editText.setTextColor(color);
+		}
+	}
 }
