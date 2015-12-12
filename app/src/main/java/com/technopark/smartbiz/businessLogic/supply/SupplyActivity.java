@@ -1,8 +1,12 @@
 package com.technopark.smartbiz.businessLogic.supply;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +22,7 @@ import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.HomeProxyActivity;
 import com.technopark.smartbiz.R;
+import com.technopark.smartbiz.Utils;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
@@ -43,6 +48,9 @@ public class SupplyActivity extends ActivityWithNavigationDrawer implements Http
 	private ProductAdapter adapter;
 	private DatabaseHelper dbHelper;
 
+	private View progressView;
+	private View supplyActionView;
+
 	private PurchaseDialogFragment purchaseDialogFragment = new PurchaseDialogFragment();
 
 	private DialogFragmentCallback dialogListener = new DialogFragmentCallback() {
@@ -60,6 +68,9 @@ public class SupplyActivity extends ActivityWithNavigationDrawer implements Http
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_supply);
+
+		progressView = findViewById(R.id.activity_supply_progress_view);
+		supplyActionView = findViewById(R.id.activity_supply_view_supply_action);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
@@ -221,14 +232,19 @@ public class SupplyActivity extends ActivityWithNavigationDrawer implements Http
 	}
 
 	@Override
-	public void onPreExecute() {}
+	public void onPreExecute() {
+		Utils.showProgress(true, supplyActionView, progressView, SupplyActivity.this);
+	}
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
 		Intent intent = new Intent(getApplicationContext(), HomeProxyActivity.class);
 		startActivity(intent);
+		Utils.showProgress(false, supplyActionView, progressView, SupplyActivity.this);
 	}
 
 	@Override
-	public void onCancelled() {}
+	public void onCancelled() {
+		Utils.showProgress(false, supplyActionView, progressView, SupplyActivity.this);
+	}
 }

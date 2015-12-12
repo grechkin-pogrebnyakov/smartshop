@@ -29,15 +29,18 @@
 
     <include
         layout="@layout/content_add_product"
+        android:id="@+id/activity_add_product_view_for_add_product"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/add_product_appbar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
-    <!-- Login progress -->
+    <!-- Add product progress -->
     <ProgressBar
-        android:id="@+id/login_progress"
+        android:id="@+id/activity_add_product_progress_view"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
