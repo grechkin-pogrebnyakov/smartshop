@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -69,18 +68,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private final String ACTION_AUTHORIZATION = "authorization";
 	private final String ACTION_REGISTRATION = "registration";
-	private final String ACTION_PASSWORD_CHANGE = "passwordChange";
 	private final String ACTION_VALIDATION = "validation";
-	private SharedPreferences sharedPreferences;
 	private AccessControl accessControl;
 
 	// Ссылки на графические компоненты
-	private AutoCompleteTextView mEmailView;
+	private AutoCompleteTextView mLoginView;
 	private EditText mPasswordView;
 	private EditText mPasswordRepeatView;
 	private View mProgressView;
 	private View mLoginFormView;
-	private Button registrtionButton;
+	private Button buttonRegistration;
 
 	private static final String[] sMyScope = new String[]{
 			VKScope.FRIENDS,
@@ -94,12 +91,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 
-		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
 		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
 		accessControl.displayActivityOfAccessRights();
 		// Инициализация приложения...
 		// Инициализируем компоненты формы логина
-		mEmailView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
+		mLoginView = (AutoCompleteTextView) findViewById(R.id.activity_login_login_textField);
 		populateAutoComplete();
 		mPasswordRepeatView = (EditText) findViewById(R.id.login_password_repeat);
 		mPasswordRepeatView.setVisibility(View.GONE);
@@ -134,26 +130,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 					case "Новый акаунт":
 						mPasswordRepeatView.setVisibility(View.VISIBLE);
 						newAccountButton.setVisibility(View.GONE);
-						registrtionButton.setVisibility(View.VISIBLE);
+						buttonRegistration.setVisibility(View.VISIBLE);
 						mEmailSignInButton.setText("Зарегистрироваться");
 						break;
 				}
 			}
 		});
 
-		registrtionButton = (Button) findViewById(R.id.login_button_registration);
-		registrtionButton.setVisibility(View.GONE);
-		registrtionButton.setOnClickListener(new OnClickListener() {
+		buttonRegistration = (Button) findViewById(R.id.login_button_registration);
+		buttonRegistration.setVisibility(View.GONE);
+		buttonRegistration.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
 					mPasswordRepeatView.setVisibility(View.GONE);
-					registrtionButton.setVisibility(View.GONE);
+					buttonRegistration.setVisibility(View.GONE);
 					newAccountButton.setVisibility(View.VISIBLE);
 					mEmailSignInButton.setText("Войти");
 				}
 				startActionInitiatedByUser(ACTION_AUTHORIZATION);
-				//startActionInitiatedByUser(ACTION_REGISTRATION);
 			}
 		});
 
@@ -162,9 +157,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			@Override
 			public void onClick(View view) {
 				if (mPasswordRepeatView.getVisibility() == View.VISIBLE) {
-					//					mPasswordRepeatView.setVisibility(View.GONE);
-					//					registrtionButton.setVisibility(View.GONE);
-					//					newAccountButton.setVisibility(View.VISIBLE);
 					startActionInitiatedByUser(ACTION_REGISTRATION);
 				}
 				else {
@@ -201,12 +193,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 			@Override
 			public void onResult(VKAccessToken res) {
 				// Пользователь успешно авторизовался
+				showProgress(true);
 				startVkAuthorization(res.accessToken, res.email, res.userId);
 			}
 
 			@Override
 			public void onError(VKError error) {
 				// Произошла ошибка авторизации (например, пользователь запретил авторизацию)
+				showProgress(false);
 				showToast("Ошибка авторизации !");
 			}
 		})) {
@@ -229,16 +223,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	 * Представляются ошибки и не производиться попытка авторизации.
 	 */
 	private void startActionInitiatedByUser(String action) {
-		//		if (mAuthTask != null) {
-		//			return;
-		//		}
-
 		// Сброс ошибок.
-		mEmailView.setError(null);
+		mLoginView.setError(null);
 		mPasswordView.setError(null);
 
 		// Получаем значения введенные пользователем для попытки авторизации.
-		String email = mEmailView.getText().toString().replace(" ", "");
+		String email = mLoginView.getText().toString().replace(" ", "");
 		String password = mPasswordView.getText().toString();
 		String repeatPassword = mPasswordRepeatView.getVisibility() == View.VISIBLE ? mPasswordRepeatView.getText().toString() : null;
 
@@ -261,13 +251,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 		// Проверка правильности email.
 		if (TextUtils.isEmpty(email)) {
-			mEmailView.setError(getString(R.string.error_field_required));
-			focusView = mEmailView;
+			mLoginView.setError(getString(R.string.error_field_required));
+			focusView = mLoginView;
 			cancel = true;
 		}
 		else if (!isEmailValid(email)) {
-			mEmailView.setError(getString(R.string.error_invalid_email));
-			focusView = mEmailView;
+			mLoginView.setError(getString(R.string.error_invalid_email));
+			focusView = mLoginView;
 			cancel = true;
 		}
 
@@ -508,7 +498,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void startVkAuthorization(final String token, final String email, final String userId) {
 		VKRequest request = VKApi.users().get();
-		final List<String> tempMass = new ArrayList<>();
 		final VkAuthorization vkAuthorization = new VkAuthorization(
 				UserIdentificationContract.REQUEST_CODE_VK_AUTHORIZATION_ACTION,
 				getApplicationContext(), LoginActivity.this);
@@ -561,7 +550,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 				new ArrayAdapter<>(LoginActivity.this,
 						android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
-		mEmailView.setAdapter(adapter);
+		mLoginView.setAdapter(adapter);
 	}
 
 

@@ -35,5 +35,15 @@
         android:layout_below="@+id/add_product_appbar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
+    <!-- Login progress -->
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        />
 
 </RelativeLayout>
