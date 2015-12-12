@@ -1,79 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.technopark.smartbiz.businessLogic.productSales.PaymentActivity"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal"
+              android:orientation="vertical"
+              tools:context=".businessLogic.productSales.PaymentActivity"
     >
 
     <android.support.v7.widget.Toolbar
         android:id="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:elevation="4dp"
         android:theme="@style/AppTheme.AppBarOverlay"
         />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:text="@string/textView2"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        />
+    <RelativeLayout
+        android:id="@+id/activity_payment_view_payment_action"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        >
 
-    <TextView
-        android:id="@+id/activity_payment_textview_total"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
-        android:text="@string/activity_payment_textview_total"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/textView2"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/activity_payment_textview_total"
-        android:text="@string/textView4"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        />
+        <TextView
+            android:id="@+id/activity_payment_textview_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView2"
+            android:text="@string/activity_payment_textview_total"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
 
-    <EditText
-        android:id="@+id/activity_payment_edittext_payment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView4"
-        android:ems="10"
-        android:inputType="number|numberDecimal"
-        />
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/activity_payment_textview_total"
+            android:text="@string/textView4"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
 
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/activity_payment_edittext_payment"
-        android:text="@string/textView5"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        />
+        <EditText
+            android:id="@+id/activity_payment_edittext_payment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView4"
+            android:ems="10"
+            android:inputType="number|numberDecimal"
+            />
 
-    <TextView
-        android:id="@+id/activity_payment_textview_odd_money"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView5"
-        android:text="@string/activity_payment_textview_odd_money"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        />
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/activity_payment_edittext_payment"
+            android:text="@string/textView5"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
 
-    <Button
-        android:id="@+id/activity_payment_button_pay"
+        <TextView
+            android:id="@+id/activity_payment_textview_odd_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView5"
+            android:text="@string/activity_payment_textview_odd_money"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
+
+        <Button
+            android:id="@+id/activity_payment_button_pay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/activity_payment_textview_odd_money"
+            android:text="@string/activity_payment_button_pay"
+            />
+
+    </RelativeLayout>
+
+    <!-- Payment product progress -->
+    <ProgressBar
+        android:id="@+id/activity_payment_progress_view"
+        style="?android:attr/progressBarStyleLarge"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/activity_payment_textview_odd_money"
-        android:text="@string/activity_payment_button_pay"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
         />
-</RelativeLayout>
+</LinearLayout>

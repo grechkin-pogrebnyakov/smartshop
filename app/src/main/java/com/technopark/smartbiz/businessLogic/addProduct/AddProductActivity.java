@@ -42,7 +42,8 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 
 	static final int REQUEST_TAKE_PHOTO = 1;
 
-	String name, priceCostProduct, priceSellingProduct, count, barcode, description, photoPath;
+	private String name, priceCostProduct, priceSellingProduct, count, barcode, description, photoPath;
+	private String productId;
 
 	ImageButton addProductPhotoButton;
 	Button addProductButton;
@@ -51,12 +52,17 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 	EditText nameEditText, priceCostProductEditText, priceSellingProductEditText,
 			barcodeEditText, countEditText, descriptionEditText;
 
-	private String productId;
+	private View progressView;
+	private View addProductFormView;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_product);
+
+		progressView = findViewById(R.id.activity_add_product_progress_view);
+		addProductFormView = findViewById(R.id.activity_add_product_view_for_add_product);
 
 		photoPath = "";
 
@@ -100,7 +106,6 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 				integrator.initiateScan(IntentIntegrator.ALL_CODE_TYPES);
 			}
 		});
-
 		addProductPhotoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -110,6 +115,7 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 	}
 
 	private void actionForAddProductButton() {
+		Utils.showProgress(true, addProductFormView, progressView, this);
 		name = nameEditText.getText().toString();
 		priceCostProduct = priceCostProductEditText.getText().toString();
 		priceSellingProduct = priceSellingProductEditText.getText().toString();
@@ -139,6 +145,7 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 					.execute(HttpsHelper.Method.POST);
 		}
 		else {
+			Utils.showProgress(false, addProductFormView, progressView, this);
 			Toast.makeText(getApplicationContext(), "Ошибка добавления продукта", Toast.LENGTH_LONG).show();
 		}
 	}
@@ -260,7 +267,9 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 	}
 
 	@Override
-	public void onPreExecute() {}
+	public void onPreExecute() {
+		Utils.showProgress(true, addProductFormView, progressView, this);
+	}
 
 	@Override
 	public void onPostExecute(JSONObject jsonObject) {
@@ -278,13 +287,14 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 						contentValues, "_id=" + productId,
 						null
 				);
-
+				Utils.showProgress(false, addProductFormView, progressView, this);
 				Toast.makeText(getApplicationContext(), "Продукт добавлен", Toast.LENGTH_LONG).show();
 				Intent goToListAddedProduct = new Intent(getApplicationContext(), ListAddedProducts.class);
 				startActivity(goToListAddedProduct);
 				finish();
 			}
 			else {
+				Utils.showProgress(false, addProductFormView, progressView, this);
 				Toast.makeText(getApplicationContext(), "Ошибка добавления продукта", Toast.LENGTH_LONG).show();
 			}
 		}
@@ -295,6 +305,6 @@ public class AddProductActivity extends ActivityWithNavigationDrawer implements 
 
 	@Override
 	public void onCancelled() {
-
+		Utils.showProgress(false, addProductFormView, progressView, this);
 	}
 }
