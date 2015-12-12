@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
@@ -21,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  * Created by Abovyan on 15.11.15.
  */
-public class EditProductActivity extends AppCompatActivity implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
+public class EditProductActivity extends ActivityWithNavigationDrawer implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback {
 	static final int REQUEST_TAKE_PHOTO = 1;
 
 	private String name, priceCostProduct, priceSellingProduct, count, barcode, description, photoPath;
@@ -64,6 +64,7 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		setDrawerToolbar(toolbar);
 
 		titleTextView = (TextView) findViewById(R.id.content_add_product_textView_description_operation);
 		titleTextView.setVisibility(View.GONE);
@@ -76,6 +77,13 @@ public class EditProductActivity extends AppCompatActivity implements HttpsHelpe
 		photoPath = product.getPhotoPath();
 		setPic();
 
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		setArrowDrawerToggle();
 	}
 
 	private void initializationEditTextFields() {
