@@ -216,8 +216,6 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	private Drawer drawer;
 	private DrawerBuilder drawerBuilder;
 
-	private static boolean isInSession = false;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -228,13 +226,9 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	}
 
 	private void registerGcmToken() {
-		if (!isInSession) {
-			isInSession = true;
-
-			// Start IntentService to register this application with GCM.
-			Intent intent = new Intent(this, RegistrationIntentService.class);
-			startService(intent);
-		}
+		// Start IntentService to register this application with GCM.
+		Intent intent = new Intent(this, RegistrationIntentService.class);
+		startService(intent);
 	}
 
 	@Override
