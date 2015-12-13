@@ -73,6 +73,7 @@
             android:label="@string/title_activity_edit_product"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
             >
         </activity>
 

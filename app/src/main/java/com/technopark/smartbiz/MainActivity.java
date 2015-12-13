@@ -8,11 +8,8 @@ import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.format.DateUtils;
@@ -21,12 +18,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -34,7 +31,6 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.mikepenz.materialdrawer.Drawer;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
@@ -54,6 +50,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
@@ -116,7 +113,7 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 			public void onClick(View v) {
 				currentDateLink = dateStart;
 				setDate(dateStartStatisticsCalculateEditText);
-//				dateStart.setTime(dateAndTime.getTime());
+				//				dateStart.setTime(dateAndTime.getTime());
 			}
 		});
 
@@ -125,7 +122,7 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 			public void onClick(View v) {
 				setDate(dateEndStatisticsCalculateEditText);
 				currentDateLink = dateEnd;
-//				dateEnd.setTime(dateAndTime.getTime());
+				//				dateEnd.setTime(dateAndTime.getTime());
 			}
 		});
 
@@ -517,6 +514,7 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 		dateEnd.set(Calendar.SECOND, 59);
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String dateStartString = df.format(dateStart.getTime());
 		String dateEndString = df.format(dateEnd.getTime());
 
@@ -529,7 +527,6 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 
 		Cursor cursor = db
 				.query(ContractClass.Сhecks.TABLE_NAME, columns, selection, null, null, null, null);
-
 		if (cursor != null) {
 			if (cursor.moveToFirst()) {
 				int setSize = cursor.getCount();
@@ -538,7 +535,6 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 				}
 			}
 		}
-
 		return circulation;
 	}
 
@@ -552,6 +548,7 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 		dateEnd.set(Calendar.SECOND, 59);
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String dateStartString = df.format(dateStart.getTime());
 		String dateEndString = df.format(dateEnd.getTime());
 
@@ -600,7 +597,7 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 			dateAndTime.set(Calendar.YEAR, year);
 			dateAndTime.set(Calendar.MONTH, monthOfYear);
 			dateAndTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-			if ( dateAndTime.after(Calendar.getInstance()) ) {
+			if (dateAndTime.after(Calendar.getInstance())) {
 				showToast("Дата не может указывать на будущее !");
 				dateAndTime = Calendar.getInstance();
 			}
