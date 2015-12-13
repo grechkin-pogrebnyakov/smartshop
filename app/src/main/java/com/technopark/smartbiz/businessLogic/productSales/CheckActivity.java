@@ -155,6 +155,7 @@ public class CheckActivity extends ActivityWithNavigationDrawer {
 		switch (item.getItemId()) {
 			case R.id.refresh:
 				startRefreshAnimation();
+				syncProducts();
 				out = true;
 				break;
 
