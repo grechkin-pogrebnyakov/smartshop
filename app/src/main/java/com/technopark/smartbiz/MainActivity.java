@@ -317,7 +317,6 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 				employeesCallback,
 				this
 		).execute(HttpsHelper.Method.GET);
-
 	}
 
 	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback productCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
