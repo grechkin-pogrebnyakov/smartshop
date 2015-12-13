@@ -40,7 +40,6 @@ import com.technopark.smartbiz.businessLogic.userIdentification.activities.Login
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
-import com.technopark.smartbiz.gcm.RegistrationIntentService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -136,10 +135,6 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 
 		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
 		accessControl.displayActivityOfAccessRights();
-
-		// Start IntentService to register this application with GCM.
-		Intent intent = new Intent(this, RegistrationIntentService.class);
-		startService(intent);
 	}
 
 	private void calculateStatistics() {

@@ -27,6 +27,7 @@ import com.technopark.smartbiz.businessLogic.supply.SupplyActivity;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
+import com.technopark.smartbiz.gcm.RegistrationIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -215,11 +216,25 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 	private Drawer drawer;
 	private DrawerBuilder drawerBuilder;
 
+	private static boolean isInSession = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setupDrawerBuilder(savedInstanceState);
+
+		registerGcmToken();
+	}
+
+	private void registerGcmToken() {
+		if (!isInSession) {
+			isInSession = true;
+
+			// Start IntentService to register this application with GCM.
+			Intent intent = new Intent(this, RegistrationIntentService.class);
+			startService(intent);
+		}
 	}
 
 	@Override
