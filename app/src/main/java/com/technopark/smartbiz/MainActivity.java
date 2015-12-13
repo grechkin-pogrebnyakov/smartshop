@@ -7,14 +7,17 @@ import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -22,7 +25,6 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.mikepenz.materialdrawer.Drawer;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
@@ -54,6 +56,14 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 	private AccessControl accessControl;
 	private LineChart mainChart;
 
+	private Menu menu;
+
+	private ImageView refreshImageView;
+	private Animation rotateAnimation;
+	private boolean isInRefresh = false;
+
+	private static boolean isInSession = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,6 +84,38 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 		// Start IntentService to register this application with GCM.
 		Intent intent = new Intent(this, RegistrationIntentService.class);
 		startService(intent);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_main, menu);
+
+		this.menu = menu;
+
+		if (!isInSession) {
+			isInSession = true;
+			syncData();
+		}
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean out;
+
+		switch (item.getItemId()) {
+			case R.id.refresh:
+				startRefreshAnimation();
+				syncData();
+				out = true;
+				break;
+			default:
+				out = super.onOptionsItemSelected(item);
+				break;
+		}
+
+		return out;
 	}
 
 	@Override
@@ -214,9 +256,62 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 		}
 	}
 
+	private void startRefreshAnimation() {
+		if (!isInRefresh) {
+			isInRefresh = true;
+
+			if (refreshImageView == null) {
+				LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+				refreshImageView = (ImageView) inflater.inflate(R.layout.iv_refresh, null);
+			}
+
+			if (rotateAnimation == null) {
+				rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
+				rotateAnimation.setRepeatCount(Animation.INFINITE);
+			}
+
+			refreshImageView.startAnimation(rotateAnimation);
+
+			MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
+			refreshMenuItem.setActionView(refreshImageView);
+		}
+	}
+
+	private void stopRefreshAnimation() {
+		if (isInRefresh) {
+			isInRefresh = false;
+
+			MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
+
+			if (refreshImageView != null) {
+				refreshImageView.clearAnimation();
+			}
+
+			refreshMenuItem.setActionView(null);
+		}
+	}
+
+	private void syncData() {
+		new HttpsHelper.HttpsAsyncTask(
+				SmartShopUrl.Shop.Item.URL_ITEM_LIST,
+				null,
+				productCallback,
+				this
+		).execute(HttpsHelper.Method.GET);
+
+		// TODO Calculate time
+		new HttpsHelper.HttpsAsyncTask(
+				SmartShopUrl.Shop.Check.URL_CHECK_LIST + "?time1=12099242&time2=12209039393&type=0",
+				null,
+				checkCallback,
+				this
+		).execute(HttpsHelper.Method.GET);
+	}
+
 	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback productCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
 		@Override
 		public void onPreExecute() {
+			startRefreshAnimation();
 		}
 
 		@Override
@@ -265,16 +360,20 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 			catch (JSONException e) {
 				e.printStackTrace();
 			}
+
+			stopRefreshAnimation();
 		}
 
 		@Override
 		public void onCancelled() {
+			stopRefreshAnimation();
 		}
 	};
 
 	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback checkCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
 		@Override
 		public void onPreExecute() {
+			startRefreshAnimation();
 		}
 
 		@Override
@@ -325,10 +424,12 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 				e.printStackTrace();
 			}
 
+			stopRefreshAnimation();
 		}
 
 		@Override
 		public void onCancelled() {
+			stopRefreshAnimation();
 		}
 	};
 }
