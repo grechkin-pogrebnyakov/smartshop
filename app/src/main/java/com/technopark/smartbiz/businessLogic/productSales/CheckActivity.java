@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -25,12 +28,16 @@ import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
+import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteAnimationListenter;
+import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteProductFromListDialogFragment;
+import com.technopark.smartbiz.businessLogic.deleteProduct.SwipeDetector;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
+import com.technopark.smartbiz.database.items.Product;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +49,8 @@ import java.util.Locale;
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 
-public class CheckActivity extends ActivityWithNavigationDrawer {
+public class CheckActivity extends ActivityWithNavigationDrawer implements
+		DeleteProductFromListDialogFragment.NoticeDialogListener {
 
 	private static int SELECT_PRODUCT = 1;
 	public static String KEY_RESPONCE_OBJECT = "check";
@@ -52,6 +60,7 @@ public class CheckActivity extends ActivityWithNavigationDrawer {
 	private final String LOG_TAG = "CheckActivity";
 	// Уникальный идентификатор загрузчика
 	private ProductAdapter adapter;
+	private int positionItem;
 
 	public static String TOTAL_PRICE = "TotalPrice";
 	public static String CHECK_LIST_NAME = "CheckListName";
@@ -87,8 +96,38 @@ public class CheckActivity extends ActivityWithNavigationDrawer {
 		setContentView(R.layout.activity_check);
 
 		initializationButtons();
+		final SwipeDetector swipeDetector = new SwipeDetector();
 
 		checkList = (ListView) findViewById(R.id.activity_check_listview);
+		checkList.setOnTouchListener(swipeDetector);
+		checkList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				// Если был обнаружен свайп, то удаляем айтем
+				if (swipeDetector.swipeDetected()) {
+					float toX;
+					if (swipeDetector.getAction() == SwipeDetector.Action.LR ||
+							swipeDetector.getAction() == SwipeDetector.Action.RL) {
+						positionItem = position;
+						toX = swipeDetector.getAction() == SwipeDetector.Action.LR ? 1 : 0;
+						view.startAnimation(getDeleteAnimation(0, (toX == 0) ? -view.getWidth() : 2 * view.getWidth()));
+					}
+				}
+				// Иначе выбираем айтем
+				else {
+
+				}
+			}
+		});
+		checkList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+				positionItem = i;
+				showNoticeDialog();
+				return true;
+			}
+		});
+
 		adapter = new ProductAdapter(this);
 
 		checkList.setAdapter(adapter);
@@ -342,5 +381,40 @@ public class CheckActivity extends ActivityWithNavigationDrawer {
 			stopRefreshAnimation();
 		}
 	};
+
+	public void showNoticeDialog() {
+		// Create an instance of the dialog fragment and show it
+		DialogFragment dialog = new DeleteProductFromListDialogFragment();
+		dialog.show(getSupportFragmentManager(), "NoticeDialogFragment");
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		deleteProduct();
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+
+	}
+
+	private void deleteProduct() {
+		adapter.getListItems().remove(positionItem);
+		adapter.notifyDataSetChanged();
+		setTotalPrice(calculateSumCheck());
+	}
+
+	/**
+	 * Запуск анимации удаления
+	 */
+	private Animation getDeleteAnimation(float fromX, float toX) {
+		Animation animation = new TranslateAnimation(fromX, toX, 0, 0);
+		animation.setStartOffset(100);
+		animation.setDuration(800);
+		animation.setAnimationListener(new DeleteAnimationListenter(CheckActivity.this));
+		animation.setInterpolator(AnimationUtils.loadInterpolator(this,
+				android.R.anim.anticipate_overshoot_interpolator));
+		return animation;
+	}
 
 }

@@ -5,6 +5,7 @@ package com.technopark.smartbiz.businessLogic.deleteProduct;
  */
 
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.animation.Animation;
 
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
@@ -14,16 +15,16 @@ import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
  */
 public class DeleteAnimationListenter implements Animation.AnimationListener
 {
-	private ListAddedProducts listAddedProducts;
-	public DeleteAnimationListenter(ListAddedProducts listAddedProducts)
+	private AppCompatActivity activity;
+	public DeleteAnimationListenter(AppCompatActivity listAddedProducts)
 	{
-		this.listAddedProducts = listAddedProducts;
+		this.activity = listAddedProducts;
 	}
 	@Override
 	public void onAnimationEnd(Animation arg0) {
 		// Create an instance of the dialog fragment and show it
 		DialogFragment dialog = new DeleteProductFromListDialogFragment();
-		dialog.show(listAddedProducts.getSupportFragmentManager(), "NoticeDialogFragment");
+		dialog.show(activity.getSupportFragmentManager(), "NoticeDialogFragment");
 	}
 
 	@Override
