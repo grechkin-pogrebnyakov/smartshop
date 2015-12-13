@@ -15,7 +15,7 @@ from storeManage.models import Shop, Check, Supply
 from rest_framework import authentication, permissions
 from django.conf import settings
 from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSerializer,ShopItemUpdateSerializer,\
-    ItemConfirmPriceUpdateSerializer, SupplySerializer, SupplyConfirmSerializer
+    ItemConfirmPriceUpdateSerializer, SupplySerializer, SupplyConfirmSerializer, ItemDeleteSerializer
 import logging
 from my_utils import get_client_ip
 from userManage.utils import send_push_to_other_workers
@@ -58,10 +58,16 @@ class Item(GenericAPIView):
     serializer_class = ShopItemSerializer
 
     def get(self, request, *args, **kwargs):
-        curShop = request.user.profile.oShop
-        if curShop==None:
-            curShop=request.user.profile.shop
-        items = models.Item.objects.filter(shop=curShop)
+        shop = request.user.profile.oShop
+        if shop is None:
+            shop = request.user.profile.shop
+        deleted = request.GET.get('deleted')
+        if deleted is None:
+            deleted = '0'
+        if deleted == '1':
+            items = models.Item.objects.filter(shop=shop)
+        else:
+            items = models.Item.objects.filter(shop=shop, is_deleted=False)
         serializer = self.get_serializer(items, many=True)
         return Response({'response':serializer.data})
 
@@ -73,7 +79,7 @@ class Item(GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(owner=self.request.user)
         log.info("add item: id '{0}' price_id '{1}' user '{2}' ip {3}".format(
-            serializer.data.get('id'), serializer.price_id ,self.request.user.username, get_client_ip(request)))
+            serializer.data.get('id'), serializer.price_id, self.request.user.username, get_client_ip(request)))
         return Response({'id': serializer.data.get("id"),'price_id':serializer.price_id,
                          'image_hash': serializer.data.get('image_hash')},status=status.HTTP_201_CREATED)
 
@@ -106,22 +112,22 @@ class ItemListChangePrice(GenericAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ShopItemSerializer
 
-    def get(self,request):
+    def get(self, request):
         shop = request.user.profile.oShop  # TODO: это говнокод его надо перенести в Item
         if shop is None:
             shop = request.user.profile.shop
-        items = models.Item.objects.filter(shop=shop, new_price__isnull = False)
+        items = models.Item.objects.filter(shop=shop, new_price__isnull=False, is_deleted=False)
         serializer = self.get_serializer(items, many=True)
-        return Response({'response':serializer.data})
+        return Response({'response': serializer.data})
 
 
 class ItemConfirmPriceUpdate(GenericAPIView):
     serializer_class = ItemConfirmPriceUpdateSerializer
-    authentication_classes = (authentication.TokenAuthentication,authentication.SessionAuthentication,)
+    authentication_classes = (authentication.TokenAuthentication, authentication.SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data = request.data)
+        serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(user=request.user)
@@ -129,6 +135,19 @@ class ItemConfirmPriceUpdate(GenericAPIView):
 
     def get_serializer_context(self):
         return {'request': self.request}
+
+
+class ItemDeleteView(GenericAPIView):
+    serializer_class = ItemDeleteSerializer
+    authentication_classes = (authentication.TokenAuthentication, authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(user=request.user)
+        return Response({'response': 'success'}, status=status.HTTP_200_OK)
 
 
 class CheckView(ListCreateAPIView):

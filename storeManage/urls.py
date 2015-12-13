@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^/',views.Store.as_view()), #TODO: remove tris
     url(r'^item/add/$',views.Item.as_view()),
     url(r'^item/list/$',views.Item.as_view()),
+    url(r'^item/delete/$',views.ItemDeleteView.as_view()),
     url(r'^check/add/$',views.CheckView.as_view()),
     url(r'^check/list/$',views.CheckView.as_view()),
     url(r'^supply/add/$',views.SupplyView.as_view()),

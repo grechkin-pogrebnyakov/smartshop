@@ -20,6 +20,7 @@ class Item(models.Model):
     new_price = models.OneToOneField('Price', null=True, related_name='i_hate_this_fucking_django')
     image = models.ImageField(upload_to='media/items')
     image_hash = models.CharField(max_length=32, blank=True, default='')
+    is_deleted = models.BooleanField(default=False)
 
 
 class Price(models.Model):

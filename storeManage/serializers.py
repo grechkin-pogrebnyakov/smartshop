@@ -67,6 +67,10 @@ class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
                 log.warn("attempt to confirm update another shop item: '{0}' user '{1}' ip {2}".format(
                     item.id, user.username, get_client_ip(request)))
                 raise serializers.ValidationError({"item_id": "item is not yours"})
+            if item.is_deleted is True:
+                log.warn("attempt to confirm update of deleted item: '{0}' user '{1}' ip {2}".format(
+                    item.id, user.username, get_client_ip(request)))
+                raise serializers.ValidationError({"item_id": "item is deleted"})
             new_price = item.new_price
             if new_price is None:
                 log.warn("attempt to confirm update item without new price: '{0}' user '{1}' ip {2}".format(
@@ -142,6 +146,10 @@ class ShopItemUpdateSerializer(serializers.Serializer):
                 log.warn("attempt to update another shop item: '{0}' user '{1}' ip {2}".format(
                     item.id, user.username, get_client_ip(request)))
                 raise serializers.ValidationError({"id": "item is not yours"})
+            if item.is_deleted is True:
+                log.warn("attempt to update deleted item: '{0}' user '{1}' ip {2}".format(
+                    item.id, user.username, get_client_ip(request)))
+                raise serializers.ValidationError({"id": "item is deleted"})
             data['item'] = item
         except ObjectDoesNotExist:
             log.warn("attempt to update not existed item: '{0}' user '{1}' ip {2}".format(
@@ -221,6 +229,7 @@ class ShopItemSerializer(serializers.Serializer):
     image = serializers.CharField(required=False, write_only=True, allow_blank=True)
     image_url = serializers.SerializerMethodField('get_image_url_blya', read_only=True)
     image_hash = serializers.CharField(max_length=32, read_only=True, allow_blank=True)
+    is_deleted = serializers.BooleanField(read_only=True)
 
     def validate(self, data):
         request = self.context['request']
@@ -288,6 +297,42 @@ class ShopItemSerializer(serializers.Serializer):
             item.save()
             price.itemInfo = item
             price.save()
+        return item
+
+
+class ItemDeleteSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+    def validate(self, attrs):
+        request = self.context['request']
+        user = request.user
+        shop = user.profile.oShop
+        if shop is None:
+            log.warn("worker attempts to delete item: id '{0}' user '{1}' ip {2}".format(attrs[id], user.username,
+                                                                                         get_client_ip(request)))
+            raise serializers.ValidationError({"user": "not shop owner"})
+        try:
+            item = Item.objects.get(id=attrs['id'])
+            if item.shop != user.profile.oShop:
+                log.warn("attempt to delete another shop item: '{0}' user '{1}' ip {2}".format(
+                    item.id, user.username, get_client_ip(request)))
+                raise serializers.ValidationError({"id": "item is not yours"})
+            if item.is_deleted is True:
+                log.warn("attempt to delete deleted item: '{0}' user '{1}' ip {2}".format(
+                    item.id, user.username, get_client_ip(request)))
+                raise serializers.ValidationError({"id": "item is deleted"})
+            attrs['item'] = item
+        except ObjectDoesNotExist:
+            log.warn("attempt to delete not existed item: '{0}' user '{1}' ip {2}".format(
+                attrs['id'], user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'id': 'item not exist'})
+        return attrs
+
+    def create(self, validated_data):
+        item = validated_data.get("item")
+        with transaction.atomic():
+            item.is_deleted = True
+            item.save()
         return item
 
 
