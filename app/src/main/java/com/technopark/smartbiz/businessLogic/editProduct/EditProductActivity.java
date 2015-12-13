@@ -138,7 +138,7 @@ public class EditProductActivity extends ActivityWithNavigationDrawer implements
 		addProductButton.setText("Редактировать");
 
 		addProductPhotoButton.setEnabled(false);
-		scanBarcodeButton.setEnabled(false);
+		scanBarcodeButton.setVisibility(View.GONE);
 	}
 
 	private void initializationButtonsListener() {
@@ -153,7 +153,7 @@ public class EditProductActivity extends ActivityWithNavigationDrawer implements
 						setColorEditTextsExcept(listEditText, editTextsSet, Color.BLACK);
 
 						addProductPhotoButton.setEnabled(true);
-						scanBarcodeButton.setEnabled(true);
+						scanBarcodeButton.setVisibility(View.VISIBLE);
 						addProductButton.setText("Сохранить");
 						break;
 					case "Сохранить":
