@@ -306,6 +306,18 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 				checkCallback,
 				this
 		).execute(HttpsHelper.Method.GET);
+
+		syncEmployees();
+	}
+
+	private void syncEmployees() {
+		new HttpsHelper.HttpsAsyncTask(
+				SmartShopUrl.Employee.URL_EMPLOYEE_LIST,
+				null,
+				employeesCallback,
+				this
+		).execute(HttpsHelper.Method.GET);
+
 	}
 
 	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback productCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
@@ -432,4 +444,57 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 			stopRefreshAnimation();
 		}
 	};
+
+	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback employeesCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
+		@Override
+		public void onPreExecute() {
+			startRefreshAnimation();
+		}
+
+		@Override
+		public void onPostExecute(JSONObject jsonObject) {
+			try {
+				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
+					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+
+					databaseHelper.dropTable(ContractClass.Employees.TABLE_NAME);
+
+					JSONArray response = jsonObject.getJSONArray(SmartShopUrl.Employee.RESPONSE_ARRAY_NAME);
+					for (int i = 0; i < response.length(); ++i) {
+						JSONObject employee = response.getJSONObject(i);
+
+						String firstName = employee.getString("first_name");
+						String lastName = employee.getString("last_name");
+						String fatherName = employee.getString("father_name");
+						String login = employee.getString("login");
+
+						ContentValues contentValues = new ContentValues();
+
+						contentValues.put(ContractClass.Employees.COLUMN_NAME_FIRST_NAME, firstName);
+						contentValues.put(ContractClass.Employees.COLUMN_NAME_LAST_NAME, lastName);
+						contentValues.put(ContractClass.Employees.COLUMN_NAME_FATHER_NAME, fatherName);
+						contentValues.put(ContractClass.Employees.COLUMN_NAME_LOGIN, login);
+
+						getContentResolver().insert(ContractClass.Employees.CONTENT_URI, contentValues);
+					}
+				}
+			}
+
+			catch (
+					JSONException e
+					)
+
+			{
+				e.printStackTrace();
+			}
+
+			stopRefreshAnimation();
+		}
+
+		@Override
+		public void onCancelled() {
+			stopRefreshAnimation();
+		}
+	};
+
 }
