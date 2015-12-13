@@ -1,5 +1,6 @@
 package com.technopark.smartbiz;
 
+import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -7,14 +8,22 @@ import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -25,6 +34,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.mikepenz.materialdrawer.Drawer;
 import com.technopark.smartbiz.api.HttpsHelper;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
@@ -39,7 +49,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
@@ -55,6 +68,12 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 	private AccessControl accessControl;
 	private LineChart mainChart;
 
+	TextView circulationTextView, revenueTextView;
+	EditText dateStartStatisticsCalculateEditText, dateEndStatisticsCalculateEditText,
+			currentDataEditText;
+	private Calendar dateAndTime = Calendar.getInstance();
+	private Calendar dateStart, dateEnd, currentDateLink;
+
 	private Menu menu;
 
 	private ImageView refreshImageView;
@@ -67,7 +86,47 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		dbHelper = new DatabaseHelper(this);
+
 		sharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+		circulationTextView = (TextView) findViewById(R.id.activity_main_circulatioin_textView);
+		revenueTextView = (TextView) findViewById(R.id.activity_main_revenue_textView);
+
+		dateStartStatisticsCalculateEditText = (EditText) findViewById(R.id.activity_main_date_begin_calculation_editText);
+		dateEndStatisticsCalculateEditText = (EditText) findViewById(R.id.activity_main_date_end_calculation_editText);
+
+		dateStartStatisticsCalculateEditText.setInputType(InputType.TYPE_NULL);
+		dateEndStatisticsCalculateEditText.setInputType(InputType.TYPE_NULL);
+
+		currentDataEditText = dateEndStatisticsCalculateEditText;
+		setInitialDateTime();
+		dateEnd = Calendar.getInstance();
+		dateEnd.setTime(dateAndTime.getTime());
+		dateAndTime.set(Calendar.DAY_OF_MONTH, dateAndTime.get(Calendar.DAY_OF_MONTH) - 7);
+		currentDataEditText = dateStartStatisticsCalculateEditText;
+		setInitialDateTime();
+		dateStart = Calendar.getInstance();
+		dateStart.setTime(dateAndTime.getTime());
+
+		calculateStatistics();
+
+		dateStartStatisticsCalculateEditText.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				currentDateLink = dateStart;
+				setDate(dateStartStatisticsCalculateEditText);
+//				dateStart.setTime(dateAndTime.getTime());
+			}
+		});
+
+		dateEndStatisticsCalculateEditText.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				setDate(dateEndStatisticsCalculateEditText);
+				currentDateLink = dateEnd;
+//				dateEnd.setTime(dateAndTime.getTime());
+			}
+		});
 
 		getContentResolver()
 				.registerContentObserver(SmartShopContentProvider.CHECKS_CONTENT_URI, false, checkContentObserver);
@@ -79,6 +138,11 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 
 		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
 		accessControl.displayActivityOfAccessRights();
+	}
+
+	private void calculateStatistics() {
+		circulationTextView.setText(String.format(Locale.US, "%.2f", getCirculateBetween()) + " руб.");
+		revenueTextView.setText(String.format(Locale.US, "%.2f", getRevenueBetween()) + " руб.");
 	}
 
 	@Override
@@ -317,7 +381,6 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback productCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
 		@Override
 		public void onPreExecute() {
-			startRefreshAnimation();
 		}
 
 		@Override
@@ -436,6 +499,109 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 		@Override
 		public void onCancelled() {
 			stopRefreshAnimation();
+		}
+	};
+
+	private double getCirculateBetween() {
+		double circulation = 0;
+		dateStart.set(Calendar.HOUR_OF_DAY, 0);
+		dateStart.set(Calendar.MINUTE, 0);
+		dateStart.set(Calendar.SECOND, 0);
+		dateEnd.set(Calendar.HOUR_OF_DAY, 23);
+		dateEnd.set(Calendar.MINUTE, 59);
+		dateEnd.set(Calendar.SECOND, 59);
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String dateStartString = df.format(dateStart.getTime());
+		String dateEndString = df.format(dateEnd.getTime());
+
+		String[] columns = new String[]{
+				"sum(price_selling_product * _count) AS circulate",
+		};
+
+		String selection = "date_time >= '" +
+				dateStartString + "' AND " + "date_time <= '" + dateEndString + "'";
+
+		Cursor cursor = db
+				.query(ContractClass.Сhecks.TABLE_NAME, columns, selection, null, null, null, null);
+
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				int setSize = cursor.getCount();
+				for (int i = 0; i < setSize; ++i) {
+					circulation = cursor.getDouble(cursor.getColumnIndex("circulate"));
+				}
+			}
+		}
+
+		return circulation;
+	}
+
+	private double getRevenueBetween() {
+		double revenue = 0;
+		dateStart.set(Calendar.HOUR_OF_DAY, 0);
+		dateStart.set(Calendar.MINUTE, 0);
+		dateStart.set(Calendar.SECOND, 0);
+		dateEnd.set(Calendar.HOUR_OF_DAY, 23);
+		dateEnd.set(Calendar.MINUTE, 59);
+		dateEnd.set(Calendar.SECOND, 59);
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String dateStartString = df.format(dateStart.getTime());
+		String dateEndString = df.format(dateEnd.getTime());
+
+		String[] columns = new String[]{
+				"sum(price_selling_product * _count) - sum(price_cost * _count) AS revenue",
+		};
+
+		String selection = "date_time >= '" +
+				dateStartString + "' AND " + "date_time <= '" + dateEndString + "'";
+
+		Cursor cursor = db
+				.query(ContractClass.Сhecks.TABLE_NAME, columns, selection, null, null, null, null);
+
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				int setSize = cursor.getCount();
+				for (int i = 0; i < setSize; ++i) {
+					revenue = cursor.getDouble(cursor.getColumnIndex("revenue"));
+				}
+			}
+		}
+
+		return revenue;
+	}
+
+	// отображаем диалоговое окно для выбора даты
+	public void setDate(EditText editText) {
+		currentDataEditText = editText;
+		new DatePickerDialog(MainActivity.this, d,
+				dateAndTime.get(Calendar.YEAR),
+				dateAndTime.get(Calendar.MONTH),
+				dateAndTime.get(Calendar.DAY_OF_MONTH))
+				.show();
+	}
+
+	// установка начальных даты и времени
+	private void setInitialDateTime() {
+		currentDataEditText.setText(DateUtils.formatDateTime(this,
+				dateAndTime.getTimeInMillis(),
+				DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+	}
+
+	// установка обработчика выбора даты
+	DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
+		public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+			dateAndTime.set(Calendar.YEAR, year);
+			dateAndTime.set(Calendar.MONTH, monthOfYear);
+			dateAndTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+			if ( dateAndTime.after(Calendar.getInstance()) ) {
+				showToast("Дата не может указывать на будущее !");
+				dateAndTime = Calendar.getInstance();
+			}
+			currentDateLink.setTime(dateAndTime.getTime());
+			setInitialDateTime();
+			calculateStatistics();
 		}
 	};
 
