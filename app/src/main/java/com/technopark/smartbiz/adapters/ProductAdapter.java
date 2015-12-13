@@ -13,6 +13,7 @@ import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,9 +72,21 @@ public class ProductAdapter extends BaseAdapter {
 		stringBuilder.setLength(0);
 		priceOfTheProductTextView.setText(stringBuilder.append("Цена : ").append(String.valueOf(product.getPriceSellingProduct())).append(" р."));
 
-		Picasso.with(layoutInflater.getContext())
-				.load(SmartShopUrl.URL_HOST + "/" + product.getPhotoPath())
-				.into(imageProductView);
+		File imageFile = new File(product.getPhotoPath());
+
+		if (imageFile.exists()) {
+			Picasso.with(layoutInflater.getContext())
+					.load(imageFile)
+					.resize(300, 300)
+					.into(imageProductView);
+		}
+		else {
+			final String imageUrl = SmartShopUrl.URL_HOST + "/" + product.getPhotoPath();
+
+			Picasso.with(layoutInflater.getContext())
+					.load(imageUrl)
+					.into(imageProductView);
+		}
 
 		return tempView;
 	}
