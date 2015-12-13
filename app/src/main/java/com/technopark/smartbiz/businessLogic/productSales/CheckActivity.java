@@ -1,14 +1,19 @@
 package com.technopark.smartbiz.businessLogic.productSales;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,14 +23,23 @@ import com.google.zxing.integration.android.IntentResult;
 import com.technopark.smartbiz.ActivityWithNavigationDrawer;
 import com.technopark.smartbiz.R;
 import com.technopark.smartbiz.adapters.ProductAdapter;
+import com.technopark.smartbiz.api.HttpsHelper;
+import com.technopark.smartbiz.api.SmartShopUrl;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
 import com.technopark.smartbiz.database.ContractClass;
+import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Locale;
+
+import static com.technopark.smartbiz.Utils.isResponseSuccess;
 
 
 public class CheckActivity extends ActivityWithNavigationDrawer {
@@ -46,6 +60,14 @@ public class CheckActivity extends ActivityWithNavigationDrawer {
 	private Button checkButtonSubmit;
 
 	private PurchaseDialogFragment purchaseDialogFragment = new PurchaseDialogFragment();
+
+	private Menu menu;
+
+	private ImageView refreshImageView;
+	private Animation rotateAnimation;
+	private boolean isInRefresh = false;
+
+	private static boolean isInSession = false;
 
 	private DialogFragmentCallback dialogListener = new DialogFragmentCallback() {
 		@Override
@@ -115,23 +137,41 @@ public class CheckActivity extends ActivityWithNavigationDrawer {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_check, menu);
+
+		this.menu = menu;
+
+		if (!isInSession) {
+			isInSession = true;
+			syncProducts();
+		}
+
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean out = super.onOptionsItemSelected(item);
+
 		switch (item.getItemId()) {
+			case R.id.refresh:
+				startRefreshAnimation();
+				out = true;
+				break;
+
 			case R.id.add_product:
 				Intent addProduct = new Intent(getApplicationContext(), PurchaseActivity.class);
 				addProduct.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivityForResult(addProduct, SELECT_PRODUCT);
-				return false;
+				out = true;
+				break;
+
 			case R.id.scan_product:
 				scanBarcode();
-				return false;
-			default:
-				return false;
+				out = true;
+				break;
 		}
+
+		return out;
 	}
 
 	@Override
@@ -195,4 +235,111 @@ public class CheckActivity extends ActivityWithNavigationDrawer {
 		purchaseDialogFragment.setProductCount(1);
 		purchaseDialogFragment.show(getFragmentManager(), DIALOG);
 	}
+
+	private void startRefreshAnimation() {
+		if (!isInRefresh) {
+			isInRefresh = true;
+
+			if (refreshImageView == null) {
+				LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+				refreshImageView = (ImageView) inflater.inflate(R.layout.iv_refresh, null);
+			}
+
+			if (rotateAnimation == null) {
+				rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
+				rotateAnimation.setRepeatCount(Animation.INFINITE);
+			}
+
+			refreshImageView.startAnimation(rotateAnimation);
+
+			MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
+			refreshMenuItem.setActionView(refreshImageView);
+		}
+	}
+
+	private void stopRefreshAnimation() {
+		if (isInRefresh) {
+			isInRefresh = false;
+
+			MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
+
+			if (refreshImageView != null) {
+				refreshImageView.clearAnimation();
+			}
+
+			refreshMenuItem.setActionView(null);
+		}
+	}
+
+	private void syncProducts() {
+		new HttpsHelper.HttpsAsyncTask(
+				SmartShopUrl.Shop.Item.URL_ITEM_LIST,
+				null,
+				productCallback,
+				this
+		).execute(HttpsHelper.Method.GET);
+	}
+
+	private HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback productCallback = new HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback() {
+		@Override
+		public void onPreExecute() {
+			startRefreshAnimation();
+		}
+
+		@Override
+		public void onPostExecute(JSONObject jsonObject) {
+			try {
+				if (isResponseSuccess(jsonObject.getInt(HttpsHelper.RESPONSE_CODE))) {
+					DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+
+					databaseHelper.dropTable(ContractClass.Products.TABLE_NAME);
+
+					JSONArray products = jsonObject.getJSONArray(HttpsHelper.RESPONSE);
+					for (int i = 0; i < products.length(); ++i) {
+						JSONObject product = products.getJSONObject(i);
+
+						String productName = product.getString("productName");
+						String descriptionProduct = product.getString("descriptionProduct");
+						String productBarcode = product.getString("productBarcode");
+						String count = product.getString("count");
+						String id = product.getString("id");
+						String priceId = product.getString("price_id");
+						String imageUrl = product.getString("image_url");
+
+						JSONObject price = product.getJSONObject("price");
+						String priceSellingProduct = price.getString("priceSellingProduct");
+						String pricePurchaseProduct = price.getString("pricePurchaseProduct");
+
+						ContentValues contentValues = new ContentValues();
+
+						contentValues.put(ContractClass.Products.NAME, productName);
+						contentValues.put(ContractClass.Products.DESCRIPTION, descriptionProduct);
+						contentValues.put(ContractClass.Products.PRICE_SELLING, priceSellingProduct);
+						contentValues.put(ContractClass.Products.PRICE_COST, pricePurchaseProduct);
+						contentValues.put(ContractClass.Products.BARCODE, productBarcode);
+						contentValues.put(ContractClass.Products._COUNT, count);
+						contentValues.put(ContractClass.Products._ID, id);
+						contentValues.put(ContractClass.Products.PRICE_ID, priceId);
+						contentValues.put(ContractClass.Products.PHOTO_PATH, imageUrl);
+
+						getContentResolver().insert(SmartShopContentProvider.PRODUCTS_CONTENT_URI, contentValues);
+					}
+
+					Toast.makeText(getApplicationContext(), "Товары успешно синхронизированы!", Toast.LENGTH_LONG)
+							.show();
+				}
+			}
+			catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+			stopRefreshAnimation();
+		}
+
+		@Override
+		public void onCancelled() {
+			stopRefreshAnimation();
+		}
+	};
+
 }

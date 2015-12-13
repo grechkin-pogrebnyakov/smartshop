@@ -37,6 +37,8 @@ public final class SmartShopUrl {
 
 	public static final class Employee {
 
+		public static final String RESPONSE_ARRAY_NAME = "employees";
+
 		private static final String EMPLOYEE = "/employee";
 
 		private static final String REGISTRATION = "/register/";

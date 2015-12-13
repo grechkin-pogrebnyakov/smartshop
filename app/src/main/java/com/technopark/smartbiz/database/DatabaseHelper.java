@@ -102,6 +102,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
 				db.execSQL(PRICE_UPDATE_TABLE_CREATE);
 				break;
+			case ContractClass.Employees.TABLE_NAME:
+				db.execSQL("DROP TABLE IF EXISTS '" + table + "';");
+				db.execSQL(EMPLOYEE_TABLE_CREATE);
+				break;
 		}
 		db.close();
 	}
