@@ -23,7 +23,7 @@ class Item(models.Model):
 
 
 class Price(models.Model):
-    #на самом деле, null быть не может, но это нужно для того, что бы создать цену до итема
+    # на самом деле, null быть не может, но это нужно для того, что бы создать цену до итема
     itemInfo = models.ForeignKey(Item, related_name='prices', null=True)
     priceSellingProduct = models.FloatField()
     pricePurchaseProduct = models.FloatField()
@@ -32,11 +32,10 @@ class Price(models.Model):
     changer = models.ForeignKey(User, null=True)
 
 
-
 class Check(models.Model):
     author = models.ForeignKey(User)
     creation_time = models.DateTimeField(auto_now_add=True)
-    #type = 0 -- sell, 1 -- sypply, 2 -- discard
+    # type = 0 -- sell, 2 -- discard, 1 -- supply (DEPRECATED)
     type = models.IntegerField()
     shop = models.ForeignKey(Shop)
 
@@ -46,3 +45,14 @@ class CheckPosition(models.Model):
     item = models.ForeignKey(Item)
     count = models.IntegerField()
     price = models.ForeignKey(Price)
+
+
+class Supply(models.Model):
+    price = models.ForeignKey(Price)
+    worker = models.ForeignKey(User, null=True)
+    expected_date = models.DateTimeField()
+    real_date = models.DateTimeField(null=True)
+    expected_count = models.IntegerField()
+    real_count = models.IntegerField(default=0)
+    done = models.BooleanField(default=False)
+    shop = models.ForeignKey(Shop)

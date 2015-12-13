@@ -2,14 +2,14 @@
 __author__ = 'mid'
 
 from rest_framework import serializers
-from storeManage.models import Shop,Item, Check,CheckPosition, Price
+from storeManage.models import Shop,Item, Check,CheckPosition, Price, Supply
 from userManage.models import UserProfile
 from userManage.utils import send_push_to_workers
 import time,datetime
 from django.core.exceptions import ObjectDoesNotExist
 import logging
 from my_utils import get_client_ip
-from userManage.utils import send_push_to_other_workers
+from userManage.utils import send_push_to_other_workers, send_push_to_owner
 import base64
 import imghdr
 import uuid
@@ -314,7 +314,7 @@ class CheckSerializer(serializers.Serializer):
                 data['type'], user.username, get_client_ip(request)))
             raise serializers.ValidationError({'type': 'not allowed'})
         shop = user.profile.shop
-        if shop is None :
+        if shop is None:
             shop = user.profile.oShop
         if shop is None:
             log.error("user without shop and oShop: id {0} username '{1}' ip {2}".format(
@@ -343,10 +343,10 @@ class CheckSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = validated_data.get('user')
-        type = validated_data.get('type')
+        operation_type = validated_data.get('type')
         shop = validated_data.get('shop')
         with transaction.atomic():
-            check = Check(author=user, type=type, shop=shop)
+            check = Check(author=user, type=operation_type, shop=shop)
             check.time = datetime.datetime.now()
             check.save()
             for pos in validated_data.get('check_positions'):
@@ -355,8 +355,130 @@ class CheckSerializer(serializers.Serializer):
                 db_count = pos.get('count')
                 position = CheckPosition(item=item, count=db_count, relatedCheck=check, price=price)
                 position.save()
-                if type == 1:
-                    db_count = -db_count
-                item.count = item.count-db_count
+                if operation_type == 1:
+                    log.error("type 1 is deprecated")
+                    db_count *= -1
+                item.count = item.count - db_count
                 item.save()
         return check
+
+
+class DateSerializer(serializers.CharField):
+    def to_representation(self, obj):
+        return obj.date()
+
+
+class SupplySerializer(serializers.Serializer):
+    price_id = serializers.IntegerField()
+    item_id = serializers.SerializerMethodField('get_item_id_blya', read_only=True)
+    expected_count = serializers.IntegerField(validators=[above_zero])
+    real_count = serializers.IntegerField(validators=[above_zero], read_only=True)
+    expected_date = DateSerializer(max_length=20, allow_blank=False)
+    real_date = serializers.SerializerMethodField('get_real_date_blya')
+    price = PriceSerializer(read_only=True)
+    id = serializers.IntegerField(read_only=True)
+    worker = serializers.CharField(max_length=255, read_only=True)
+    done = serializers.BooleanField(read_only=True)
+
+    def get_real_date_blya(self, obj):
+        if obj.real_date:
+            return obj.real_date.date()
+
+    def validate_expected_date(self, date_str):
+        try:
+            expected_date = datetime.datetime.fromtimestamp(int(date_str))
+            return expected_date
+        except ValueError:
+            raise serializers.ValidationError('invalid value')
+        except TypeError:
+            raise serializers.ValidationError('invalid value')
+
+    def get_item_id_blya(self, obj):
+        return obj.price.itemInfo_id
+
+    def validate(self, data):
+        request = self.context['request']
+        user = request.user
+        shop = user.profile.oShop
+        if shop is None:
+            log.error("attempt to add supply not from owner: id {0} username '{1}' ip {2}".format(
+                user.id, user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'user': "not owner"})
+        try:
+            price = Price.objects.get(id=data.get('price_id'))
+        except ObjectDoesNotExist:
+            log.warn("price not exist: '{0}' user '{1}' ip {2}".format(
+                data['price_id'], user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'price_id': 'item not exist'})
+        if price.is_deleted:
+            log.warn("attempt to create supply with deleted price: '{0}' user '{1}' ip {2}".format(
+                data['price_id'], user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'price_id': 'price deleted'})
+        item = price.itemInfo
+        if item.shop != shop:
+            log.warn("attempt to create supply with price from other shop: '{0}' user '{1}' ip {2}".format(
+                data['price_id'], user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'price_id': 'not your item'})
+        data['price'] = price
+        data['shop'] = shop
+        return data
+
+    def create(self, validated_data):
+        shop = validated_data['shop']
+        price = validated_data['price']
+        count = validated_data['expected_count']
+        date = validated_data['expected_date']
+        with transaction.atomic():
+            supply = Supply(price=price, shop=shop, expected_count=count, expected_date=date)
+            supply.save()
+        return supply
+
+
+class SupplyConfirmSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    real_count = serializers.IntegerField(validators=[above_zero])
+
+    def validate(self, data):
+        request = self.context['request']
+        user = request.user
+        try:
+            supply = Supply.objects.get(id=data['id'])
+            item = supply.price.itemInfo
+            if supply.shop != user.profile.shop and supply.shop != user.profile.oShop:
+                log.warn("attempt to confirm supply of another shop item: '{0}' user '{1}' ip {2}".format(
+                    supply.id, user.username, get_client_ip(request)))
+                raise serializers.ValidationError({"id": "item is not yours"})
+            if supply.done is True:
+                log.warn("attempt to confirm already done supply: '{0}' user '{1}' ip {2}".format(
+                    supply.id, user.username, get_client_ip(request)))
+                raise serializers.ValidationError({"id": "supply is already done"})
+            data['item'] = item
+            data['supply'] = supply
+            data['worker'] = user
+        except ObjectDoesNotExist:
+            log.warn("attempt to confirm supply of not existed item: '{0}' user '{1}' ip {2}".format(
+                data['id'], user.username, get_client_ip(request)))
+            raise serializers.ValidationError({'id': 'supply not exist'})
+        return data
+
+    def create(self, validated_data):
+        request = self.context['request']
+        item = validated_data['item']
+        supply = validated_data['supply']
+        worker = validated_data['worker']
+        real_count = validated_data['real_count']
+        with transaction.atomic():
+            item.count += real_count
+            item.save()
+            supply.worker = worker
+            supply.real_date = datetime.date.today()
+            supply.real_count = real_count
+            supply.done = True
+            supply.save()
+        data = {'count': real_count} if real_count != supply.expected_count else None
+        push_res = send_push_to_owner(worker, "Была произведена поставка товара.", data)
+        if push_res is not None:
+            log.debug(push_res)
+        log.info("confirm supply: id '{0}' user '{1}' ip {2}".format(
+            validated_data['id'], worker.username, get_client_ip(request)))
+        return supply

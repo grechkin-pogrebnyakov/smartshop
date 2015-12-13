@@ -15,7 +15,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'o*g5f59=9ih19jo_bjy#8-2i-javgg)%%$ro1u^yi5-8@w(*m1'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -83,12 +81,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SmartShop.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-     'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'SmartShop',
         'USER': 'root',
@@ -96,8 +93,8 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
-                    'charset': 'utf8',
-                    'use_unicode': True, },
+            'charset': 'utf8',
+            'use_unicode': True, },
 
     }
 }
@@ -119,7 +116,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
@@ -131,7 +127,7 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'filters': {
-	'require_debug_true': {
+        'require_debug_true': {
             '()': 'django.utils.log.RequireDebugTrue',
         },
         'require_debug_false': {
@@ -158,7 +154,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 7,
             'formatter': 'error',
-	    'filters': ['require_debug_true'],
+            'filters': ['require_debug_true'],
         },
         'error_log_file': {
             'level': 'WARNING',
@@ -167,7 +163,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 7,
             'formatter': 'error',
-	    'filters': ['require_debug_false'],
+            'filters': ['require_debug_false'],
         },
         'django_log_file_debug': {
             'level': 'DEBUG',
@@ -176,7 +172,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 7,
             'formatter': 'error',
-	    'filters': ['require_debug_true'],
+            'filters': ['require_debug_true'],
         },
         'django_log_file': {
             'level': 'WARNING',
@@ -185,7 +181,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 7,
             'formatter': 'error',
-	    'filters': ['require_debug_false'],
+            'filters': ['require_debug_false'],
         }
     },
     'loggers': {
@@ -194,7 +190,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'smartshop.log':{
+        'smartshop.log': {
             'handlers': ['error_log_file', 'error_log_file_debug'],
             'propagate': False,
             'level': 'DEBUG',
@@ -205,8 +201,8 @@ LOGGING = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-        #'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
     )
 }
 
@@ -220,6 +216,6 @@ TEMPLATE_CONTEXT_PROCESSORS = {
 }
 
 PUSH_NOTIFICATIONS_SETTINGS = {
-        'GCM_API_KEY': 'AIzaSyAbnX99ai1LJSPWmqPECK_uAhuTFZEYXCI',
+    'GCM_API_KEY': 'AIzaSyAbnX99ai1LJSPWmqPECK_uAhuTFZEYXCI',
 
 }
