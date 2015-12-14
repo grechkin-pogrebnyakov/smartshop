@@ -24,10 +24,14 @@ public class HomeProxyActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Intent intent = new Intent();
+		final Bundle bundle = getIntent().getExtras();
 
-		Role role = AccessControl.getCurrentUserRole(this);
+		final Intent intent = new Intent();
+		if (bundle != null) {
+			intent.putExtras(bundle);
+		}
 
+		final Role role = AccessControl.getCurrentUserRole(this);
 		Log.d(LOG, role.toString());
 
 		switch (role) {

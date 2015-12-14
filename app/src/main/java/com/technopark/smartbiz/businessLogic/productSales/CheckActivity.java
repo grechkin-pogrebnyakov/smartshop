@@ -32,12 +32,12 @@ import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteAnimationListen
 import com.technopark.smartbiz.businessLogic.deleteProduct.DeleteProductFromListDialogFragment;
 import com.technopark.smartbiz.businessLogic.deleteProduct.SwipeDetector;
 import com.technopark.smartbiz.businessLogic.showProducts.EndlessScrollListener;
+import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
 import com.technopark.smartbiz.database.ContractClass;
 import com.technopark.smartbiz.database.DatabaseHelper;
 import com.technopark.smartbiz.database.SmartShopContentProvider;
 import com.technopark.smartbiz.database.items.Check;
 import com.technopark.smartbiz.database.items.ItemForProductAdapter;
-import com.technopark.smartbiz.database.items.Product;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,8 +75,6 @@ public class CheckActivity extends ActivityWithNavigationDrawer implements
 	private ImageView refreshImageView;
 	private Animation rotateAnimation;
 	private boolean isInRefresh = false;
-
-	private static boolean isInSession = false;
 
 	private DialogFragmentCallback dialogListener = new DialogFragmentCallback() {
 		@Override
@@ -142,6 +140,12 @@ public class CheckActivity extends ActivityWithNavigationDrawer implements
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		setDrawerToolbar(toolbar);
+
+		final boolean needRefresh = getIntent().getBooleanExtra(LoginActivity.KEY_REFRESH, false);
+		if (needRefresh) {
+			syncProducts();
+		}
+
 	}
 
 	private void initializationButtons() {
@@ -178,11 +182,6 @@ public class CheckActivity extends ActivityWithNavigationDrawer implements
 		getMenuInflater().inflate(R.menu.activity_check, menu);
 
 		this.menu = menu;
-
-		if (!isInSession) {
-			isInSession = true;
-			syncProducts();
-		}
 
 		return true;
 	}

@@ -63,6 +63,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	 */
 	public static final String APP_PREFERENCES = "mysettings";
 
+	public static final String KEY_REFRESH = "refresh";
+
 	private final String ACTION_AUTHORIZATION = "authorization";
 	private final String ACTION_REGISTRATION = "registration";
 	private final String ACTION_VALIDATION = "validation";
@@ -379,24 +381,32 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 	private void authorizationResultAction(JSONObject resultActionCode) {
 		try {
 			if (resultActionCode.has(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
+				Intent intent = new Intent();
+				Bundle bundle = new Bundle();
 
 				switch (resultActionCode.getInt(UserIdentificationContract.AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 					case UserIdentificationContract.AUTHORIZATION_STATUS_SUCCESS:
-						Intent goMainActivity = new Intent(getApplicationContext(), HomeProxyActivity.class);
-						startActivity(goMainActivity);
-						finish();
+						intent.setClass(this, HomeProxyActivity.class);
+						bundle.putBoolean(KEY_REFRESH, true);
 						break;
+
 					case UserIdentificationContract.AUTHORIZATION_STATUS_FAIL:
 						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
-						break;
+						return;
+
 					case UserIdentificationContract.AUTHORIZATION_STATUS_CHANGE_PASSWORD:
-						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
-						startActivity(goChangePasswordActivity);
-						finish();
+						intent.setClass(this, ChangePasswordActivity.class);
 						break;
+
 					default:
 						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
+						return;
 				}
+
+				intent.putExtras(bundle);
+
+				startActivity(intent);
+				finish();
 			}
 		}
 		catch (JSONException e) {
@@ -406,26 +416,35 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void vkAuthorizationResultAction(JSONObject resultActionCode) {
 		try {
+			Intent intent = new Intent();
+			Bundle bundle = new Bundle();
+
 			if (resultActionCode.has(UserIdentificationContract.VK_AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 
 				switch (resultActionCode.getInt(UserIdentificationContract.VK_AUTHORIZATION_RESPONSE_STATUS_KEY)) {
 					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_SUCCESS:
-						Intent goMainActivity = new Intent(getApplicationContext(), HomeProxyActivity.class);
-						startActivity(goMainActivity);
-						finish();
+						intent.setClass(this, HomeProxyActivity.class);
+						bundle.putBoolean(KEY_REFRESH, true);
 						break;
+
 					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_FAIL:
 						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
-						break;
+						return;
+
 					case UserIdentificationContract.VK_AUTHORIZATION_STATUS_CHANGE_PASSWORD:
-						Intent goChangePasswordActivity = new Intent(getApplicationContext(), ChangePasswordActivity.class);
-						startActivity(goChangePasswordActivity);
-						finish();
+						intent.setClass(this, ChangePasswordActivity.class);
 						break;
+
 					default:
 						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
+						return;
 				}
 			}
+
+			intent.putExtras(bundle);
+
+			startActivity(intent);
+			finish();
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
@@ -434,21 +453,31 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void registrationResultAction(JSONObject resultActionCode) {
 		try {
+			Intent intent = new Intent();
+			Bundle bundle = new Bundle();
+
 			if (resultActionCode.has(UserIdentificationContract.REGISTRATION_RESPONSE_STATUS_KEY)) {
 
 				switch (resultActionCode.getInt(UserIdentificationContract.REGISTRATION_RESPONSE_STATUS_KEY)) {
 					case UserIdentificationContract.REGISTRATION_STATUS_SUCCESS:
-						Intent goMainActivity = new Intent(getApplicationContext(), HomeProxyActivity.class);
-						startActivity(goMainActivity);
-						finish();
+						intent.setClass(this, HomeProxyActivity.class);
+						bundle.putBoolean(KEY_REFRESH, true);
 						break;
+
 					case UserIdentificationContract.REGISTRATION_STATUS_FAIL:
 						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
-						break;
+						return;
+
 					default:
 						Utils.showProgress(false, mLoginFormView, mProgressView, LoginActivity.this);
+						return;
 				}
 			}
+
+			intent.putExtras(bundle);
+
+			startActivity(intent);
+			finish();
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
@@ -488,7 +517,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 	private void showActivityForAccessStatus(String accessRightIdentificator) {
 		if (accessRightIdentificator.contains(UserIdentificationContract.SUCCESS_AUTHORIZATION)) {
-			startActivity(new Intent(getApplicationContext(), HomeProxyActivity.class));
+			Intent intent = new Intent(this, HomeProxyActivity.class);
+			intent.putExtra(KEY_REFRESH, true);
+
+			startActivity(intent);
 			finish();
 		}
 	}

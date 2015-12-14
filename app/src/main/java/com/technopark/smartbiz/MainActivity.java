@@ -77,8 +77,6 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 	private Animation rotateAnimation;
 	private boolean isInRefresh = false;
 
-	private static boolean isInSession = false;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -135,6 +133,11 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 
 		accessControl = new AccessControl(getApplicationContext(), this, UserIdentificationContract.REQUEST_CODE_ACCESS_LOGIN);
 		accessControl.displayActivityOfAccessRights();
+
+		final boolean needRefresh = getIntent().getBooleanExtra(LoginActivity.KEY_REFRESH, false);
+		if (needRefresh) {
+			syncData();
+		}
 	}
 
 	private void calculateStatistics() {
@@ -147,11 +150,6 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 
 		this.menu = menu;
-
-		if (!isInSession) {
-			isInSession = true;
-			syncData();
-		}
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -327,9 +325,10 @@ public class MainActivity extends ActivityWithNavigationDrawer implements Intera
 			}
 
 			refreshImageView.startAnimation(rotateAnimation);
-
-			MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
-			refreshMenuItem.setActionView(refreshImageView);
+			if (menu != null) {
+				MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
+				refreshMenuItem.setActionView(refreshImageView);
+			}
 		}
 	}
 
