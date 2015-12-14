@@ -291,8 +291,10 @@ public class CheckActivity extends ActivityWithNavigationDrawer implements
 
 			refreshImageView.startAnimation(rotateAnimation);
 
-			MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
-			refreshMenuItem.setActionView(refreshImageView);
+			if (menu != null) {
+				MenuItem refreshMenuItem = menu.findItem(R.id.refresh);
+				refreshMenuItem.setActionView(refreshImageView);
+			}
 		}
 	}
 
