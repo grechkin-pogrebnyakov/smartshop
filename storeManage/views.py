@@ -18,7 +18,6 @@ from storeManage.serializers import ShopSerializer,ShopItemSerializer,CheckSeria
     ItemConfirmPriceUpdateSerializer, SupplySerializer, SupplyConfirmSerializer, ItemDeleteSerializer
 import logging
 from my_utils import get_client_ip
-from userManage.utils import send_push_to_other_workers
 import datetime
 
 log = logging.getLogger('smartshop.log')
