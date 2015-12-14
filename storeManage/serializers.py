@@ -99,8 +99,9 @@ class ItemConfirmPriceUpdateSerializer(serializers.Serializer):
             item.price = new_price
             item.new_price = None
             item.save()
+        data = {'type': 1}
         push_res = send_push_to_other_workers(user, "Внимание! В магазине были поменяны ценники. "
-                                                    "Цена в приложении изменится автоматически.", badge=1)
+                                                    "Цена в приложении изменится автоматически.", data=data)
         if push_res is not None:
             log.debug(push_res)
         log.info("confirm price change: item_id '{0}' price_id '{1}' user '{2}' ip {3}".format(
@@ -194,7 +195,9 @@ class ShopItemUpdateSerializer(serializers.Serializer):
                     item.price = new_price
                 else:
                     item.new_price = new_price
-                    push_res = send_push_to_workers(item.shop, 'Внимание! Цены некоторых товаров обновились!', badge=2)
+                    data = {'type': 2}
+                    push_res = send_push_to_workers(item.shop, 'Внимание! Цены некоторых товаров обновились!',
+                                                    data=data)
                     if push_res is not None:
                         log.debug(push_res)
             image = validated_data.get('image')
@@ -520,8 +523,8 @@ class SupplyConfirmSerializer(serializers.Serializer):
             supply.real_count = real_count
             supply.done = True
             supply.save()
-        data = {'count': real_count} if real_count != supply.expected_count else None
-        push_res = send_push_to_owner(worker, "Была произведена поставка товара.", data=data, badge=3)
+        data = {'count': real_count, 'type': 3} if real_count != supply.expected_count else {'type': 3}
+        push_res = send_push_to_owner(worker, "Была произведена поставка товара.", data=data)
         if push_res is not None:
             log.debug(push_res)
         log.info("confirm supply: id '{0}' user '{1}' ip {2}".format(
