@@ -68,8 +68,12 @@ public class LogOut implements HttpsHelper.HttpsAsyncTask.HttpsAsyncTaskCallback
 		try {
 			int responceCode = jsonResponce.getInt(HttpsHelper.RESPONSE_CODE);
 			if (200 <= responceCode && responceCode < 300) {
+				sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+				sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
 				return UserIdentificationContract.LOGOUT_STATUS_SUCCESS;
 			}else if (responceCode >= 500) {
+				sharedPreferences.edit().remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY).apply();
+				sharedPreferences.edit().remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
 				interactionWithUI.showToast("Ошибка сервера !");
 				return UserIdentificationContract.LOGOUT_STATUS_FAIL;
 			}

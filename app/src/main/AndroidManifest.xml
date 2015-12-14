@@ -108,18 +108,21 @@
             android:name=".businessLogic.shopProfile.ShopProfileActivity"
             android:label="@string/title_activity_shop_profile"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".businessLogic.supply.SupplyActivity"
             android:label="Поставка"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".businessLogic.discard.DiscardActivity"
             android:label="Списание"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity

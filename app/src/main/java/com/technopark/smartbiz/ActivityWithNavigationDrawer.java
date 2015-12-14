@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.View;
+import android.widget.Toast;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -25,9 +26,14 @@ import com.technopark.smartbiz.businessLogic.shopProfile.ShopProfileActivity;
 import com.technopark.smartbiz.businessLogic.showProducts.ListAddedProducts;
 import com.technopark.smartbiz.businessLogic.supply.SupplyActivity;
 import com.technopark.smartbiz.businessLogic.userIdentification.AccessControl;
+import com.technopark.smartbiz.businessLogic.userIdentification.InteractionWithUI;
 import com.technopark.smartbiz.businessLogic.userIdentification.UserIdentificationContract;
 import com.technopark.smartbiz.businessLogic.userIdentification.activities.LoginActivity;
+import com.technopark.smartbiz.businessLogic.userIdentification.identificationServices.LogOut;
 import com.technopark.smartbiz.gcm.RegistrationIntentService;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +41,7 @@ import java.util.List;
 /**
  * Created by titaevskiy.s on 11.12.15
  */
-public class ActivityWithNavigationDrawer extends AppCompatActivity {
+public class ActivityWithNavigationDrawer extends AppCompatActivity implements InteractionWithUI{
 
 	private final ArrayList<Pair<Permission, IDrawerItem>> permissionToIDrawerItem = new ArrayList<Pair<Permission, IDrawerItem>>() {{
 		add(new Pair<Permission, IDrawerItem>(
@@ -192,21 +198,21 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 				new SecondaryDrawerItem().withName("Выйти").withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 					@Override
 					public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-						SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.APP_PREFERENCES, MODE_PRIVATE);
+//						SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.APP_PREFERENCES, MODE_PRIVATE);
+//
+//						sharedPreferences.edit()
+//								.remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)
+//								.remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
+//
+//						final Intent intent = new Intent(ActivityWithNavigationDrawer.this, LoginActivity.class);
+//						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//
+//						startActivity(intent);
 
-						sharedPreferences.edit()
-								.remove(UserIdentificationContract.STATUS_AUTHORIZATION_KEY)
-								.remove(UserIdentificationContract.TOKEN_AUTHORIZATION).apply();
-
-						final Intent intent = new Intent(ActivityWithNavigationDrawer.this, LoginActivity.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-						startActivity(intent);
-
-						//if (Utils.isNetworkEnabled()) {
-						//	new LogOut(UserIdentificationContract.REQUEST_CODE_LOG_OUT_ACTION, getApplicationContext(), MainActivity.this).startLogOut();
-						//	return true;
-						//}
+						if (Utils.isNetworkEnabled(getApplicationContext())) {
+							new LogOut(UserIdentificationContract.REQUEST_CODE_LOG_OUT_ACTION, getApplicationContext(), ActivityWithNavigationDrawer.this).startLogOut();
+							return true;
+						}
 						return true;
 					}
 				})
@@ -296,4 +302,45 @@ public class ActivityWithNavigationDrawer extends AppCompatActivity {
 			}
 		}
 	}
+
+	@Override
+	public void netActionResponse(int requestActionCode, JSONObject jsonResponse) {
+		switch (requestActionCode) {
+			case UserIdentificationContract.REQUEST_CODE_LOG_OUT_ACTION:
+				logOutResultAction(jsonResponse);
+				break;
+		}
+	}
+
+	@Override
+	public void callbackAccessControl(int requestActionCode, String accessRightIdentificator) {
+
+	}
+
+	@Override
+	public void showToast(String message) {
+		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+	}
+
+	private void logOutResultAction(JSONObject resultActionCode) {
+		try {
+			if (resultActionCode.has(UserIdentificationContract.LOG_OUT_RESPONSE_STATUS_KEY)) {
+				final Intent intent = new Intent(ActivityWithNavigationDrawer.this, LoginActivity.class);
+				switch (resultActionCode.getInt(UserIdentificationContract.LOG_OUT_RESPONSE_STATUS_KEY)) {
+					case UserIdentificationContract.LOGOUT_STATUS_SUCCESS:
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						startActivity(intent);
+						break;
+					case UserIdentificationContract.LOGOUT_STATUS_FAIL:
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						startActivity(intent);
+						break;
+				}
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
