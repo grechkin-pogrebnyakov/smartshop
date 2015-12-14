@@ -68,10 +68,9 @@ public class SmartShopGcmListenerService extends GcmListenerService {
 	private void sendNotification(String message, String type) {
 		Intent intent = new Intent();
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
 
 		switch (type) {
-			case "1":
+			case "2":
 				intent.setClass(this, ListChangesPriceActivity.class);
 				break;
 
@@ -79,6 +78,8 @@ public class SmartShopGcmListenerService extends GcmListenerService {
 				intent.setClass(this, HomeProxyActivity.class);
 				break;
 		}
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
 
 		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
