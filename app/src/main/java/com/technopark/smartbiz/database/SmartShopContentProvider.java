@@ -80,10 +80,10 @@ public class SmartShopContentProvider extends ContentProvider {
 		uriMatcher.addURI(AUTHORITY, PRODUCTS_PATH + "/#", URI_PRODUCTS_ID);
 		uriMatcher.addURI(AUTHORITY, CHECKS_PATH, URI_CHECKS);
 		uriMatcher.addURI(AUTHORITY, CHECKS_PATH + "/#", URI_CHECKS_ID);
-		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.Employees.PATH_EMPLOYEES, EMPLOYEES);
-		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.Employees.PATH_EMPLOYEES + "/#", EMPLOYEES_ID);
-		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.PriceUpdate.PATH_PRICE_UPDATE, PRICE_UPDATE);
-		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.PriceUpdate.PATH_PRICE_UPDATE + "/#", PRICE_UPDATE_ID);
+		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.Employees.TABLE_NAME, EMPLOYEES);
+		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.Employees.TABLE_NAME + "/#", EMPLOYEES_ID);
+		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.PriceUpdate.TABLE_NAME, PRICE_UPDATE);
+		uriMatcher.addURI(ContractClass.AUTHORITY, ContractClass.PriceUpdate.TABLE_NAME + "/#", PRICE_UPDATE_ID);
 	}
 
 	private static Map<String, String> employeesProjectionMap = new HashMap<>();

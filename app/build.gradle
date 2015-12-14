@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.technopark.smartbiz"
-        minSdkVersion 19
+        minSdkVersion 16
         maxSdkVersion 22
         versionCode 1
         versionName "1.0"
