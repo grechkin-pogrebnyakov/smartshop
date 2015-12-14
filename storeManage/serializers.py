@@ -161,13 +161,13 @@ class ShopItemUpdateSerializer(serializers.Serializer):
         item = validated_data.get("item")
         with transaction.atomic():
             product_name = validated_data.get("productName")
-            if product_name is not None:
+            if product_name is not None and len(product_name) > 0:
                 item.productName = product_name
             description = validated_data.get("descriptionProduct")
-            if description is not None:
+            if description is not None and len(description) > 0:
                 item.descriptionProduct = description
             barcode = validated_data.get("productBarcode")
-            if barcode is not None:
+            if barcode is not None and len(barcode) > 0:
                 item.productBarcode = barcode
             price_purchase_product = validated_data.get("pricePurchaseProduct")
             price_selling_product = validated_data.get("priceSellingProduct")
@@ -349,7 +349,7 @@ class CheckSerializer(serializers.Serializer):
     type = serializers.IntegerField()
     author = serializers.CharField(max_length=255,read_only=True)
     shop_id = serializers.IntegerField(read_only=True)
-    creation_time = serializers.DateTimeField(read_only=True)
+    creation_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
 
     def validate(self, data):
         request = self.context['request']
